@@ -1,0 +1,23 @@
+.breakout {
+  &::before {
+    block-size: 100%;
+    content: "";
+    inline-size: 100%;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    position: absolute;
+    z-index: 0;
+  }
+}
+
+.srOnly:not(:focus, :active) {
+  /* stylelint-disable-next-line unit-allowed-list */
+  block-size: 1px;
+  clip-path: inset(50%);
+  clip: rect(0 0 0 0);
+  /* stylelint-disable-next-line unit-allowed-list */
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

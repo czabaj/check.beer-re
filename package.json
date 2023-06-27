@@ -1,0 +1,46 @@
+{
+  "dependencies": {
+    "@nobleai/rescript-rxjs": "^7.5.8",
+    "@rescript/core": "^0.3.1",
+    "@rescript/react": "^0.11.0",
+    "@rescriptbr/reform": "^12.1.0",
+    "@rescriptbr/reschema": "^3.0.3",
+    "dialog-polyfill": "^0.5.6",
+    "firebase": "^9.23.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-intl": "^6.4.4",
+    "reactfire": "^4.2.2",
+    "rescript-react-intl": "^3.0.0",
+    "rescript-webapi": "^0.8.0",
+    "rxfire": "^6.0.3",
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "@csstools/postcss-relative-color-syntax": "^1.0.2",
+    "@jihchi/vite-plugin-rescript": "^5.3.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^14.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "cssnano": "^6.0.1",
+    "jsdom": "^22.0.0",
+    "lenses-ppx": "^6.1.10",
+    "postcss-combine-duplicated-selectors": "^10.0.3",
+    "postcss-preset-env": "^8.5.0",
+    "rescript": "^10.1.4",
+    "rescript-vitest": "^1.2.0",
+    "vite": "^4.3.5",
+    "vite-plugin-svgr": "^3.2.0",
+    "vitest": "^0.31.0"
+  },
+  "private": true,
+  "scripts": {
+    "build": "vite build",
+    "clean": "rescript clean -with-deps",
+    "format": "rescript format -all",
+    "serve": "vite preview",
+    "start": "vite",
+    "test": "vitest"
+  },
+  "version": "0.0.0"
+}

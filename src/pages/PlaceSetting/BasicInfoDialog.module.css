@@ -1,0 +1,13 @@
+.fieldset {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1em;
+}
+
+.fieldset label {
+  text-align: right;
+}
+
+.fieldset label::after {
+  content: ":";
+}

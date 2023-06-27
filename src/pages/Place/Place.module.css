@@ -1,0 +1,18 @@
+.root {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
+}
+
+.root > main > dl > div {
+  font-size: 150%;
+  display: flex;
+  position: relative;
+}
+
+.root > main > dl > div > dt::after {
+  content: " -";
+}
+
+.root > main > dl > div > dd {
+  margin-inline-start: 0.5rem;
+}

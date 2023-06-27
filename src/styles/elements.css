@@ -1,0 +1,35 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
+html {
+  background-color: var(--surface-1);
+  color: var(--text-2);
+  font-family: var(--font-sans);
+  line-height: var(--ratio);
+}
+
+@media screen and (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-inline-size: 100%;
+}
+
+a:link,
+button,
+details summary,
+label {
+  cursor: pointer;
+}
+
+button:disabled,
+label:has(*:disabled) {
+  cursor: not-allowed;
+}

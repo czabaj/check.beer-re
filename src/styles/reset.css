@@ -1,0 +1,56 @@
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  /* Corrects inability to style clickable `input` types in iOS */
+  appearance: none;
+  background-color: transparent;
+  border: none;
+  color: inherit;
+  font-family: inherit;
+  /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
+  line-height: normal;
+  margin: 0;
+  overflow: visible;
+  padding: 0;
+  inline-size: auto;
+  /* Corrects font smoothing for webkit */
+  -webkit-font-smoothing: inherit;
+  -moz-osx-font-smoothing: inherit;
+
+  /* Remove excess padding and border in Firefox 4+ */
+  &::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+fieldset:where(.reset) {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+
+:is(h1, h2, h3, h4, h5, h6):where(.reset) {
+  font-size: 100%;
+  font-weight: inherit;
+  margin: 0;
+}
+
+legend:where(.reset) {
+  display: table;
+  padding: 0;
+}
+
+:is(ol, ul):where(.reset) {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

@@ -1,0 +1,5 @@
+.root {
+  border-radius: var(--radius-2);
+  border-style: none;
+  box-shadow: var(--shadow-4);
+}
