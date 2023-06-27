@@ -10,6 +10,7 @@ module FormFields = %lenses(
 )
 
 module Form = ReForm.Make(FormFields)
+module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
 let make = (~initialValues, ~onDismiss, ~onSubmit) => {
@@ -34,8 +35,8 @@ let make = (~initialValues, ~onDismiss, ~onSubmit) => {
     },
     ~validationStrategy=OnDemand,
     ~schema={
-      open Form.Validation
-      schema([nonEmpty(~error="Bez tohoto to nepůjde", Name)])
+      open Validators
+      schema([required(Name)])
     },
     (),
   )

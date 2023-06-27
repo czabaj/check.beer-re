@@ -1,9 +1,10 @@
 module FormFields = %lenses(type state = {name: string})
 
 module Form = ReForm.Make(FormFields)
+module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
-let make = (~onDismiss, ~onSubmit) => {
+let make = (~existingNames, ~onDismiss, ~onSubmit) => {
   let form = Form.use(
     ~initialState={name: ""},
     ~onSubmit=({state, raiseSubmitFailed}) => {
@@ -25,8 +26,11 @@ let make = (~onDismiss, ~onSubmit) => {
     },
     ~validationStrategy=OnDemand,
     ~schema={
-      open Form.Validation
-      schema([string(~min=3, Name)])
+      open Validators
+      schema([
+        required(Name),
+        notIn(~haystack=existingNames, ~error="Tato pípa již existuje", Name),
+      ])
     },
     (),
   )

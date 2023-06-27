@@ -6,7 +6,6 @@ type classesType = {root: string}
 let make = (~placeId) => {
   let firestore = Firebase.useFirestore()
   let placeDocData = Db.usePlaceDocData(placeId)
-  let (addTapDialogOpened, setAddTapDialogOpened) = React.useState(_ => false)
   let (basicDataDialogOpened, setBasicDataDialogOpened) = React.useState(_ => false)
   switch placeDocData.data {
   | Some(place) =>
@@ -22,21 +21,6 @@ let make = (~placeId) => {
           <span> {React.string("Změnit")} </span>
         </button>}
       />
-      <h3> {React.string("Pípy")} </h3>
-      <button
-        className={Styles.buttonClasses.button}
-        onClick={_ => setAddTapDialogOpened(_ => true)}
-        type_="button">
-        {React.string("Přidat pípu")}
-      </button>
-      <ul>
-        {place.taps
-        ->Js.Dict.keys
-        ->Array.map(tapName => {
-          <li key={tapName}> {React.string(tapName)} </li>
-        })
-        ->React.array}
-      </ul>
       {switch basicDataDialogOpened {
       | false => React.null
       | true =>
@@ -63,33 +47,7 @@ let make = (~placeId) => {
           }}
         />
       }}
-      {switch addTapDialogOpened {
-      | false => React.null
-      | true => {
-          let handleDismiss = _ => setAddTapDialogOpened(_ => false)
-          <AddTapDialog
-            onDismiss={handleDismiss}
-            onSubmit={async values => {
-              switch place.taps->Js.Dict.get(values.name) {
-              | Some(_) => Js.Exn.raiseError("Taková pípa už existuje")
-              | None => {
-                  let placeDoc = Db.placeDocument(firestore, placeId)
-                  let newTaps = DictUtils.clone(place.taps)
-                  newTaps->Js.Dict.set(values.name, Js.Nullable.null)
-                  await Firebase.updateDoc(
-                    placeDoc,
-                    {
-                      ...place,
-                      taps: newTaps,
-                    },
-                  )
-                  handleDismiss()
-                }
-              }
-            }}
-          />
-        }
-      }}
+      <TapsSetting place placeId />
     </div>
   | _ => React.null
   }

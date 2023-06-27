@@ -1,0 +1,30 @@
+.root > header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.root > ul {
+  background-color: var(--surface-2);
+  border-radius: var(--radius-2);
+  padding: var(--border-size-2);
+}
+
+.root > ul > li {
+  align-items: center;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1rem;
+  padding-block: var(--s-4);
+  padding-inline: 0.5rem;
+}
+
+.root > ul > li + li {
+  border-block-start: var(--border-size-2) solid var(--surface-1);
+}
+
+.root > ul > li > span {
+  order: 1;
+  margin-inline-end: auto;
+}
