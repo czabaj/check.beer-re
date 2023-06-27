@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nobleai/rescript-rxjs": "^7.5.8",
+    "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#refs/heads/vg/add-share-replay",
     "@rescript/core": "^0.3.1",
     "@rescript/react": "^0.11.0",
     "@rescriptbr/reform": "^12.1.0",

@@ -1106,10 +1106,9 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@nobleai/rescript-rxjs@^7.5.8":
+"@nobleai/rescript-rxjs@https://github.com/czabaj/rescript-rxjs#refs/heads/vg/add-share-replay":
   version "7.5.8"
-  resolved "https://registry.yarnpkg.com/@nobleai/rescript-rxjs/-/rescript-rxjs-7.5.8.tgz#69725e80691fe89bfd6e65e06a6574f84a282c94"
-  integrity sha512-CpyX7RXChW7keOSgNzGA8OSJ96UStK7hf+7JIT2KblM4Xiu0/5KyGxEQMA1nMn3O9OZkllgRUB9Pes3vAOoHmQ==
+  resolved "https://github.com/czabaj/rescript-rxjs#1c5980fff61367ab958e032aa33952629eb2a81c"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
