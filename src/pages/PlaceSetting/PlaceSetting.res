@@ -6,10 +6,23 @@ type classesType = {root: string}
 let make = (~placeId) => {
   let firestore = Firebase.useFirestore()
   let placeDocData = Db.usePlaceDocData(placeId)
-  let kegsCollectionStatus = Db.useKegCollectionStatus(placeId)
+  let chargedKegsStatus = Db.useChargedKegsStatus(placeId)
   let (basicDataDialogOpened, setBasicDataDialogOpened) = React.useState(_ => false)
-  switch (placeDocData.data, kegsCollectionStatus.data) {
-  | (Some(place), Some(kegs)) =>
+  switch (placeDocData.data, chargedKegsStatus.data) {
+  | (Some(place), Some(chargedKegs)) =>
+    let kegsOnTapUids =
+      place.taps
+      ->Belt.Map.String.valuesToArray
+      ->Belt.Array.keepMap(maybeKegReference =>
+        maybeKegReference->Js.Null.toOption->Option.map(ref => ref.id)
+      )
+    let (untappedChargedKegs, tappedChargedKegs) = chargedKegs->Belt.Array.partition(keg => {
+      switch Db.getUid(keg) {
+      | Some(kegUid) => !(kegsOnTapUids->Array.includes(kegUid))
+      | None => false
+      }
+    })
+
     <FormattedCurrency.Provider value={place.currency}>
       <div className={classes.root}>
         <PlaceHeader
@@ -49,8 +62,9 @@ let make = (~placeId) => {
                 }}
               />
             }}
-        <TapsSetting place placeId />
-        <KegsSetting kegs placeId />
+        <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
+        <KegsSetting chargedKegs placeId />
+        <AccountingOverview chargedKegs untappedChargedKegs />
       </div>
     </FormattedCurrency.Provider>
   | _ => React.null

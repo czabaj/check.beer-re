@@ -2,6 +2,10 @@ open FirestoreModels
 
 // Resources
 
+let kegDoc = (firestore, placeId, kegId): Firebase.documentReference<keg> => {
+  Firebase.doc(firestore, ~path=`places/${placeId}/kegs/${kegId}`)
+}
+
 let userAccountsCollection = (firestore): Firebase.collectionReference<userAccount> => {
   Firebase.collection(firestore, ~path="users")
 }
@@ -26,7 +30,7 @@ type placeConverted = {
   name: string,
   // the key is the person's UUID
   personsAll: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>, // converted to Map.String
-  taps: Belt.Map.String.t<Js.nullable<Firebase.documentReference<keg>>>, // converted to Map.String
+  taps: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>, // converted to Map.String
 }
 
 let placeConverter: Firebase.dataConverter<place, placeConverted> = {
@@ -53,10 +57,10 @@ type kegConverted = {
   consumptions: array<consumption>,
   consumptionsSum: int, // added by converter
   createdAt: Firebase.Timestamp.t,
-  depletedAt: option<Firebase.Timestamp.t>,
-  lastConsumptionAt: option<Firebase.Timestamp.t>,
+  depletedAt: Null.t<Firebase.Timestamp.t>,
+  lastConsumptionAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
-  priceEnd: option<int>,
+  priceEnd: Null.t<int>,
   priceNew: int,
   serial: int,
 }
@@ -111,6 +115,10 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 // Queries and helpers
 
+let reactFireOptions: Firebase.reactFireOptions<'a> = {idField: "uid"}
+
+let getUid: 'a => option<string> = %raw("data => data?.uid")
+
 let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
   Firebase.query(userAccountsCollection(firestore), [Firebase.where("email", #"==", user.email)])
 }
@@ -122,7 +130,7 @@ let currentUserAccountRx = (auth, firestore) => {
       | None => Rxjs.fromArray([])
       | Some(user) => {
           let query = currentUserAccountQuery(firestore, user)
-          Firebase.collectionDataRx(query, {idField: "id"})
+          Firebase.collectionDataRx(query, reactFireOptions)
         }
       }
     }),
@@ -151,7 +159,7 @@ let kegsWithRecentConsumptionRx = (placeId, firestore) => {
         placeKegsCollection(firestore, placeId),
         [Firebase.where("lastConsumptionAt", #">=", firebaseTimestamp)],
       )
-      Firebase.collectionDataRx(query, {})
+      Firebase.collectionDataRx(query, reactFireOptions)
     }),
   )
 }
@@ -186,7 +194,7 @@ let useKegCollectionStatus = (~limit=20, ~startAfter: option<FirestoreModels.keg
   | Some(keg) => constraints->Belt.Array.push(Firebase.startAfter(keg))
   }
   let query = Firebase.query(placeKegsCollectionConverted(firestore, placeId), constraints)
-  Firebase.useFirestoreCollectionData(query, {})
+  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
 }
 
 let useMostRecentKegStatus = placeId => {
@@ -195,5 +203,14 @@ let useMostRecentKegStatus = placeId => {
     placeKegsCollection(firestore, placeId),
     [Firebase.orderBy("serial", ~direction=#desc), Firebase.limit(1)],
   )
-  Firebase.useFirestoreCollectionData(query, {})
+  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
+}
+
+let useChargedKegsStatus = placeId => {
+  let firestore = Firebase.useFirestore()
+  let query = Firebase.query(
+    placeKegsCollectionConverted(firestore, placeId),
+    [Firebase.orderBy("serial", ~direction=#desc), Firebase.where("depletedAt", #"==", null)],
+  )
+  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
 }

@@ -133,7 +133,7 @@ external useFirestoreDocData: documentReference<'a> => observableStatus<'a> = "u
 
 @module("reactfire")
 external useFirestoreCollectionData: (
-  query<'a>,
+  . query<'a>,
   reactFireOptions<'a>,
 ) => observableStatus<array<'a>> = "useFirestoreCollectionData"
 

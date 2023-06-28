@@ -1,0 +1,17 @@
+.list > li {
+  align-items: center;
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 1rem;
+  padding-block: var(--s-4);
+  padding-inline: 0.5rem;
+}
+
+.list > li + li {
+  border-block-start: var(--border-size-2) solid var(--surface-1);
+}
+
+.list > li > div {
+  order: 1;
+  margin-inline-end: auto;
+}

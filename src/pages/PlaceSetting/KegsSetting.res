@@ -1,9 +1,6 @@
 type classesType = {emptyTableMessage: string, table: string}
 @module("./KegsSetting.module.css") external classes: classesType = "default"
 
-type sectionClassesType = {root: string}
-@module("./SettingSection.module.css") external sectionClasses: sectionClassesType = "default"
-
 type dialogState = Hidden | AddKeg
 
 type dialogEvent = Hide | ShowAddKeg
@@ -16,22 +13,20 @@ let dialogReducer = (_, event) => {
 }
 
 @react.component
-let make = (~kegs: array<Db.kegConverted>, ~placeId) => {
+let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
   let firestore = Firebase.useFirestore()
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
+  let {minorUnit} = FormattedCurrency.useCurrency()
 
-  <section ariaLabelledby="kegs-setting" className={sectionClasses.root}>
-    <header>
-      <h3 id="kegs-setting"> {React.string("Sudy")} </h3>
-      <button
-        className={Styles.buttonClasses.button}
-        onClick={_ => sendDialog(ShowAddKeg)}
-        type_="button">
-        {React.string("Přidat sud")}
-      </button>
-    </header>
-    {switch kegs {
+  <SectionWithHeader
+    buttonsSlot={<button
+      className={Styles.buttonClasses.button} onClick={_ => sendDialog(ShowAddKeg)} type_="button">
+      {React.string("Přidat sud")}
+    </button>}
+    headerId="kegs-setting"
+    headerSlot={React.string("Sudy na skladě")}>
+    {switch chargedKegs {
     | [] =>
       <div className={classes.emptyTableMessage}>
         {React.string("Naskladni sudy tlačítkem ⤴")}
@@ -97,11 +92,11 @@ let make = (~kegs: array<Db.kegConverted>, ~placeId) => {
                 beer,
                 consumptions: [],
                 createdAt: Firebase.Timestamp.now(),
-                depletedAt: None,
-                lastConsumptionAt: None,
-                milliliters: liters * 1000,
-                priceEnd: None,
-                priceNew: price,
+                depletedAt: Null.null,
+                lastConsumptionAt: Null.null,
+                milliliters: (liters *. 1000.0)->Int.fromFloat,
+                priceEnd: Null.null,
+                priceNew: (price *. minorUnit)->Int.fromFloat,
                 serial,
               },
             )
@@ -111,5 +106,5 @@ let make = (~kegs: array<Db.kegConverted>, ~placeId) => {
         placeId
       />
     }}
-  </section>
+  </SectionWithHeader>
 }

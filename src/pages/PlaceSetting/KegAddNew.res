@@ -1,4 +1,4 @@
-module FormFields = %lenses(type state = {beer: string, liters: int, price: int, serial: int})
+module FormFields = %lenses(type state = {beer: string, liters: float, price: float, serial: int})
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
@@ -10,13 +10,18 @@ module FormComponent = {
     switch mostRecentKegStatus.data {
     | None => React.null
     | Some(mostResentKegs) => {
-        let emptyState: FormFields.state = {beer: "", liters: 30, price: 0, serial: 1}
+        let emptyState: FormFields.state = {beer: "", liters: 30.0, price: 0.0, serial: 1}
         let recentKegState =
           mostResentKegs
           ->Belt.Array.get(0)
           ->Belt.Option.mapWithDefault(emptyState, keg => {
             let {beer, milliliters, priceNew, serial} = keg
-            {beer, liters: milliliters / 1000, price: priceNew, serial: serial + 1}
+            {
+              beer,
+              liters: milliliters->Float.fromInt /. 1000.0,
+              price: priceNew->Float.fromInt,
+              serial: serial + 1,
+            }
           })
         let form = Form.use(
           ~initialState={recentKegState},
@@ -38,11 +43,11 @@ module FormComponent = {
             None
           },
           ~schema={
-            open Validators
+            open! Validators
             schema([
               required(Beer),
-              int(~min=1, ~minError="Sud nemůže být nulový", Liters),
-              int(~min=0, ~minError="Cena nemůže být záporná", Price),
+              float(~min=1.0, ~minError="Sud nemůže být nulový", Liters),
+              float(~min=0.0, ~minError="Cena nemůže být záporná", Price),
             ])
           },
           ~validationStrategy=OnDemand,
@@ -85,7 +90,7 @@ module FormComponent = {
                         field.handleChange(ReactEvent.Form.target(event)["valueAsNumber"])}
                       step=1.0
                       type_="number"
-                      value={field.value->Int.toString}
+                      value={field.value->Float.toString}
                     />
                     {switch field.error {
                     | Some(error) => React.string(error)
@@ -107,7 +112,7 @@ module FormComponent = {
                         field.handleChange(ReactEvent.Form.target(event)["valueAsNumber"])}
                       step=1.0
                       type_="number"
-                      value={field.value->Int.toString}
+                      value={field.value->Float.toString}
                     />
                     {switch field.error {
                     | Some(error) => React.string(error)

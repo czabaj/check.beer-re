@@ -6,7 +6,7 @@ type personShort = {
   id: personUID,
   lastUpdateAt: Firebase.Timestamp.t,
   name: personName,
-  preferredTap: option<tapName>,
+  preferredTap: Null.t<tapName>,
 }
 
 type userAccount = {
@@ -24,10 +24,10 @@ and keg = {
   beer: string,
   consumptions: array<consumption>,
   createdAt: Firebase.Timestamp.t,
-  depletedAt: option<Firebase.Timestamp.t>,
-  lastConsumptionAt: option<Firebase.Timestamp.t>,
+  depletedAt: Null.t<Firebase.Timestamp.t>,
+  lastConsumptionAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
-  priceEnd: option<int>,
+  priceEnd: Null.t<int>,
   priceNew: int,
   serial: int,
 }
@@ -52,5 +52,5 @@ type place = {
   // the key is the person's UUID
   personsAll: Js.Dict.t<(personName, Firebase.Timestamp.t, option<tapName>)>,
   // null means the tap is not in use, undefined would remove the key
-  taps: Js.Dict.t<Js.nullable<Firebase.documentReference<keg>>>,
+  taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
 }

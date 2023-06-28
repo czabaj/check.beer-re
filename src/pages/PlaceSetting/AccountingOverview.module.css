@@ -1,0 +1,19 @@
+.descriptionList {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  font-size: 120%;
+  margin: 0;
+}
+
+.descriptionList :where(dd, dt) {
+  margin: 0;
+  padding-inline: 0.5rem;
+}
+
+.descriptionList :where(dd, dt):nth-of-type(n + 2) {
+  border-block-start: var(--border-size-2) solid var(--surface-1);
+}
+
+.descriptionList dd {
+  text-align: end;
+}
