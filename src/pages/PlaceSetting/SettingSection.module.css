@@ -28,14 +28,3 @@
   order: 1;
   margin-inline-end: auto;
 }
-
-.root > table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-.emptyList {
-  font-family: var(--font-cursive);
-  text-align: end;
-  padding-inline-end: 4rem;
-}

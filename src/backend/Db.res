@@ -2,10 +2,6 @@ open FirestoreModels
 
 // Resources
 
-let kegCollection = (firestore, placeId): Firebase.collectionReference<keg> => {
-  Firebase.collection(firestore, ~path=`places/${placeId}/kegs`)
-}
-
 let userAccountsCollection = (firestore): Firebase.collectionReference<userAccount> => {
   Firebase.collection(firestore, ~path="users")
 }
@@ -29,27 +25,88 @@ type placeConverted = {
   currency: string,
   name: string,
   // the key is the person's UUID
-  personsAll: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>,
-  taps: Belt.Map.String.t<Js.nullable<Firebase.documentReference<keg>>>,
+  personsAll: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>, // converted to Map.String
+  taps: Belt.Map.String.t<Js.nullable<Firebase.documentReference<keg>>>, // converted to Map.String
 }
 
 let placeConverter: Firebase.dataConverter<place, placeConverted> = {
-  toFirestore: (. place, _) => {
-    let {createdAt, currency, name, personsAll, taps} = place
-    let tapsDict = taps->Belt.Map.String.toArray->Js.Dict.fromArray
-    let personsAllDict = personsAll->Belt.Map.String.toArray->Js.Dict.fromArray
-    {createdAt, currency, name, personsAll: personsAllDict, taps: tapsDict}
-  },
   fromFirestore: (. snapshot, options) => {
     let {createdAt, currency, name, personsAll, taps} = snapshot.data(. options)
     let personsAllMap = personsAll->Js.Dict.entries->Belt.Map.String.fromArray
     let tapsMap = taps->Js.Dict.entries->Belt.Map.String.fromArray
     {createdAt, currency, name, personsAll: personsAllMap, taps: tapsMap}
   },
+  toFirestore: (. place, _) => {
+    let {createdAt, currency, name, personsAll, taps} = place
+    let tapsDict = taps->Belt.Map.String.toArray->Js.Dict.fromArray
+    let personsAllDict = personsAll->Belt.Map.String.toArray->Js.Dict.fromArray
+    {createdAt, currency, name, personsAll: personsAllDict, taps: tapsDict}
+  },
 }
 
 let placeDocumentConverted = (firestore, placeId) => {
   placeDocument(firestore, placeId)->Firebase.withConterterDoc(placeConverter)
+}
+
+type kegConverted = {
+  beer: string,
+  consumptions: array<consumption>,
+  consumptionsSum: int, // added by converter
+  createdAt: Firebase.Timestamp.t,
+  depletedAt: option<Firebase.Timestamp.t>,
+  lastConsumptionAt: option<Firebase.Timestamp.t>,
+  milliliters: int,
+  priceEnd: option<int>,
+  priceNew: int,
+  serial: int,
+}
+
+let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
+  fromFirestore: (. snapshot, options) => {
+    let keg = snapshot.data(. options)
+    let consumptionsSum =
+      keg.consumptions->Belt.Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
+    {
+      beer: keg.beer,
+      consumptions: keg.consumptions,
+      consumptionsSum,
+      createdAt: keg.createdAt,
+      depletedAt: keg.depletedAt,
+      lastConsumptionAt: keg.lastConsumptionAt,
+      milliliters: keg.milliliters,
+      priceEnd: keg.priceEnd,
+      priceNew: keg.priceNew,
+      serial: keg.serial,
+    }
+  },
+  toFirestore: (. keg, _) => {
+    let {
+      beer,
+      consumptions,
+      createdAt,
+      depletedAt,
+      lastConsumptionAt,
+      milliliters,
+      priceEnd,
+      priceNew,
+      serial,
+    } = keg
+    {
+      beer,
+      consumptions,
+      createdAt,
+      depletedAt,
+      lastConsumptionAt,
+      milliliters,
+      priceEnd,
+      priceNew,
+      serial,
+    }
+  },
+}
+
+let placeKegsCollectionConverted = (firestore, placeId) => {
+  placeKegsCollection(firestore, placeId)->Firebase.withConterterCollection(kegConverter)
 }
 
 // Queries and helpers
@@ -91,7 +148,7 @@ let kegsWithRecentConsumptionRx = (placeId, firestore) => {
       let monthAgo = Js.Date.setMonth(now, Js.Date.getMonth(now) -. 1.0)
       let firebaseTimestamp = Firebase.Timestamp.fromMillis(monthAgo)
       let query = Firebase.query(
-        kegCollection(firestore, placeId),
+        placeKegsCollection(firestore, placeId),
         [Firebase.where("lastConsumptionAt", #">=", firebaseTimestamp)],
       )
       Firebase.collectionDataRx(query, {})
@@ -128,14 +185,14 @@ let useKegCollectionStatus = (~limit=20, ~startAfter: option<FirestoreModels.keg
   | None => ()
   | Some(keg) => constraints->Belt.Array.push(Firebase.startAfter(keg))
   }
-  let query = Firebase.query(kegCollection(firestore, placeId), constraints)
+  let query = Firebase.query(placeKegsCollectionConverted(firestore, placeId), constraints)
   Firebase.useFirestoreCollectionData(query, {})
 }
 
 let useMostRecentKegStatus = placeId => {
   let firestore = Firebase.useFirestore()
   let query = Firebase.query(
-    kegCollection(firestore, placeId),
+    placeKegsCollection(firestore, placeId),
     [Firebase.orderBy("serial", ~direction=#desc), Firebase.limit(1)],
   )
   Firebase.useFirestoreCollectionData(query, {})

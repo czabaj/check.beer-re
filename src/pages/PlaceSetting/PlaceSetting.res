@@ -50,7 +50,7 @@ let make = (~placeId) => {
               />
             }}
         <TapsSetting place placeId />
-        <KegsSetting kegs place placeId />
+        <KegsSetting kegs placeId />
       </div>
     </FormattedCurrency.Provider>
   | _ => React.null

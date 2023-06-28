@@ -90,6 +90,12 @@ type dataConverter<'a, 'b> = {
 }
 
 @send
+external withConterterCollection: (
+  collectionReference<'a>,
+  dataConverter<'a, 'b>,
+) => collectionReference<'b> = "withConverter"
+
+@send
 external withConterterDoc: (documentReference<'a>, dataConverter<'a, 'b>) => documentReference<'b> =
   "withConverter"
 

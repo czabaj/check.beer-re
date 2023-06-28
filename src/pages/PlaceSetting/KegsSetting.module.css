@@ -1,0 +1,22 @@
+.table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.table tr > :where(th, td) {
+  padding-inline: 0.5rem;
+}
+
+.table tr > :where(th, td):where(:nth-child(2), :nth-child(3)) {
+  text-align: left;
+}
+
+.table tr > :where(th, td):where(:nth-child(4), :nth-child(5), :nth-child(6)) {
+  text-align: right;
+}
+
+.emptyTableMessage {
+  font-family: var(--font-cursive);
+  text-align: end;
+  padding-inline-end: 4rem;
+}

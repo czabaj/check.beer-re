@@ -6,7 +6,7 @@ type personShort = {
   id: personUID,
   lastUpdateAt: Firebase.Timestamp.t,
   name: personName,
-  preferredTap?: tapName,
+  preferredTap: option<tapName>,
 }
 
 type userAccount = {
@@ -24,21 +24,21 @@ and keg = {
   beer: string,
   consumptions: array<consumption>,
   createdAt: Firebase.Timestamp.t,
-  depletedAt?: Firebase.Timestamp.t,
-  lastConsumptionAt?: Firebase.Timestamp.t,
+  depletedAt: option<Firebase.Timestamp.t>,
+  lastConsumptionAt: option<Firebase.Timestamp.t>,
   milliliters: int,
-  priceEnd?: int,
+  priceEnd: option<int>,
   priceNew: int,
   serial: int,
 }
 and financialTransaction = {
   amount: int,
   createdAt: Firebase.Timestamp.t,
-  keg?: Firebase.documentReference<keg>,
-  note?: string,
+  keg: option<Firebase.documentReference<keg>>,
+  note: option<string>,
 }
 and person = {
-  account?: Firebase.documentReference<userAccount>,
+  account: option<Firebase.documentReference<userAccount>>,
   balance: int,
   createdAt: Firebase.Timestamp.t,
   name: personName,

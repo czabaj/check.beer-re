@@ -1,6 +1,8 @@
-type classesType = {emptyList: string, root: string}
+type classesType = {emptyTableMessage: string, table: string}
+@module("./KegsSetting.module.css") external classes: classesType = "default"
 
-@module("./SettingSection.module.css") external classes: classesType = "default"
+type sectionClassesType = {root: string}
+@module("./SettingSection.module.css") external sectionClasses: sectionClassesType = "default"
 
 type dialogState = Hidden | AddKeg
 
@@ -14,12 +16,12 @@ let dialogReducer = (_, event) => {
 }
 
 @react.component
-let make = (~kegs: array<FirestoreModels.keg>, ~place, ~placeId) => {
+let make = (~kegs: array<Db.kegConverted>, ~placeId) => {
   let firestore = Firebase.useFirestore()
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
 
-  <section ariaLabelledby="kegs-setting" className={classes.root}>
+  <section ariaLabelledby="kegs-setting" className={sectionClasses.root}>
     <header>
       <h3 id="kegs-setting"> {React.string("Sudy")} </h3>
       <button
@@ -31,23 +33,29 @@ let make = (~kegs: array<FirestoreModels.keg>, ~place, ~placeId) => {
     </header>
     {switch kegs {
     | [] =>
-      <div className={classes.emptyList}> {React.string("Naskladni sudy tlačítkem ⤴")} </div>
+      <div className={classes.emptyTableMessage}>
+        {React.string("Naskladni sudy tlačítkem ⤴")}
+      </div>
     | kegs =>
-      <table>
+      <table className={classes.table}>
         <thead>
-          <th scope="col"> {React.string("No.")} </th>
-          <th scope="col"> {React.string("Pivo")} </th>
-          <th scope="col"> {React.string("Naskladněno")} </th>
-          <th scope="col"> {React.string("Cena")} </th>
-          <th scope="col"> {React.string("Objem")} </th>
-          <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
+          <tr>
+            <th scope="col"> {React.string("No.")} </th>
+            <th scope="col"> {React.string("Pivo")} </th>
+            <th scope="col"> {React.string("Naskladněno")} </th>
+            <th scope="col"> {React.string("Cena")} </th>
+            <th scope="col"> {React.string("Objem")} </th>
+            <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
+          </tr>
         </thead>
         <tbody>
           {kegs
           ->Array.map(keg => {
             let volume = keg.milliliters
             <tr key={keg.serial->Int.toString}>
-              <th scope="row"> {React.string(`#${keg.serial->Int.toString}`)} </th>
+              <th scope="row">
+                {React.string(`#${keg.serial->Int.toString->String.padStart(3, "0")}`)}
+              </th>
               <td> {React.string(keg.beer)} </td>
               <td>
                 {<ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />}
@@ -64,7 +72,7 @@ let make = (~kegs: array<FirestoreModels.keg>, ~place, ~placeId) => {
                   low={volume / 5}
                   high={volume / 5 * 4}
                   optimum={volume / 2}
-                  value={volume->Int.toString}>
+                  value={(volume - keg.consumptionsSum)->Int.toString}>
                   {React.string(
                     `${Int.toString(volume / 1000)} / ${Int.toString(volume / 1000)} litrů`,
                   )}
@@ -89,7 +97,10 @@ let make = (~kegs: array<FirestoreModels.keg>, ~place, ~placeId) => {
                 beer,
                 consumptions: [],
                 createdAt: Firebase.Timestamp.now(),
+                depletedAt: None,
+                lastConsumptionAt: None,
                 milliliters: liters * 1000,
+                priceEnd: None,
                 priceNew: price,
                 serial,
               },
