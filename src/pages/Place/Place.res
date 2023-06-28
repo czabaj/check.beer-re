@@ -9,30 +9,30 @@ type activePersonInfo = {
   preferredTap: string,
 }
 
-let getActivePersons = (place: FirestoreModels.place, kegs: array<FirestoreModels.keg>) => {
-  let activePersons =
-    place.personsAll
-    ->Js.Dict.entries
-    ->Array.reduce(Js.Dict.empty(), (activePersons, (id, (name, _, maybePreferredTap))) => {
-      switch maybePreferredTap {
-      | Some(preferredTap) => {
-          activePersons->Js.Dict.set(id, {consumptions: [], id, name, preferredTap})
-          activePersons
-        }
-      | None => activePersons
+let getActivePersons = (place: Db.placeConverted, kegs: array<FirestoreModels.keg>) => {
+  let activePersons = place.personsAll->Belt.Map.String.reduce(Belt.MutableMap.String.make(), (
+    activePersons,
+    id,
+    (name, _, maybePreferredTap),
+  ) => {
+    switch maybePreferredTap {
+    | Some(preferredTap) => {
+        activePersons->Belt.MutableMap.String.set(id, {consumptions: [], id, name, preferredTap})
+        activePersons
       }
-    })
+    | None => activePersons
+    }
+  })
   kegs->Array.forEach(({consumptions}) => {
     consumptions->Array.forEach(consumption => {
-      let maybeActivePersonRecord = Js.Dict.get(activePersons, consumption.person.id)
-      switch maybeActivePersonRecord {
+      switch Belt.MutableMap.String.get(activePersons, consumption.person.id) {
       | Some(activePersonRecord) => activePersonRecord.consumptions->Array.push(consumption)
       | _ => ()
       }
     })
   })
   activePersons
-  ->Js.Dict.values
+  ->Belt.MutableMap.String.valuesToArray
   ->Js.Array2.sortInPlaceWith((a, b) => Js.String2.localeCompare(a.name, b.name)->Int.fromFloat)
 }
 

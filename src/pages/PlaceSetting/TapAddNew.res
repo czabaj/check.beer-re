@@ -24,7 +24,6 @@ let make = (~existingNames, ~onDismiss, ~onSubmit) => {
       ->ignore
       None
     },
-    ~validationStrategy=OnDemand,
     ~schema={
       open Validators
       schema([
@@ -32,6 +31,7 @@ let make = (~existingNames, ~onDismiss, ~onSubmit) => {
         notIn(~haystack=existingNames, ~error="Tato pípa již existuje", Name),
       ])
     },
+    ~validationStrategy=OnDemand,
     (),
   )
 

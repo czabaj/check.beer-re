@@ -1,5 +1,5 @@
 @react.component
-let make = (~children, ~formId, ~heading, ~onDismiss, ~visible) => {
+let make = (~children, ~heading, ~onConfirm, ~onDismiss, ~visible) => {
   <Dialog visible>
     <header>
       <h3> {React.string(heading)} </h3>
@@ -8,9 +8,9 @@ let make = (~children, ~formId, ~heading, ~onDismiss, ~visible) => {
     <footer>
       <button
         className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
-        form={formId}
+        onClick={_ => onConfirm()}
         type_="submit">
-        {React.string("Uložit")}
+        {React.string("Provést")}
       </button>
       <button
         className={`${Styles.buttonClasses.button}`} type_="button" onClick={_ => onDismiss()}>

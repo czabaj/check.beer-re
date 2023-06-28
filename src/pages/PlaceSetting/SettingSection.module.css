@@ -5,13 +5,13 @@
   justify-content: space-between;
 }
 
-.root > ul {
+.root > :where(ol, table, ul) {
   background-color: var(--surface-2);
   border-radius: var(--radius-2);
   padding: var(--border-size-2);
 }
 
-.root > ul > li {
+.root > :where(ol, ul) > li {
   align-items: center;
   display: flex;
   flex-direction: row-reverse;
@@ -20,11 +20,22 @@
   padding-inline: 0.5rem;
 }
 
-.root > ul > li + li {
+.root > :where(ol, ul) > li + li {
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.root > ul > li > span {
+.root > :where(ol, ul) > li > span {
   order: 1;
   margin-inline-end: auto;
+}
+
+.root > table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.emptyList {
+  font-family: var(--font-cursive);
+  text-align: end;
+  padding-inline-end: 4rem;
 }

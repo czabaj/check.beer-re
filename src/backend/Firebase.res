@@ -38,7 +38,7 @@ module FirestoreProvider = {
   external make: (~sdk: firestore, ~children: React.element) => React.element = "FirestoreProvider"
 }
 
-// TODO: Bind TS string union `status`
+// the #loading is missing because we are using Suspense mode
 type observableStatus<'a> = {status: @string [#error | #success], data: option<'a>}
 @module("reactfire")
 external useInitFirestore: (FirebaseApp.t => promise<firestore>) => observableStatus<_> =
@@ -54,9 +54,7 @@ external enableIndexedDbPersistence: firestore => promise<unit> = "enableIndexed
 external enableMultiTabIndexedDbPersistence: firestore => promise<unit> =
   "enableMultiTabIndexedDbPersistence"
 
-type documentReference<'a> = {
-  id: string
-}
+type documentReference<'a> = {id: string}
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"
 
@@ -72,15 +70,35 @@ external query: (collectionReference<'a>, array<queryConstraint>) => query<'a> =
 @module("firebase/firestore")
 external orderBy: (string, ~direction: [#asc | #desc]) => queryConstraint = "orderBy"
 
-type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. unit) => 'a}
+@module("firebase/firestore")
+external limit: int => queryConstraint = "limit"
+
+@module("firebase/firestore")
+external startAfter: 'a => queryConstraint = "startAfter"
+
+type snapshotOptions = {serverTimestamps: @string [#estimate | #previous | #none]}
+
+type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. snapshotOptions) => 'a}
 @module("firebase/firestore")
 external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDoc"
+
+type sendOptions = {merge?: bool, mergeFields?: array<string>}
+
+type dataConverter<'a, 'b> = {
+  fromFirestore: (. documentSnapshot<'a>, snapshotOptions) => 'b,
+  toFirestore: (. 'b, sendOptions) => 'a,
+}
+
+@send
+external withConterterDoc: (documentReference<'a>, dataConverter<'a, 'b>) => documentReference<'b> =
+  "withConverter"
 
 @module("firebase/firestore")
 external setDoc: (documentReference<'a>, 'a) => promise<unit> = "setDoc"
 
+// Beware that updateDoc does not invoke the converter
 @module("firebase/firestore")
-external updateDoc: (documentReference<'a>, 'a) => promise<unit> = "updateDoc"
+external updateDoc: (documentReference<'a>, {..}) => promise<unit> = "updateDoc"
 
 @module("firebase/firestore")
 external addDoc: (collectionReference<'a>, 'a) => promise<documentReference<'a>> = "addDoc"
@@ -201,6 +219,8 @@ module Timestamp = {
   external fromDate: Js.Date.t => t = "fromDate"
   @module("firebase/firestore") @scope("Timestamp")
   external fromMillis: float => t = "fromMillis"
+  @module("firebase/firestore") @scope("Timestamp")
+  external now: unit => t = "now"
 }
 
 module StyledFirebaseAuth = {

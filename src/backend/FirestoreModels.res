@@ -24,11 +24,12 @@ and keg = {
   beer: string,
   consumptions: array<consumption>,
   createdAt: Firebase.Timestamp.t,
-  depletedAt: option<Firebase.Timestamp.t>,
+  depletedAt?: Firebase.Timestamp.t,
   lastConsumptionAt?: Firebase.Timestamp.t,
   milliliters: int,
-  priceEnd: int,
+  priceEnd?: int,
   priceNew: int,
+  serial: int,
 }
 and financialTransaction = {
   amount: int,
@@ -46,7 +47,7 @@ and person = {
 
 type place = {
   createdAt: Firebase.Timestamp.t,
-  currency: [#CZK],
+  currency: string,
   name: string,
   // the key is the person's UUID
   personsAll: Js.Dict.t<(personName, Firebase.Timestamp.t, option<tapName>)>,

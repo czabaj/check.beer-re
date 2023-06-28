@@ -34,7 +34,7 @@
   }
 
   &:disabled {
-    background-color: var(--_disabled-background, var(--surface-4));
+    background-color: var(--_disabled-background, var(--surface-3));
     border-color: var(--_disabled-border, currentColor);
     color: var(--_disabled-text, var(--text-3));
   }
