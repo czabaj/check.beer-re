@@ -1,9 +1,6 @@
 type classesType = {descriptionList: string}
 @module("./AccountingOverview.module.css") external classes: classesType = "default"
 
-type sectionClassesType = {root: string}
-@module("./SettingSection.module.css") external sectionClasses: sectionClassesType = "default"
-
 @react.component
 let make = (~chargedKegs: array<Db.kegConverted>, ~untappedChargedKegs: array<Db.kegConverted>) => {
   let totalCharged = chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.priceNew)

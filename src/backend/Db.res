@@ -63,6 +63,7 @@ type kegConverted = {
   priceEnd: Null.t<int>,
   priceNew: int,
   serial: int,
+  serialFormatted: string, // added by converter
 }
 
 let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
@@ -70,6 +71,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
     let keg = snapshot.data(. options)
     let consumptionsSum =
       keg.consumptions->Belt.Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
+    let serialFormatted = "#" ++ keg.serial->Int.toString->String.padStart(3, "0")
     {
       beer: keg.beer,
       consumptions: keg.consumptions,
@@ -81,6 +83,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       priceEnd: keg.priceEnd,
       priceNew: keg.priceNew,
       serial: keg.serial,
+      serialFormatted,
     }
   },
   toFirestore: (. keg, _) => {
@@ -213,4 +216,35 @@ let useChargedKegsStatus = placeId => {
     [Firebase.orderBy("serial", ~direction=#desc), Firebase.where("depletedAt", #"==", null)],
   )
   Firebase.useFirestoreCollectionData(. query, reactFireOptions)
+}
+
+// Mutations
+
+let removeUndefinedValues: {..} => {..} = %raw("data => {
+  const result = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      result[key] = value
+    }
+  }
+  return result
+}")
+
+type placeUpdate = {
+  personsAll?: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>,
+  taps?: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>,
+}
+
+let updatePlace = (firestore, placeId, data) => {
+  let maybePersonsDict =
+    data.personsAll->Option.map(personsAll =>
+      personsAll->Belt.Map.String.toArray->Js.Dict.fromArray
+    )
+  let maybeTapsDict = data.taps->Option.map(taps => {
+    taps->Belt.Map.String.toArray->Js.Dict.fromArray
+  })
+  Firebase.updateDoc(
+    placeDocument(firestore, placeId),
+    removeUndefinedValues({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
+  )
 }

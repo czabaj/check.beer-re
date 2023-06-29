@@ -48,9 +48,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
           ->Array.map(keg => {
             let volume = keg.milliliters
             <tr key={keg.serial->Int.toString}>
-              <th scope="row">
-                {React.string(`#${keg.serial->Int.toString->String.padStart(3, "0")}`)}
-              </th>
+              <th scope="row"> {React.string(keg.serialFormatted)} </th>
               <td> {React.string(keg.beer)} </td>
               <td>
                 {<ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />}

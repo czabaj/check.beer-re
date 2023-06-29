@@ -10,9 +10,7 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
   let options = untappedChargedKegs->Belt.Array.keepMap(keg => {
     Db.getUid(keg)->Option.map(uid => {
       {
-        text: `#${keg.serial
-          ->Int.toString
-          ->String.padStart(3, "0")} ${keg.beer} (${(keg.milliliters / 1000)->Int.toString} L)`,
+        text: `#${keg.serialFormatted} ${keg.beer} (${(keg.milliliters / 1000)->Int.toString} L)`,
         value: uid,
       }
     })

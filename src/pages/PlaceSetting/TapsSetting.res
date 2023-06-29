@@ -1,4 +1,4 @@
-type classesType = {list: string}
+type classesType = {list: string, tappedBeer: string}
 @module("./TapsSetting.module.css") external classes: classesType = "default"
 
 module ConfirmDeleteTap = {
@@ -14,7 +14,12 @@ module ConfirmDeleteTap = {
 }
 
 type dialogState =
-  Hidden | AddTap | RenameTap(string) | DeleteTap(string) | TapKegOn(string) | UntapKeg(string)
+  | Hidden
+  | AddTap
+  | RenameTap(string)
+  | DeleteTap(string)
+  | TapKegOn(string)
+  | UntapKeg(string, Db.kegConverted)
 
 type dialogEvent =
   | Hide
@@ -22,7 +27,7 @@ type dialogEvent =
   | ShowDeleteTap(string)
   | ShowRenameTap(string)
   | ShowTapKeg(string)
-  | ShowUntapKeg(string)
+  | ShowUntapKeg(string, Db.kegConverted)
 
 let dialogReducer = (_, event) => {
   switch event {
@@ -31,7 +36,7 @@ let dialogReducer = (_, event) => {
   | ShowDeleteTap(tapName) => DeleteTap(tapName)
   | ShowRenameTap(tapName) => RenameTap(tapName)
   | ShowTapKeg(tapName) => TapKegOn(tapName)
-  | ShowUntapKeg(tapName) => UntapKeg(tapName)
+  | ShowUntapKeg(tapName, keg) => UntapKeg(tapName, keg)
   }
 }
 
@@ -43,10 +48,19 @@ let make = (
   ~untappedChargedKegs,
 ) => {
   let firestore = Firebase.useFirestore()
-  let placeDoc = Db.placeDocumentConverted(firestore, placeId)
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
   let hasKegsToTap = untappedChargedKegs->Array.length > 0
+  let tappedKegsById = React.useMemo1(() =>
+    tappedChargedKegs
+    ->Belt.Array.keepMap(keg => {
+      switch Db.getUid(keg) {
+      | Some(uid) => Some((uid, keg))
+      | None => None
+      }
+    })
+    ->Belt.Map.String.fromArray
+  , [tappedChargedKegs])
 
   <SectionWithHeader
     buttonsSlot={<button
@@ -64,37 +78,37 @@ let make = (
           let tappedKeg =
             maybeKegReference
             ->Js.Null.toOption
-            ->Option.map(kegRef =>
-              tappedChargedKegs
-              ->Array.find(
-                keg =>
-                  switch Db.getUid(keg) {
-                  | Some(uid) => uid === kegRef.id
-                  | _ => false
-                  },
-              )
-              ->Option.getUnsafe
-            )
+            ->Option.map(kegRef => tappedKegsById->Belt.Map.String.get(kegRef.id))
+            ->Option.getUnsafe
+
           <li key={tapName}>
             <div>
               {React.string(tapName)}
               {tappedKeg->Option.mapWithDefault(React.null, keg => {
-                <span> {React.string(` 🍺 ${keg.beer}`)} </span>
+                <div className={classes.tappedBeer}>
+                  <span> {React.string(keg.serialFormatted)} </span>
+                  {React.string(HtmlEntities.nbsp)}
+                  {React.string(keg.beer)}
+                </div>
               })}
             </div>
-            {tappedKeg === None
-              ? <button
-                  disabled={!hasKegsToTap}
-                  className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
-                  onClick={_ => sendDialog(ShowTapKeg(tapName))}
-                  type_="button">
-                  {React.string("Narazit")}
-                </button>
-              : <button
-                  className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
-                  type_="button">
-                  {React.string("Odrazit")}
-                </button>}
+            {switch tappedKeg {
+            | None =>
+              <button
+                disabled={!hasKegsToTap}
+                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                onClick={_ => sendDialog(ShowTapKeg(tapName))}
+                type_="button">
+                {React.string("Narazit")}
+              </button>
+            | Some(keg) =>
+              <button
+                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                onClick={_ => sendDialog(ShowUntapKeg(tapName, keg))}
+                type_="button">
+                {React.string("Odrazit")}
+              </button>
+            }}
             <button
               className={Styles.buttonClasses.button}
               onClick={_ => sendDialog(ShowRenameTap(tapName))}
@@ -121,10 +135,10 @@ let make = (
         onDismiss={hideDialog}
         onSubmit={async values => {
           let newName = values.name
-          await Firebase.setDoc(
-            placeDoc,
+          await Db.updatePlace(
+            firestore,
+            placeId,
             {
-              ...place,
               taps: place.taps->Belt.Map.String.set(newName, Js.null),
             },
           )
@@ -134,13 +148,7 @@ let make = (
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          Firebase.setDoc(
-            placeDoc,
-            {
-              ...place,
-              taps: place.taps->Belt.Map.String.remove(tapName),
-            },
-          )
+          Db.updatePlace(firestore, placeId, {taps: place.taps->Belt.Map.String.remove(tapName)})
           ->Promise.then(_ => {
             hideDialog()
             Promise.resolve()
@@ -159,10 +167,10 @@ let make = (
           let oldName = tapName
           let oldValue = place.taps->Belt.Map.String.getExn(oldName)
           let newName = values.name
-          await Firebase.setDoc(
-            placeDoc,
+          await Db.updatePlace(
+            firestore,
+            placeId,
             {
-              ...place,
               personsAll: place.personsAll->Belt.Map.String.map(person => {
                 switch person {
                 | (a, b, Some(c)) =>
@@ -187,24 +195,40 @@ let make = (
         onDismiss={hideDialog}
         onSubmit={async values => {
           let kegDoc = Db.kegDoc(firestore, placeId, values.keg)
-          let tapsDict =
-            place.taps
-            ->Belt.Map.String.set(tapName, Some(kegDoc)->Js.Null.fromOption)
-            ->Belt.Map.String.toArray
-            ->Js.Dict.fromArray
-          %debugger
-          await Firebase.updateDoc(
-            placeDoc,
+          await Db.updatePlace(
+            firestore,
+            placeId,
             {
-              "taps": tapsDict,
+              taps: place.taps->Belt.Map.String.set(tapName, Some(kegDoc)->Js.Null.fromOption),
             },
           )
-          ()
+          hideDialog()
         }}
         tapName
         untappedChargedKegs
       />
-    | UntapKeg(tapName) => React.null
+    | UntapKeg(tapName, keg) =>
+      <TapKegOff
+        onSubmit={async values => {
+          switch values.untapOption {
+          | "finish" => Js.Exn.raiseError("not implemented")
+          | "toStocks" => {
+              await Db.updatePlace(
+                firestore,
+                placeId,
+                {
+                  taps: place.taps->Belt.Map.String.set(tapName, Null.null),
+                },
+              )
+              hideDialog()
+            }
+          | _ => Js.Exn.raiseError("unknown option")
+          }
+        }}
+        onDismiss={hideDialog}
+        keg
+        tapName
+      />
     }}
   </SectionWithHeader>
 }
