@@ -8,5 +8,6 @@
 .root > div {
   background-color: var(--surface-2);
   border-radius: var(--radius-2);
+  box-shadow: var(--shadow-2);
   padding: var(--border-size-2);
 }

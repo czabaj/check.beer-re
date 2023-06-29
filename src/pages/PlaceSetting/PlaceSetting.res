@@ -36,35 +36,39 @@ let make = (~placeId) => {
             <span> {React.string("Změnit")} </span>
           </button>}
         />
-        {!basicDataDialogOpened
-          ? React.null
-          : {
-              let handleDismiss = _ => setBasicDataDialogOpened(_ => false)
-              <BasicInfoDialog
-                initialValues={{
-                  createdAt: place.createdAt->Firebase.Timestamp.toDate->DateUtils.toIsoDateString,
-                  name: place.name,
-                }}
-                onDismiss={handleDismiss}
-                onSubmit={async values => {
-                  let placeDoc = Db.placeDocumentConverted(firestore, placeId)
-                  await Firebase.setDoc(
-                    placeDoc,
-                    {
-                      ...place,
-                      createdAt: values.createdAt
-                      ->DateUtils.fromIsoDateString
-                      ->Firebase.Timestamp.fromDate,
-                      name: values.name,
-                    },
-                  )
-                  handleDismiss()
-                }}
-              />
-            }}
-        <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
-        <KegsSetting chargedKegs placeId />
-        <AccountingOverview chargedKegs untappedChargedKegs />
+        <main>
+          {!basicDataDialogOpened
+            ? React.null
+            : {
+                let handleDismiss = _ => setBasicDataDialogOpened(_ => false)
+                <BasicInfoDialog
+                  initialValues={{
+                    createdAt: place.createdAt
+                    ->Firebase.Timestamp.toDate
+                    ->DateUtils.toIsoDateString,
+                    name: place.name,
+                  }}
+                  onDismiss={handleDismiss}
+                  onSubmit={async values => {
+                    let placeDoc = Db.placeDocumentConverted(firestore, placeId)
+                    await Firebase.setDoc(
+                      placeDoc,
+                      {
+                        ...place,
+                        createdAt: values.createdAt
+                        ->DateUtils.fromIsoDateString
+                        ->Firebase.Timestamp.fromDate,
+                        name: values.name,
+                      },
+                    )
+                    handleDismiss()
+                  }}
+                />
+              }}
+          <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
+          <KegsSetting chargedKegs placeId />
+          <AccountingOverview chargedKegs untappedChargedKegs />
+        </main>
       </div>
     </FormattedCurrency.Provider>
   | _ => React.null

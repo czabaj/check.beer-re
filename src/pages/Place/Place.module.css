@@ -3,16 +3,26 @@
   margin-inline: auto;
 }
 
-.root > main > dl > div {
+.descriptionList {
+  margin: 0;
+}
+
+.descriptionList > div {
   font-size: 150%;
   display: flex;
   position: relative;
 }
 
-.root > main > dl > div > dt::after {
+.descriptionList > div + div {
+  border-block-start: var(--border-size-2) solid var(--surface-1);
+}
+
+.descriptionList > div > dt::after {
   content: " -";
 }
 
-.root > main > dl > div > dd {
+.descriptionList > div > dd {
+  font-style: italic;
+  font-family: var(--font-cursive);
   margin-inline-start: 0.5rem;
 }

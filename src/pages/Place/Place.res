@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {descriptionList: string, root: string}
 
 @module("./Place.module.css") external classes: classesType = "default"
 
@@ -56,24 +56,31 @@ let make = (~placeId) => {
           </a>}
         />
         <main>
-          <dl>
-            {activePersons
-            ->Array.map(person => {
-              <div key={person.id}>
-                <dt>
-                  {React.string(person.name)}
-                  <button
-                    className={Styles.utilityClasses.breakout}
-                    onClick={_ => setSelectedPerson(_ => Some(person))}
-                    title="Otevřít kartu"
-                    type_="button"
-                  />
-                </dt>
-                <dd> {React.string("XY")} </dd>
-              </div>
-            })
-            ->React.array}
-          </dl>
+          <SectionWithHeader
+            buttonsSlot={<button className={Styles.buttonClasses.button} type_="button">
+              {React.string("Obsazení")}
+            </button>}
+            headerSlot={React.string("U stolu")}
+            headerId="active-persons">
+            <dl className={classes.descriptionList}>
+              {activePersons
+              ->Array.map(person => {
+                <div key={person.id}>
+                  <dt>
+                    {React.string(person.name)}
+                    <button
+                      className={Styles.utilityClasses.breakout}
+                      onClick={_ => setSelectedPerson(_ => Some(person))}
+                      title="Otevřít kartu"
+                      type_="button"
+                    />
+                  </dt>
+                  <dd> {React.string("XII")} </dd>
+                </div>
+              })
+              ->React.array}
+            </dl>
+          </SectionWithHeader>
         </main>
         {switch maybeSelectedPerson {
         | None => React.null

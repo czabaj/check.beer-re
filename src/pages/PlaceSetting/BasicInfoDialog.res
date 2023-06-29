@@ -1,7 +1,3 @@
-type classesType = {fieldset: string}
-
-@module("./BasicInfoDialog.module.css") external classes: classesType = "default"
-
 module FormFields = %lenses(
   type state = {
     createdAt: string,
@@ -44,39 +40,35 @@ let make = (~initialValues, ~onDismiss, ~onSubmit) => {
   <DialogForm formId="basicInfo" heading="Základní údaje místa" onDismiss visible=true>
     <Form.Provider value=Some(form)>
       <form id="basicInfo" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-        <fieldset className={`reset ${classes.fieldset}`}>
+        <fieldset className={`reset ${Styles.fieldsetClasses.grid}`}>
           <Form.Field
             field=Name
             render={field => {
-              <>
-                <label htmlFor="name"> {React.string("Název")} </label>
-                <input
-                  id="name"
-                  name="name"
+              <InputWrapper
+                inputError=?field.error
+                inputName="name"
+                inputSlot={<input
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="text"
                   value={field.value}
-                />
-                {switch Field(Name)->form.getFieldError {
-                | None => React.null
-                | Some(message) => React.string(message)
-                }}
-              </>
+                />}
+                labelSlot={React.string("Název")}
+              />
             }}
           />
           <Form.Field
             field=CreatedAt
             render={field => {
-              <>
-                <label htmlFor="created"> {React.string("Založeno")} </label>
-                <input
-                  id="created"
-                  name="created"
+              <InputWrapper
+                inputError=?field.error
+                inputName="created"
+                inputSlot={<input
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="date"
                   value={field.value}
-                />
-              </>
+                />}
+                labelSlot={React.string("Založeno")}
+              />
             }}
           />
         </fieldset>

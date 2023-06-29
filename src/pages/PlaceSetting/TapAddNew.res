@@ -42,20 +42,16 @@ let make = (~existingNames, ~onDismiss, ~onSubmit) => {
           <Form.Field
             field=Name
             render={field => {
-              <>
-                <label htmlFor="name"> {React.string("Označení")} </label>
-                <input
-                  id="name"
-                  name="name"
+              <InputWrapper
+                inputError=?field.error
+                inputName="name"
+                inputSlot={<input
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="text"
                   value={field.value}
-                />
-                {switch field.error {
-                | Some(error) => React.string(error)
-                | None => React.null
-                }}
-              </>
+                />}
+                labelSlot={React.string("Označení")}
+              />
             }}
           />
         </fieldset>

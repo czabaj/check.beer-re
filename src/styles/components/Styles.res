@@ -10,6 +10,9 @@ type buttonClassesType = {
 }
 @module("./button.module.css") external buttonClasses: buttonClassesType = "default"
 
+type fieldsetClassesType = {grid: string}
+@module("./fieldset.module.css") external fieldsetClasses: fieldsetClassesType = "default"
+
 type utilityClassesType = {
   breakout: string,
   srOnly: string,

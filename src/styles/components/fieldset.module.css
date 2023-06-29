@@ -1,0 +1,13 @@
+.grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1rem;
+}
+
+.grid > div:global(.inputWrapper) {
+  display: contents;
+}
+
+.grid label {
+  text-align: right;
+}

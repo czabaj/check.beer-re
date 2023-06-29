@@ -56,69 +56,57 @@ module FormComponent = {
 
         <Form.Provider value=Some(form)>
           <form id="addKeg" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-            <fieldset>
+            <fieldset className={`reset ${Styles.fieldsetClasses.grid}`}>
               <Form.Field
                 field=Beer
                 render={field => {
-                  <>
-                    <label htmlFor="beer"> {React.string("Pivo")} </label>
-                    <input
-                      id="beer"
-                      name="beer"
+                  <InputWrapper
+                    inputError=?field.error
+                    inputName="beer"
+                    inputSlot={<input
                       onChange={ReForm.Helpers.handleChange(field.handleChange)}
                       type_="text"
                       value={field.value}
-                    />
-                    {switch field.error {
-                    | Some(error) => React.string(error)
-                    | None => React.null
-                    }}
-                  </>
+                    />}
+                    labelSlot={React.string("Pivo")}
+                  />
                 }}
               />
               <Form.Field
                 field=Liters
                 render={field => {
-                  <>
-                    <label htmlFor="liters"> {React.string("Objem sudu")} </label>
-                    <input
-                      id="liters"
+                  <InputWrapper
+                    inputError=?field.error
+                    inputName="liters"
+                    inputSlot={<input
                       max="200"
                       min="1"
-                      name="liters"
                       onChange={event =>
                         field.handleChange(ReactEvent.Form.target(event)["valueAsNumber"])}
                       step=1.0
                       type_="number"
                       value={field.value->Float.toString}
-                    />
-                    {switch field.error {
-                    | Some(error) => React.string(error)
-                    | None => React.null
-                    }}
-                  </>
+                    />}
+                    labelSlot={React.string("Objem sudu")}
+                  />
                 }}
               />
               <Form.Field
                 field=Price
                 render={field => {
-                  <>
-                    <label htmlFor="price"> {React.string("Cena sudu")} </label>
-                    <input
-                      id="price"
+                  <InputWrapper
+                    inputError=?field.error
+                    inputName="price"
+                    inputSlot={<input
                       min="0"
-                      name="price"
                       onChange={event =>
                         field.handleChange(ReactEvent.Form.target(event)["valueAsNumber"])}
                       step=1.0
                       type_="number"
                       value={field.value->Float.toString}
-                    />
-                    {switch field.error {
-                    | Some(error) => React.string(error)
-                    | None => React.null
-                    }}
-                  </>
+                    />}
+                    labelSlot={React.string("Cena sudu")}
+                  />
                 }}
               />
             </fieldset>
