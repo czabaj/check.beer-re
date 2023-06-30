@@ -33,6 +33,9 @@ type firestore
 @module("firebase/firestore")
 external getFirestore: FirebaseApp.t => firestore = "getFirestore"
 
+@module("firebase/firestore")
+external documentId: unit => string = "documentId"
+
 module FirestoreProvider = {
   @react.component @module("reactfire")
   external make: (~sdk: firestore, ~children: React.element) => React.element = "FirestoreProvider"
@@ -112,7 +115,7 @@ external addDoc: (collectionReference<'a>, 'a) => promise<documentReference<'a>>
 @module("firebase/firestore")
 external where: (
   string,
-  [#"<" | #"<=" | #"==" | #">=" | #">" | #array_contains],
+  [#"<" | #"<=" | #"==" | #">=" | #">" | #array_contains | #"in"],
   'a,
 ) => queryConstraint = "where"
 
@@ -266,6 +269,12 @@ external collectionDataRx: (
   query<'a>,
   reactFireOptions<'a>,
 ) => Rxjs.t<Rxjs.foreign, Rxjs.void, array<'a>> = "collectionData"
+
+@module("rxfire/firestore")
+external docDataRx: (
+  documentReference<'a>,
+  reactFireOptions<'a>,
+) => Rxjs.t<Rxjs.foreign, Rxjs.void, 'a> = "docData"
 
 type authProvider
 

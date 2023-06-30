@@ -6,7 +6,7 @@ let make = () => {
     <a {...RouterUtils.createAnchorProps("./pridat")}> {React.string("Přidat místo")} </a>
     <div>
       {switch currentUserAccountDoc.data {
-      | Some(Some(currentUser)) =>
+      | Some(currentUser) =>
         switch currentUser.places->Js.Dict.entries {
         | [] => React.string("Nemáte žádná místa")
         | placeEntries =>

@@ -12,7 +12,7 @@ external dialogPolyfill: dialogPolyfillModule = "default"
 external toDialogElement: Dom.element => Dom.htmlDialogElement = "%identity"
 
 @react.component
-let make = (~children, ~className=?, ~visible) => {
+let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   let (maybeDialogNode, setDialogNode) = React.useState((): option<Dom.htmlDialogElement> => None)
   React.useEffect2(() => {
     switch maybeDialogNode {
@@ -25,17 +25,28 @@ let make = (~children, ~className=?, ~visible) => {
     }
     None
   }, (visible, maybeDialogNode))
+
+  let dialogWindowRef = UseHooks.useClickAway(() => {
+    switch onClickOutside {
+    | None => ()
+    | Some(handler) => handler()
+    }
+  })
   <dialog
     className={`${classes.root} ${Js.Option.getWithDefault("", className)}`}
     ref={ReactDOM.Ref.callbackDomRef(node => {
-      switch node->Js.Nullable.toOption {
-      | Some(dialogNode) => {
-          dialogPolyfill.registerDialog(. dialogNode)
-          setDialogNode(_ => Some(toDialogElement(dialogNode)))
+      setDialogNode(_ =>
+        switch node->Js.Nullable.toOption {
+        | None => None
+        | Some(dialogNode) => {
+            dialogPolyfill.registerDialog(. dialogNode)
+            Some(toDialogElement(dialogNode))
+          }
         }
-      | None => setDialogNode(_ => None)
-      }
+      )
     })}>
-    {children}
+    // The children must be wrapped in extra div for click-outside to work, the dialog element spans the whole screen
+    // so I must have a container for just the content of the window
+    <div className={`dialogWindow`} ref={dialogWindowRef}> {children} </div>
   </dialog>
 }

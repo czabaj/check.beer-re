@@ -78,8 +78,7 @@ let make = (
           let tappedKeg =
             maybeKegReference
             ->Js.Null.toOption
-            ->Option.map(kegRef => tappedKegsById->Belt.Map.String.get(kegRef.id))
-            ->Option.getUnsafe
+            ->Option.flatMap(kegRef => tappedKegsById->Belt.Map.String.get(kegRef.id))
 
           <li key={tapName}>
             <div>

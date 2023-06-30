@@ -36,14 +36,56 @@ let getActivePersons = (place: Db.placeConverted, kegs: array<FirestoreModels.ke
   ->Js.Array2.sortInPlaceWith((a, b) => Js.String2.localeCompare(a.name, b.name)->Int.fromFloat)
 }
 
+let pageDataRx = (firestore, placeId) => {
+  let placeRef = Db.placeDocumentConverted(firestore, placeId)
+  let placeRx = Firebase.docDataRx(placeRef, {idField: "uid"})
+  let tapsWithKegsRx = placeRx->Rxjs.pipe2(
+    Rxjs.distinctUntilChanged((. prev: Db.placeConverted, curr) => prev.taps == curr.taps),
+    Rxjs.mergeMap((place: Db.placeConverted) => {
+      let tapsWithKeg =
+        place.taps->Belt.Map.String.keep((_, maybeKegRef) => maybeKegRef !== Null.null)
+      let tappedKegIds =
+        tapsWithKeg
+        ->Belt.Map.String.valuesToArray
+        ->Belt.Array.keepMap(maybeKegReference =>
+          maybeKegReference->Null.toOption->Option.map(kegRef => kegRef.id)
+        )
+      Firebase.collectionDataRx(
+        Firebase.query(
+          Db.placeKegsCollectionConverted(firestore, placeId),
+          [Firebase.where(Firebase.documentId(), #"in", tappedKegIds)],
+        ),
+        {idField: "uid"},
+      )->Rxjs.pipe(
+        Rxjs.map(.(kegsOnTap, _) =>
+          tapsWithKeg->Belt.Map.String.map(
+            maybeRef =>
+              maybeRef
+              ->Null.toOption
+              ->Belt.Option.flatMap(
+                kegRef => kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegRef.id),
+              )
+              ->Option.getExn,
+          )
+        ),
+      )
+    }),
+  )
+  let kegsWithRecentConsumption = Db.kegsWithRecentConsumptionRx(firestore, placeId)
+  Rxjs.combineLatest3(placeRx, tapsWithKegsRx, kegsWithRecentConsumption)
+}
+
 @react.component
 let make = (~placeId) => {
-  let placeDoc = Db.usePlaceDocData(placeId)
-  let kegsWithRecentConsumptionCollection = Db.useKegsWithRecentConsumptionCollection(placeId)
+  let firestore = Firebase.useFirestore()
+  let placePageStatus = Firebase.useObservable(
+    ~observableId="PlacePage",
+    ~source=pageDataRx(firestore, placeId),
+  )
   let (maybeSelectedPerson, setSelectedPerson) = React.useState(_ => None)
-  switch (placeDoc.data, kegsWithRecentConsumptionCollection.data) {
-  | (Some(place), Some(kegs)) => {
-      let activePersons = getActivePersons(place, kegs)
+  switch placePageStatus.data {
+  | Some(place, tapsWithKegs, kegsWithRecentConsumption) => {
+      let activePersons = getActivePersons(place, kegsWithRecentConsumption)
       <div className={classes.root}>
         <PlaceHeader
           placeName={place.name}
@@ -85,10 +127,11 @@ let make = (~placeId) => {
         {switch maybeSelectedPerson {
         | None => React.null
         | Some(selectedPerson) =>
-          <PersonDialog
-            personName={selectedPerson.name}
+          <DrinkDialog
             onDismiss={_ => setSelectedPerson(_ => None)}
-            usedTap={selectedPerson.preferredTap}
+            personName={selectedPerson.name}
+            preferredTap={selectedPerson.preferredTap}
+            tapsWithKegs
           />
         }}
       </div>

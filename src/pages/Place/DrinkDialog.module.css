@@ -1,4 +1,4 @@
-.root > header {
+.root :global(.dialogWindow) > header {
   align-items: center;
   display: flex;
   justify-content: space-between;

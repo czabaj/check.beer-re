@@ -25,10 +25,10 @@ and keg = {
   consumptions: array<consumption>,
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
-  lastConsumptionAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
   priceEnd: Null.t<int>,
   priceNew: int,
+  recentConsumptionAt: Null.t<Firebase.Timestamp.t>,
   serial: int,
 }
 and financialTransaction = {

@@ -91,10 +91,10 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
                 consumptions: [],
                 createdAt: Firebase.Timestamp.now(),
                 depletedAt: Null.null,
-                lastConsumptionAt: Null.null,
                 milliliters: (liters *. 1000.0)->Int.fromFloat,
                 priceEnd: Null.null,
                 priceNew: (price *. minorUnit)->Int.fromFloat,
+                recentConsumptionAt: Null.null,
                 serial,
               },
             )

@@ -58,10 +58,10 @@ type kegConverted = {
   consumptionsSum: int, // added by converter
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
-  lastConsumptionAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
   priceEnd: Null.t<int>,
   priceNew: int,
+  recentConsumptionAt: Null.t<Firebase.Timestamp.t>,
   serial: int,
   serialFormatted: string, // added by converter
 }
@@ -78,7 +78,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       consumptionsSum,
       createdAt: keg.createdAt,
       depletedAt: keg.depletedAt,
-      lastConsumptionAt: keg.lastConsumptionAt,
+      recentConsumptionAt: keg.recentConsumptionAt,
       milliliters: keg.milliliters,
       priceEnd: keg.priceEnd,
       priceNew: keg.priceNew,
@@ -92,7 +92,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       consumptions,
       createdAt,
       depletedAt,
-      lastConsumptionAt,
+      recentConsumptionAt,
       milliliters,
       priceEnd,
       priceNew,
@@ -103,10 +103,10 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       consumptions,
       createdAt,
       depletedAt,
-      lastConsumptionAt,
       milliliters,
       priceEnd,
       priceNew,
+      recentConsumptionAt,
       serial,
     }
   },
@@ -123,11 +123,14 @@ let reactFireOptions: Firebase.reactFireOptions<'a> = {idField: "uid"}
 let getUid: 'a => option<string> = %raw("data => data?.uid")
 
 let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
-  Firebase.query(userAccountsCollection(firestore), [Firebase.where("email", #"==", user.email)])
+  Firebase.query(
+    userAccountsCollection(firestore),
+    [Firebase.where("email", #"==", user.email), Firebase.limit(1)],
+  )
 }
 
 let currentUserAccountRx = (auth, firestore) => {
-  Firebase.userRx(auth)->Rxjs.pipe3(
+  Firebase.userRx(auth)->Rxjs.pipe4(
     Rxjs.switchMap(user => {
       switch Js.Nullable.toOption(user) {
       | None => Rxjs.fromArray([])
@@ -139,6 +142,7 @@ let currentUserAccountRx = (auth, firestore) => {
     }),
     Rxjs.map(.(currentUsersDocs, _) => Array.at(currentUsersDocs, 0)),
     Rxjs.filter(Option.isSome),
+    Rxjs.map(.(surelyCurrentUserData, _) => surelyCurrentUserData->Option.getUnsafe),
   )
 }
 
@@ -152,7 +156,7 @@ let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
   Rxjs.shareReplay(1),
 )
 
-let kegsWithRecentConsumptionRx = (placeId, firestore) => {
+let kegsWithRecentConsumptionRx = (firestore, placeId) => {
   slidingWindowRx->Rxjs.pipe(
     Rxjs.switchMap(_slidingWindow => {
       let now = Js.Date.make()
@@ -185,7 +189,7 @@ let usePlaceDocData = placeId => {
 let useKegsWithRecentConsumptionCollection = placeId => {
   Firebase.useObservable(
     ~observableId="kegsWithRecentConsumption",
-    ~source=kegsWithRecentConsumptionRx(placeId, Firebase.useFirestore()),
+    ~source=kegsWithRecentConsumptionRx(Firebase.useFirestore(), placeId),
   )
 }
 
@@ -213,14 +217,19 @@ let useChargedKegsStatus = placeId => {
   let firestore = Firebase.useFirestore()
   let query = Firebase.query(
     placeKegsCollectionConverted(firestore, placeId),
-    [Firebase.orderBy("serial", ~direction=#desc), Firebase.where("depletedAt", #"==", null)],
+    [
+      Firebase.orderBy("serial", ~direction=#desc),
+      Firebase.where("depletedAt", #"==", null),
+      // limit to 50 to avoid expensive calls, but 50 kegs on stock is a lot
+      Firebase.limit(50),
+    ],
   )
   Firebase.useFirestoreCollectionData(. query, reactFireOptions)
 }
 
 // Mutations
 
-let removeUndefinedValues: {..} => {..} = %raw("data => {
+let omitUndefined: {..} => {..} = %raw("data => {
   const result = {}
   for (const [key, value] of Object.entries(data)) {
     if (value !== undefined) {
@@ -245,6 +254,6 @@ let updatePlace = (firestore, placeId, data) => {
   })
   Firebase.updateDoc(
     placeDocument(firestore, placeId),
-    removeUndefinedValues({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
+    omitUndefined({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
   )
 }

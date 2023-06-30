@@ -1106,9 +1106,9 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@nobleai/rescript-rxjs@https://github.com/czabaj/rescript-rxjs#refs/heads/vg/add-share-replay":
+"@nobleai/rescript-rxjs@https://github.com/czabaj/rescript-rxjs#71d325cdfa3d300b4eb83dda9fc00281c95ca745":
   version "7.5.8"
-  resolved "https://github.com/czabaj/rescript-rxjs#1c5980fff61367ab958e032aa33952629eb2a81c"
+  resolved "https://github.com/czabaj/rescript-rxjs#71d325cdfa3d300b4eb83dda9fc00281c95ca745"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
@@ -1457,6 +1457,11 @@
   integrity sha512-6i0aC7jV6QzQB8ne1joVZ0eSFIstHsCrobmOtghM11yGlH0j43FKL2UhWdELkyps0zuf7qVTUVCCR+tgSlyLLw==
   dependencies:
     "@types/yargs-parser" "*"
+
+"@uidotdev/usehooks@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@uidotdev/usehooks/-/usehooks-2.0.1.tgz#ed76a6d2ea4fe008a1d732a45489025fa2a4c586"
+  integrity sha512-rJXxE3Y8g9utRbOS9Pj9tIvrnOdaakHIhLbMxBlErV8HydnGD0DveD82aLBfVTh1hBp5IXqpeHpMrPE9WIT7vQ==
 
 "@vitejs/plugin-react@^4.0.0":
   version "4.0.0"
