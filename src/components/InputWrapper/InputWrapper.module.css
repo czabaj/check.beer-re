@@ -3,11 +3,11 @@
   gap: 1rem;
 }
 
-:global(.inputWrapper) input {
+:global(.inputWrapper) :where(input, select) {
   border: var(--border-size-1) solid var(--surface-1);
 }
 
-:global(.inputWrapper) input[aria-invalid="true"] {
+:global(.inputWrapper) :where(input, select)[aria-invalid="true"] {
   border-color: var(--surface-danger);
 }
 

@@ -1,5 +1,44 @@
-.root :global(.dialogWindow) > header {
-  align-items: center;
+.root > :global(.dialogWindow) {
+  --dialog-padding-inline: 3rem;
+  padding-block-end: var(--dialog-padding-inline);
+  inline-size: 60ch;
+}
+
+.root form {
+  font-size: 200%;
   display: flex;
+  flex-direction: column-reverse;
+  gap: var(--dialog-padding-inline);
   justify-content: space-between;
+}
+
+.root form > fieldset {
+  display: grid;
+  border-style: none;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+  padding: 0;
+}
+
+.root form > fieldset legend {
+  padding-block: 1rem;
+  width: 100%;
+  text-align: center;
+}
+
+.root form > fieldset > label {
+  background-color: var(--surface-1);
+  border-radius: var(--radius-2);
+  box-shadow: var(--inner-shadow-4);
+  padding-block: 1rem;
+  text-align: center;
+}
+
+.root form > fieldset input {
+  display: none;
+}
+
+.root form > :global(.inputWrapper) {
+  justify-content: space-between;
+  flex-wrap: wrap;
 }

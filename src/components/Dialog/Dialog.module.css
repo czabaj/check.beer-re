@@ -5,26 +5,27 @@
   padding: 0;
 }
 
-.root > div {
+.root > :global(.dialogWindow) {
+  --dialog-padding-inline: 1rem;
   display: flex;
   flex-flow: column;
   gap: 1rem;
-  max-width: var(--measure);
+  max-width: min(var(--measure), 100vw);
 }
 
-.root > div > * {
-  padding-inline: 1rem;
+.root > :global(.dialogWindow) > * {
+  padding-inline: var(--dialog-padding-inline);
 }
 
-.root > div > header {
+.root > :global(.dialogWindow) > header {
   padding-block-start: 1rem;
 }
 
-.root > div > header > h3 {
+.root > :global(.dialogWindow) > header > h3 {
   margin: 0;
 }
 
-.root > div > footer {
+.root > :global(.dialogWindow) > footer {
   background-color: var(--surface-3);
   display: flex;
   flex-flow: row-reverse;
