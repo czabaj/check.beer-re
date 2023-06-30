@@ -6,6 +6,7 @@ module Validators = Validators.CustomValidators(FormFields)
 module FormComponent = {
   @react.component
   let make = (~onSubmit, ~placeId) => {
+    let currency = FormattedCurrency.useCurrency()
     let mostRecentKegStatus = Db.useMostRecentKegStatus(placeId)
     switch mostRecentKegStatus.data {
     | None => React.null
@@ -19,7 +20,7 @@ module FormComponent = {
             {
               beer,
               liters: milliliters->Float.fromInt /. 1000.0,
-              price: priceNew->Float.fromInt,
+              price: priceNew->Float.fromInt /. currency.minorUnit,
               serial: serial + 1,
             }
           })
