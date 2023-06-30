@@ -171,14 +171,17 @@ let make = (
             placeId,
             {
               personsAll: place.personsAll->Belt.Map.String.map(person => {
-                switch person {
-                | (a, b, Some(c)) =>
-                  if c === oldName {
-                    (a, b, Some(newName))
+                switch person.preferredTap {
+                | Some(preferredTap) =>
+                  if preferredTap == oldName {
+                    {
+                      ...person,
+                      preferredTap: Some(newName),
+                    }
                   } else {
                     person
                   }
-                | _ => person
+                | None => person
                 }
               }),
               taps: place.taps

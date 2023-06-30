@@ -57,6 +57,10 @@ external enableIndexedDbPersistence: firestore => promise<unit> = "enableIndexed
 external enableMultiTabIndexedDbPersistence: firestore => promise<unit> =
   "enableMultiTabIndexedDbPersistence"
 
+type updateTag = ArrayUnion | ArrayRemove | Increment
+@module("firebase/firestore")
+external arrayUnion: 'a => updateTag = "arrayUnion"
+
 type documentReference<'a> = {id: string}
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"

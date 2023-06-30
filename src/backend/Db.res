@@ -18,32 +18,66 @@ let placePersonsCollection = (firestore, placeId): Firebase.collectionReference<
   Firebase.collection(firestore, ~path=`places/${placeId}/persons`)
 }
 
+let placePersonDocument = (firestore, placeId, personId): Firebase.documentReference<person> => {
+  Firebase.doc(firestore, ~path=`places/${placeId}/persons/${personId}`)
+}
+
 let placeKegsCollection = (firestore, placeId): Firebase.collectionReference<keg> => {
   Firebase.collection(firestore, ~path=`places/${placeId}/kegs`)
 }
 
+let placeKegDocument = (firestore, placeId, kegId): Firebase.documentReference<keg> => {
+  Firebase.doc(firestore, ~path=`places/${placeId}/kegs/${kegId}`)
+}
+
 // Converters
+
+type personsAllRecord = {
+  name: string,
+  preferredTap: option<string>,
+  recentActivityAt: Firebase.Timestamp.t,
+}
+
+let personsAllRecordToTuple = ({
+  name,
+  preferredTap,
+  recentActivityAt,
+}): FirestoreModels.personsAllItem => (name, recentActivityAt, preferredTap->Null.fromOption)
 
 type placeConverted = {
   createdAt: Firebase.Timestamp.t,
   currency: string,
   name: string,
   // the key is the person's UUID
-  personsAll: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>, // converted to Map.String
+  personsAll: Belt.Map.String.t<personsAllRecord>, // converted to Map.String
   taps: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>, // converted to Map.String
 }
 
 let placeConverter: Firebase.dataConverter<place, placeConverted> = {
   fromFirestore: (. snapshot, options) => {
     let {createdAt, currency, name, personsAll, taps} = snapshot.data(. options)
-    let personsAllMap = personsAll->Js.Dict.entries->Belt.Map.String.fromArray
+    let personsAllMap =
+      personsAll
+      ->Js.Dict.entries
+      ->Belt.Map.String.fromArray
+      ->Belt.Map.String.map(((name, recentActivityAt, preferredTap)) => {
+        {
+          name,
+          preferredTap: preferredTap->Null.toOption,
+          recentActivityAt,
+        }
+      })
     let tapsMap = taps->Js.Dict.entries->Belt.Map.String.fromArray
     {createdAt, currency, name, personsAll: personsAllMap, taps: tapsMap}
   },
   toFirestore: (. place, _) => {
     let {createdAt, currency, name, personsAll, taps} = place
     let tapsDict = taps->Belt.Map.String.toArray->Js.Dict.fromArray
-    let personsAllDict = personsAll->Belt.Map.String.toArray->Js.Dict.fromArray
+    let personsAllDict =
+      personsAll
+      ->Belt.Map.String.map(personsAllRecordToTuple)
+      ->Belt.Map.String.toArray
+      ->Js.Dict.fromArray
     {createdAt, currency, name, personsAll: personsAllDict, taps: tapsDict}
   },
 }
@@ -164,7 +198,7 @@ let kegsWithRecentConsumptionRx = (firestore, placeId) => {
       let firebaseTimestamp = Firebase.Timestamp.fromMillis(monthAgo)
       let query = Firebase.query(
         placeKegsCollection(firestore, placeId),
-        [Firebase.where("lastConsumptionAt", #">=", firebaseTimestamp)],
+        [Firebase.where("recentConsumptionAt", #">=", firebaseTimestamp)],
       )
       Firebase.collectionDataRx(query, reactFireOptions)
     }),
@@ -229,31 +263,41 @@ let useChargedKegsStatus = placeId => {
 
 // Mutations
 
-let omitUndefined: {..} => {..} = %raw("data => {
-  const result = {}
-  for (const [key, value] of Object.entries(data)) {
-    if (value !== undefined) {
-      result[key] = value
-    }
-  }
-  return result
-}")
-
 type placeUpdate = {
-  personsAll?: Belt.Map.String.t<(personName, Firebase.Timestamp.t, option<tapName>)>,
+  personsAll?: Belt.Map.String.t<personsAllRecord>,
   taps?: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>,
 }
 
 let updatePlace = (firestore, placeId, data) => {
   let maybePersonsDict =
     data.personsAll->Option.map(personsAll =>
-      personsAll->Belt.Map.String.toArray->Js.Dict.fromArray
+      personsAll
+      ->Belt.Map.String.map(personsAllRecordToTuple)
+      ->Belt.Map.String.toArray
+      ->Js.Dict.fromArray
     )
   let maybeTapsDict = data.taps->Option.map(taps => {
     taps->Belt.Map.String.toArray->Js.Dict.fromArray
   })
   Firebase.updateDoc(
     placeDocument(firestore, placeId),
-    omitUndefined({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
+    ObjectUtils.omitUndefined({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
+  )
+}
+
+let updatePlacePersonsAll = (firestore, placeId, persons: array<(string, personsAllRecord)>) => {
+  let updateData = persons->Belt.Array.reduce(Object.empty(), (data, (personId, person)) => {
+    ObjectUtils.setIn(Some(data), `personsAll.${personId}`, personsAllRecordToTuple(person))
+  })
+  Firebase.updateDoc(placeDocument(firestore, placeId), updateData)
+}
+
+let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
+  Firebase.updateDoc(
+    placeKegDocument(firestore, placeId, kegId),
+    {
+      "consumptions": Firebase.arrayUnion(consumption),
+      "recentConsumptionAt": Firebase.Timestamp.now(),
+    },
   )
 }

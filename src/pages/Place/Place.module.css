@@ -3,26 +3,52 @@
   margin-inline: auto;
 }
 
-.descriptionList {
-  margin: 0;
-}
-
-.descriptionList > div {
+.listContainer li {
   font-size: 150%;
   display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
   position: relative;
+  padding-inline: 0.5rem;
 }
 
-.descriptionList > div + div {
+.listContainer li + li {
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.descriptionList > div > dt::after {
-  content: " -";
+.listContainer h4 {
+  position: relative;
+  font-variant: small-caps;
+  padding-inline: 0.5rem;
+  font-weight: 400;
+  text-align: center;
 }
 
-.descriptionList > div > dd {
+.listContainer h4::before {
+  position: absolute;
+  content: "";
+  inset-inline: 0;
+  height: var(--border-size-2);
+  background-color: var(--surface-1);
+  inset-block-start: 50%;
+  z-index: 1;
+}
+
+.listContainer h4 > span {
+  padding-inline: 1rem;
+  position: relative;
+  background-color: var(--surface-2);
+  z-index: 10;
+}
+
+.consumption {
   font-style: italic;
   font-family: var(--font-cursive);
   margin-inline-start: 0.5rem;
+}
+
+.activeCheckbox {
+  align-items: center;
+  display: flex;
+  font-size: 1rem;
 }

@@ -48,19 +48,18 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
           <Form.Field
             field=Keg
             render={field => {
-              <>
-                <label htmlFor="keg"> {React.string("Sud")} </label>
-                <select
-                  id="keg"
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                  value={field.value}>
+              <InputWrapper
+                inputName="keg"
+                inputSlot={<select
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
                   {options
                   ->Array.map(({text, value}) =>
                     <option key={value} value={value}> {React.string(text)} </option>
                   )
                   ->React.array}
-                </select>
-              </>
+                </select>}
+                labelSlot={React.string("Sud")}
+              />
             }}
           />
         </fieldset>

@@ -45,12 +45,14 @@ and person = {
   transactions: array<financialTransaction>,
 }
 
+type personsAllItem = (personName, Firebase.Timestamp.t, Null.t<tapName>)
+
 type place = {
   createdAt: Firebase.Timestamp.t,
   currency: string,
   name: string,
   // the key is the person's UUID
-  personsAll: Js.Dict.t<(personName, Firebase.Timestamp.t, option<tapName>)>,
+  personsAll: Js.Dict.t<personsAllItem>,
   // null means the tap is not in use, undefined would remove the key
   taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
 }
