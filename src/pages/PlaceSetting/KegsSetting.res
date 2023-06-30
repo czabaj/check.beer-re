@@ -63,7 +63,6 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
                   min="0"
                   max={volume->Int.toString}
                   low={volume / 5}
-                  high={volume / 5 * 4}
                   optimum={volume / 2}
                   value={(volume - keg.consumptionsSum)->Int.toString}>
                   {React.string(
