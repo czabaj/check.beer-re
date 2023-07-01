@@ -297,7 +297,29 @@ let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
     placeKegDocument(firestore, placeId, kegId),
     {
       "consumptions": Firebase.arrayUnion(consumption),
-      "recentConsumptionAt": Firebase.Timestamp.now(),
+      "recentConsumptionAt": Firebase.serverTimestamp(),
     },
   )
+}
+
+let addPerson = async (firestore, placeId, personName) => {
+  let placeSnapshot = await Firebase.getDocFromCache(placeDocument(firestore, placeId))
+  let place = placeSnapshot.data(. {})
+  let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
+  let newPerson: FirestoreModels.person = {
+    account: Null.null,
+    balance: 0,
+    createdAt: Firebase.serverTimestamp(),
+    name: personName,
+    transactions: [],
+  }
+  let addedPerson = await Firebase.addDoc(placePersonsCollection(firestore, placeId), newPerson)
+  let personId = addedPerson.id
+  let placeShortcutRecord: personsAllRecord = {
+    name: personName,
+    preferredTap: Some(firstTap),
+    // the nested objects do not support serverTimestamp() :(
+    recentActivityAt: Firebase.Timestamp.now(),
+  }
+  await updatePlacePersonsAll(firestore, placeId, [(personId, placeShortcutRecord)])
 }

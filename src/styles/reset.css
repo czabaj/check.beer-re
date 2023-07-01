@@ -10,6 +10,7 @@ button {
   border: none;
   color: inherit;
   font-family: inherit;
+  font-size: inherit;
   /* Normalize `line-height`. Cannot be changed from `normal` in Firefox 4+. */
   line-height: normal;
   margin: 0;

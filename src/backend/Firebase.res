@@ -83,11 +83,17 @@ external limit: int => queryConstraint = "limit"
 @module("firebase/firestore")
 external startAfter: 'a => queryConstraint = "startAfter"
 
-type snapshotOptions = {serverTimestamps: @string [#estimate | #previous | #none]}
+type snapshotOptions = {serverTimestamps?: @string [#estimate | #previous | #none]}
+
+@module("firebase/firestore")
+external serverTimestamp: unit => 'a = "serverTimestamp"
 
 type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. snapshotOptions) => 'a}
 @module("firebase/firestore")
 external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDoc"
+
+@module("firebase/firestore")
+external getDocFromCache: documentReference<'a> => promise<documentSnapshot<'a>> = "getDocFromCache"
 
 type sendOptions = {merge?: bool, mergeFields?: array<string>}
 

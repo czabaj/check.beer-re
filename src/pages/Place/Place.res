@@ -8,11 +8,29 @@ type classesType = {
 
 @module("./Place.module.css") external classes: classesType = "default"
 
+type dialogState =
+  | Hidden
+  | AddConsumption({personId: string, person: Db.personsAllRecord})
+  | AddPerson
+
+type dialogEvent =
+  | Hide
+  | ShowAddConsumption({personId: string, person: Db.personsAllRecord})
+  | ShowAddPerson
+
+let dialogReducer = (_, event) => {
+  switch event {
+  | Hide => Hidden
+  | ShowAddConsumption({personId, person}) => AddConsumption({personId, person})
+  | ShowAddPerson => AddPerson
+  }
+}
+
 module ActiveCheckbox = {
   @react.component
   let make = (~changes: Belt.Map.String.t<bool>, ~initialActive, ~personId, ~setChanges) => {
     let checked = changes->Belt.Map.String.getWithDefault(personId, initialActive)
-    <label className=classes.activeCheckbox>
+    <label className={`${classes.activeCheckbox} ${Styles.utilityClasses.breakout}`}>
       {React.string("Zde")}
       <input
         checked={checked}
@@ -100,7 +118,8 @@ let make = (~placeId) => {
     ~observableId="PlacePage",
     ~source=pageDataRx(firestore, placeId),
   )
-  let (maybeSelectedPerson, setSelectedPerson) = React.useState(_ => None)
+  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
+  let hideDialog = _ => sendDialog(Hide)
   let (activePersonsChanges, setActivePersonsChanges) = React.useState((): option<
     Belt.Map.String.t<bool>,
   > => None)
@@ -121,7 +140,10 @@ let make = (~placeId) => {
         />
         <main>
           <SectionWithHeader
-            buttonsSlot={<button type_="button" className={Styles.buttonClasses.button}>
+            buttonsSlot={<button
+              className={Styles.buttonClasses.button}
+              type_="button"
+              onClick={_ => sendDialog(ShowAddPerson)}>
               {React.string("Přidat osobu")}
             </button>}
             headerSlot={React.string("Zápisník")}
@@ -144,7 +166,7 @@ let make = (~placeId) => {
                     <div className={classes.consumption}>
                       <button
                         className={Styles.utilityClasses.breakout}
-                        onClick={_ => setSelectedPerson(_ => Some(activePerson))}
+                        onClick={_ => sendDialog(ShowAddConsumption({personId, person}))}
                         title="Otevřít kartu"
                         type_="button"
                       />
@@ -197,7 +219,7 @@ let make = (~placeId) => {
               </button>
               <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
                 {Belt.Map.String.size(inactivePersons) === 0
-                  ? <p> {React.string("Nikdo nechybí ...")} </p>
+                  ? <p> {React.string("Nikdo nechybí 👌")} </p>
                   : <ol className={`reset ${classes.list}`}>
                       {inactivePersons
                       ->toSortedArray
@@ -216,16 +238,15 @@ let make = (~placeId) => {
             </>
           }}
         </main>
-        {switch maybeSelectedPerson {
-        | None => React.null
-        | Some((personId, person)) =>
-          let handleDismiss = _ => setSelectedPerson(_ => None)
+        {switch dialogState {
+        | Hidden => React.null
+        | AddConsumption({personId, person}) =>
           <DrinkDialog
-            onDismiss={handleDismiss}
+            onDismiss={hideDialog}
             onSubmit={async values => {
               let kegRef =
                 place.taps->Belt.Map.String.getExn(values.tap)->Js.Null.toOption->Option.getExn
-              await Db.addConsumption(
+              let addConsumptionPromise = Db.addConsumption(
                 firestore,
                 placeId,
                 kegRef.id,
@@ -235,7 +256,7 @@ let make = (~placeId) => {
                   person: Db.placePersonDocument(firestore, placeId, personId),
                 },
               )
-              await Db.updatePlacePersonsAll(
+              let updatePlacePersonPromise = Db.updatePlacePersonsAll(
                 firestore,
                 placeId,
                 [
@@ -249,11 +270,43 @@ let make = (~placeId) => {
                   ),
                 ],
               )
-              handleDismiss()
+              try {
+                let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
+                hideDialog()
+              } catch {
+              | e => Js.log2("Error while adding consumption", e)
+              }
             }}
             personName={person.name}
             preferredTap={person.preferredTap->Option.getExn}
             tapsWithKegs
+          />
+        | AddPerson =>
+          let existingActive =
+            activePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
+          let existingInactive =
+            inactivePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
+          <PersonAddNew
+            existingActive
+            existingInactive
+            onDismiss={hideDialog}
+            onMoveToActive={personName => {
+              let (personId, person) =
+                inactivePersons
+                ->Belt.Map.String.findFirstBy((_, {name}) => name === personName)
+                ->Option.getExn
+              let firstTap = place.taps->Belt.Map.String.keysToArray->Belt.Array.getExn(0)
+              Db.updatePlacePersonsAll(
+                firestore,
+                placeId,
+                [(personId, {...person, preferredTap: Some(firstTap)})],
+              )->ignore
+              hideDialog()
+            }}
+            onSubmit={async values => {
+              await Db.addPerson(firestore, placeId, values.name)
+              hideDialog()
+            }}
           />
         }}
       </div>

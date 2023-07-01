@@ -34,11 +34,11 @@ and keg = {
 and financialTransaction = {
   amount: int,
   createdAt: Firebase.Timestamp.t,
-  keg: option<Firebase.documentReference<keg>>,
-  note: option<string>,
+  keg: Null.t<Firebase.documentReference<keg>>,
+  note: Null.t<string>,
 }
 and person = {
-  account: option<Firebase.documentReference<userAccount>>,
+  account: Null.t<Firebase.documentReference<userAccount>>,
   balance: int,
   createdAt: Firebase.Timestamp.t,
   name: personName,

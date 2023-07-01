@@ -1,4 +1,4 @@
-type boxClassesType = {base: string}
+type boxClassesType = {base: string, variatnError: string}
 @module("./box.module.css") external boxClasses: boxClassesType = "default"
 
 type buttonClassesType = {
@@ -15,6 +15,9 @@ type buttonClassesType = {
 
 type fieldsetClassesType = {grid: string}
 @module("./fieldset.module.css") external fieldsetClasses: fieldsetClassesType = "default"
+
+type linkClassesType = {base: string}
+@module("./link.module.css") external linkClasses: linkClassesType = "default"
 
 type utilityClassesType = {
   breakout: string,
