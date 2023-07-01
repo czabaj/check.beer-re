@@ -1,7 +1,8 @@
 type classesType = {
   activeCheckbox: string,
   consumption: string,
-  listContainer: string,
+  inactiveUsers: string,
+  list: string,
   root: string,
 }
 
@@ -11,23 +12,21 @@ module ActiveCheckbox = {
   @react.component
   let make = (~changes: Belt.Map.String.t<bool>, ~initialActive, ~personId, ~setChanges) => {
     let checked = changes->Belt.Map.String.getWithDefault(personId, initialActive)
-    <div className=classes.activeCheckbox>
-      <label>
-        {React.string("Aktivní")}
-        <input
-          checked={checked}
-          type_="checkbox"
-          onChange={_ => {
-            let newChecked = !checked
-            let newChanges =
-              initialActive === newChecked
-                ? changes->Belt.Map.String.remove(personId)
-                : changes->Belt.Map.String.set(personId, newChecked)
-            setChanges(_ => Some(newChanges))
-          }}
-        />
-      </label>
-    </div>
+    <label className=classes.activeCheckbox>
+      {React.string("Zde")}
+      <input
+        checked={checked}
+        type_="checkbox"
+        onChange={_ => {
+          let newChecked = !checked
+          let newChanges =
+            initialActive === newChecked
+              ? changes->Belt.Map.String.remove(personId)
+              : changes->Belt.Map.String.set(personId, newChecked)
+          setChanges(_ => Some(newChanges))
+        }}
+      />
+    </label>
   }
 }
 
@@ -86,7 +85,6 @@ let pageDataRx = (firestore, placeId) => {
   Rxjs.combineLatest3(placeRx, tapsWithKegsRx, recentConsumptionsByUserIdRx)
 }
 
-// TODO: add a new person starting with "A", this sorting might be redundant
 let toSortedArray = placePersons => {
   let personsAsArray = placePersons->Belt.Map.String.toArray
   personsAsArray->Array.sortInPlace(((_, a: Db.personsAllRecord), (_, b)) =>
@@ -123,15 +121,55 @@ let make = (~placeId) => {
         />
         <main>
           <SectionWithHeader
-            buttonsSlot={switch activePersonsChanges {
-            | None =>
-              <button
-                className={`${Styles.buttonClasses.button}`}
-                onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
-                type_="button">
-                {React.string("Nepřítomní")}
-              </button>
-            | Some(changes) =>
+            buttonsSlot={<button type_="button" className={Styles.buttonClasses.button}>
+              {React.string("Přidat osobu")}
+            </button>}
+            headerSlot={React.string("Zápisník")}
+            headerId="active-persons">
+            <ol className={`reset ${classes.list}`}>
+              {activePersons
+              ->toSortedArray
+              ->Array.map(activePerson => {
+                let (personId, person) = activePerson
+                let consumptions =
+                  recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(personId, [])
+                <li key={personId}>
+                  <div> {React.string(person.name)} </div>
+                  {switch activePersonsChanges {
+                  | Some(changes) =>
+                    <ActiveCheckbox
+                      changes initialActive=true personId setChanges=setActivePersonsChanges
+                    />
+                  | None =>
+                    <div className={classes.consumption}>
+                      <button
+                        className={Styles.utilityClasses.breakout}
+                        onClick={_ => setSelectedPerson(_ => Some(activePerson))}
+                        title="Otevřít kartu"
+                        type_="button"
+                      />
+                      {consumptions
+                      ->Array.map(consumption => {
+                        React.string(consumption.milliliters > 400 ? "X" : "I")
+                      })
+                      ->React.array}
+                    </div>
+                  }}
+                </li>
+              })
+              ->React.array}
+            </ol>
+          </SectionWithHeader>
+          {switch activePersonsChanges {
+          | None =>
+            <button
+              className={Styles.buttonClasses.button}
+              onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
+              type_="button">
+              {React.string("Nepřítomní")}
+            </button>
+          | Some(changes) =>
+            <>
               <button
                 className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
                 onClick={_ => {
@@ -143,7 +181,10 @@ let make = (~placeId) => {
                       changes
                       ->Belt.Map.String.mapWithKey((personId, newActive) => {
                         let person = place.personsAll->Belt.Map.String.getExn(personId)
-                        let newPerson = {...person, preferredTap: newActive ? Some(firstTap) : None}
+                        let newPerson = {
+                          ...person,
+                          preferredTap: newActive ? Some(firstTap) : None,
+                        }
                         newPerson
                       })
                       ->Belt.Map.String.toArray,
@@ -154,73 +195,26 @@ let make = (~placeId) => {
                 type_="button">
                 {React.string("Uložit")}
               </button>
-            }}
-            headerSlot={React.string("Zápisník")}
-            headerId="active-persons">
-            <div className={classes.listContainer}>
-              <ol className={`reset`}>
-                {activePersons
-                ->toSortedArray
-                ->Array.map(activePerson => {
-                  let (personId, person) = activePerson
-                  let consumptions =
-                    recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(personId, [])
-                  <li key={personId}>
-                    <div> {React.string(person.name)} </div>
-                    {switch activePersonsChanges {
-                    | Some(changes) =>
-                      <ActiveCheckbox
-                        changes initialActive=true personId setChanges=setActivePersonsChanges
-                      />
-                    | None =>
-                      <div className={classes.consumption}>
-                        <button
-                          className={Styles.utilityClasses.breakout}
-                          onClick={_ => setSelectedPerson(_ => Some(activePerson))}
-                          title="Otevřít kartu"
-                          type_="button"
-                        />
-                        {consumptions
-                        ->Array.map(consumption => {
-                          React.string(consumption.milliliters > 400 ? "X" : "I")
-                        })
-                        ->React.array}
-                      </div>
-                    }}
-                  </li>
-                })
-                ->React.array}
-              </ol>
-              {switch activePersonsChanges {
-              | Some(changes) =>
-                <>
-                  <h4>
-                    <span> {React.string("Nepřítomní")} </span>
-                  </h4>
-                  {Belt.Map.String.size(inactivePersons) === 0
-                    ? <p> {React.string("Nikdo nechybí")} </p>
-                    : <ol className="reset">
-                        {inactivePersons
-                        ->toSortedArray
-                        ->Array.map(inactivePerson => {
-                          let (personId, person) = inactivePerson
-                          <li key={personId}>
-                            <div> {React.string(person.name)} </div>
-                            <ActiveCheckbox
-                              changes
-                              initialActive=false
-                              personId
-                              setChanges=setActivePersonsChanges
-                            />
-                          </li>
-                        })
-                        ->React.array}
-                      </ol>}
-                </>
-              | _ => React.null
-              }}
-            </div>
-          </SectionWithHeader>
+              <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
+                {Belt.Map.String.size(inactivePersons) === 0
+                  ? <p> {React.string("Nikdo nechybí ...")} </p>
+                  : <ol className={`reset ${classes.list}`}>
+                      {inactivePersons
+                      ->toSortedArray
+                      ->Array.map(inactivePerson => {
+                        let (personId, person) = inactivePerson
+                        <li key={personId}>
+                          <div> {React.string(person.name)} </div>
+                          <ActiveCheckbox
+                            changes initialActive=false personId setChanges=setActivePersonsChanges
+                          />
+                        </li>
+                      })
+                      ->React.array}
+                    </ol>}
+              </div>
+            </>
+          }}
         </main>
         {switch maybeSelectedPerson {
         | None => React.null

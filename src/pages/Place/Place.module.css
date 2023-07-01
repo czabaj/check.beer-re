@@ -3,7 +3,17 @@
   margin-inline: auto;
 }
 
-.listContainer li {
+.root main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.root main > button {
+  align-self: center;
+}
+
+.list li {
   font-size: 150%;
   display: flex;
   flex-flow: row wrap;
@@ -12,33 +22,14 @@
   padding-inline: 0.5rem;
 }
 
-.listContainer li + li {
+.list li + li {
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.listContainer h4 {
-  position: relative;
-  font-variant: small-caps;
-  padding-inline: 0.5rem;
-  font-weight: 400;
-  text-align: center;
-}
-
-.listContainer h4::before {
-  position: absolute;
-  content: "";
-  inset-inline: 0;
-  height: var(--border-size-2);
-  background-color: var(--surface-1);
-  inset-block-start: 50%;
-  z-index: 1;
-}
-
-.listContainer h4 > span {
+.inactiveUsers > p {
   padding-inline: 1rem;
-  position: relative;
-  background-color: var(--surface-2);
-  z-index: 10;
+  color: var(--text-2);
+  font-style: italic;
 }
 
 .consumption {

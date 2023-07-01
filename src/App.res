@@ -1,8 +1,3 @@
-module Logo = {
-  @module("./logo.svg") @react.component
-  external make: (~role: string=?, ~className: string=?) => React.element = "ReactComponent"
-}
-
 %%raw(`import './styles/index.css'`)
 
 @react.component

@@ -1,3 +1,6 @@
+type boxClassesType = {base: string}
+@module("./box.module.css") external boxClasses: boxClassesType = "default"
+
 type buttonClassesType = {
   button: string,
   iconOnly: string,
