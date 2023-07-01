@@ -1,30 +1,13 @@
 type classesType = {
   activeCheckbox: string,
   consumption: string,
+  detailButton: string,
   inactiveUsers: string,
   list: string,
   root: string,
 }
 
 @module("./Place.module.css") external classes: classesType = "default"
-
-type dialogState =
-  | Hidden
-  | AddConsumption({personId: string, person: Db.personsAllRecord})
-  | AddPerson
-
-type dialogEvent =
-  | Hide
-  | ShowAddConsumption({personId: string, person: Db.personsAllRecord})
-  | ShowAddPerson
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddConsumption({personId, person}) => AddConsumption({personId, person})
-  | ShowAddPerson => AddPerson
-  }
-}
 
 module ActiveCheckbox = {
   @react.component
@@ -45,6 +28,36 @@ module ActiveCheckbox = {
         }}
       />
     </label>
+  }
+}
+
+module DetailButton = {
+  @react.component
+  let make = (~onClick) => {
+    <button className={classes.detailButton} title="Detail osoby" type_="button" onClick={onClick}>
+      {React.string("👀")}
+    </button>
+  }
+}
+
+type dialogState =
+  | Hidden
+  | AddConsumption({personId: string, person: Db.personsAllRecord})
+  | AddPerson
+  | PersonDetail({personId: string, person: Db.personsAllRecord})
+
+type dialogEvent =
+  | Hide
+  | ShowAddConsumption({personId: string, person: Db.personsAllRecord})
+  | ShowAddPerson
+  | ShowPersonDetail({personId: string, person: Db.personsAllRecord})
+
+let dialogReducer = (_, event) => {
+  switch event {
+  | Hide => Hidden
+  | ShowAddConsumption({personId, person}) => AddConsumption({personId, person})
+  | ShowAddPerson => AddPerson
+  | ShowPersonDetail({personId, person}) => PersonDetail({personId, person})
   }
 }
 
@@ -83,7 +96,8 @@ let pageDataRx = (firestore, placeId) => {
       )
     }),
   )
-  let recentConsumptionsByUserIdRx = Db.kegsWithRecentConsumptionRx(firestore, placeId)->Rxjs.pipe(
+  let kegsWithRecentConsumptionRx = Db.kegsWithRecentConsumptionRx(firestore, placeId)
+  let recentConsumptionsByUserIdRx = kegsWithRecentConsumptionRx->Rxjs.pipe(
     Rxjs.map(.(kegs, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       kegs->Array.forEach((keg: FirestoreModels.keg) => {
@@ -100,7 +114,12 @@ let pageDataRx = (firestore, placeId) => {
       consumptionsByUser
     }),
   )
-  Rxjs.combineLatest3(placeRx, tapsWithKegsRx, recentConsumptionsByUserIdRx)
+  Rxjs.combineLatest4((
+    placeRx,
+    tapsWithKegsRx,
+    kegsWithRecentConsumptionRx,
+    recentConsumptionsByUserIdRx,
+  ))
 }
 
 let toSortedArray = placePersons => {
@@ -124,7 +143,7 @@ let make = (~placeId) => {
     Belt.Map.String.t<bool>,
   > => None)
   switch placePageStatus.data {
-  | Some(place, tapsWithKegs, recentConsumptionsByUserId) => {
+  | Some(place, tapsWithKegs, kegsWithRecentConsumption, recentConsumptionsByUserId) => {
       let (activePersons, inactivePersons) =
         place.personsAll->Belt.Map.String.partition((_, {preferredTap}) => preferredTap !== None)
       <div className={classes.root}>
@@ -177,6 +196,7 @@ let make = (~placeId) => {
                       ->React.array}
                     </div>
                   }}
+                  <DetailButton onClick={_ => sendDialog(ShowPersonDetail({person, personId}))} />
                 </li>
               })
               ->React.array}
@@ -225,10 +245,20 @@ let make = (~placeId) => {
                       ->toSortedArray
                       ->Array.map(inactivePerson => {
                         let (personId, person) = inactivePerson
+                        let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
                         <li key={personId}>
-                          <div> {React.string(person.name)} </div>
+                          <div>
+                            {React.string(`${person.name} `)}
+                            <time dateTime={recentActivityDate->Js.Date.toISOString}>
+                              {React.string(`byl tu `)}
+                              <FormattedRelativeTime dateTime={recentActivityDate} />
+                            </time>
+                          </div>
                           <ActiveCheckbox
                             changes initialActive=false personId setChanges=setActivePersonsChanges
+                          />
+                          <DetailButton
+                            onClick={_ => sendDialog(ShowPersonDetail({person, personId}))}
                           />
                         </li>
                       })
@@ -308,6 +338,44 @@ let make = (~placeId) => {
               hideDialog()
             }}
           />
+        | PersonDetail({person, personId}) => {
+            let unfinishedConsumptions =
+              kegsWithRecentConsumption
+              ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
+              ->Belt.Array.flatMap(keg =>
+                keg.consumptions->Belt.Array.keepMap((consumption): option<
+                  PersonDetail.unfinishedConsumptionsRecord,
+                > => {
+                  switch consumption.person.id === personId {
+                  | false => None
+                  | true =>
+                    Some({
+                      beer: keg.beer,
+                      kegId: Db.getUid(keg)->Option.getExn,
+                      milliliters: consumption.milliliters,
+                      createdAt: consumption.createdAt->Firebase.Timestamp.toDate,
+                    })
+                  }
+                })
+              )
+            unfinishedConsumptions->Array.sortInPlace((a, b) =>
+              (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
+            )
+            <PersonDetail
+              onDeleteConsumption={consumption => {
+                Db.deleteConsumption(
+                  firestore,
+                  placeId,
+                  consumption.kegId,
+                  personId,
+                  consumption.createdAt,
+                )->ignore
+              }}
+              onDismiss={hideDialog}
+              person
+              unfinishedConsumptions
+            />
+          }
         }}
       </div>
     }

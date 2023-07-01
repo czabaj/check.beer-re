@@ -1,13 +1,15 @@
-.breakout {
-  &::before {
-    block-size: 100%;
-    content: "";
-    inline-size: 100%;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    position: absolute;
-    z-index: 0;
-  }
+.breakout::before {
+  block-size: 100%;
+  content: "";
+  inline-size: 100%;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  position: absolute;
+  z-index: 0;
+}
+
+.breakout:hover::before {
+  background-color: var(--breakout-hover-overlay);
 }
 
 .srOnly:not(:focus, :active) {

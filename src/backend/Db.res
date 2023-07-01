@@ -323,3 +323,16 @@ let addPerson = async (firestore, placeId, personName) => {
   }
   await updatePlacePersonsAll(firestore, placeId, [(personId, placeShortcutRecord)])
 }
+
+let deleteConsumption = async (firestore, placeId, kegId, personId, createdAt) => {
+  let kegRef = kegDoc(firestore, placeId, kegId)
+  let kegSnapshot = await Firebase.getDocFromCache(kegRef)
+  let keg = kegSnapshot.data(. {})
+  let createMillis = createdAt->Js.Date.getTime
+  let newConsumptions =
+    keg.consumptions->Belt.Array.keep(c =>
+      c.person.id !== personId || c.createdAt->Firebase.Timestamp.toMillis !== createMillis
+    )
+  let updateData = ObjectUtils.setIn(None, `consumptions`, newConsumptions)
+  await Firebase.updateDoc(kegRef, updateData)
+}

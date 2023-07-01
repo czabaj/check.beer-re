@@ -13,13 +13,22 @@
   align-self: center;
 }
 
+.list {
+  --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
+}
+
 .list li {
+  --place-list-padding-inline: 0.5rem;
   font-size: 150%;
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  gap: 1rem;
   position: relative;
-  padding-inline: 0.5rem;
+  padding-inline: var(--place-list-padding-inline);
+}
+
+.list li > div:first-child {
+  margin-inline-end: auto;
 }
 
 .list li + li {
@@ -32,10 +41,26 @@
   font-style: italic;
 }
 
+.inactiveUsers ol > li time {
+  font-size: var(--font-size-16);
+  white-space: nowrap;
+}
+
 .consumption {
   font-style: italic;
   font-family: var(--font-cursive);
-  margin-inline-start: 0.5rem;
+}
+
+.detailButton {
+  margin-inline-end: calc(-1 * var(--place-list-padding-inline));
+  padding-inline: var(--place-list-padding-inline);
+  border-start-end-radius: var(--radius-2);
+  border-end-end-radius: var(--radius-2);
+  z-index: 1;
+}
+
+.detailButton:hover {
+  background-color: var(--surface-3);
 }
 
 .activeCheckbox {

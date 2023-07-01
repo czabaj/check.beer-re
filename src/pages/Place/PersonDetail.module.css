@@ -1,0 +1,19 @@
+.root {
+}
+
+.root section[aria-labelledby="unfinished_consumptions"] table caption {
+  text-align: left;
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-medium);
+}
+
+.root section[aria-labelledby="unfinished_consumptions"] table :where(td, th) {
+  text-align: right;
+}
+
+.root
+  section[aria-labelledby="unfinished_consumptions"]
+  table
+  :where(td, th):where(:nth-child(1)) {
+  text-align: left;
+}
