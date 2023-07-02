@@ -214,10 +214,16 @@ let useCurrentUserAccountDocData = () => {
   )
 }
 
-let usePlaceDocData = placeId => {
+let usePlaceDocData = (~options=?, placeId) => {
   let firestore = Firebase.useFirestore()
   let placeRef = placeDocumentConverted(firestore, placeId)
-  Firebase.useFirestoreDocData(placeRef)
+  Firebase.useFirestoreDocData(. placeRef, options)
+}
+
+let usePlacePersonDocumentStatus = (~options=?, placeId, personId) => {
+  let firestore = Firebase.useFirestore()
+  let personRef = placePersonDocument(firestore, placeId, personId)
+  Firebase.useFirestoreDocData(. personRef, options)
 }
 
 let useKegsWithRecentConsumptionCollection = placeId => {

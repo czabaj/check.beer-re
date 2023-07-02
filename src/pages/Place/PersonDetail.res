@@ -1,4 +1,9 @@
-type classesType = {root: string, scrollContent: string, unfinishedConcumptionsTable: string}
+type classesType = {
+  basicsDescriptionList: string,
+  root: string,
+  scrollContent: string,
+  unfinishedConcumptionsTable: string,
+}
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
 type unfinishedConsumptionsRecord = {
@@ -15,8 +20,15 @@ let make = (
   ~onNextPerson,
   ~onPreviousPerson,
   ~person: Db.personsAllRecord,
+  ~personId,
+  ~placeId,
   ~unfinishedConsumptions: array<unfinishedConsumptionsRecord>,
 ) => {
+  let {data: maybePersonDoc} = Db.usePlacePersonDocumentStatus(
+    ~options={suspense: false},
+    placeId,
+    personId,
+  )
   <Dialog className={classes.root} visible={true}>
     <header>
       <h3> {React.string(person.name)} </h3>
@@ -28,7 +40,38 @@ let make = (
       </button>
     </header>
     <div className={classes.scrollContent}>
-      <section> {React.string("Dluží/Má předplaceno")} </section>
+      <section ariaLabel="Základní údaje">
+        <dl className={`reset ${classes.basicsDescriptionList}`}>
+          <div>
+            <dt> {React.string("již od")} </dt>
+            <dd>
+              {switch maybePersonDoc {
+              | None => React.string("načítám…")
+              | Some(personDoc) =>
+                <FormattedDateTime value={personDoc.createdAt->Firebase.Timestamp.toDate} />
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("naposledy")} </dt>
+            <dd>
+              <FormattedDateTime value={person.recentActivityAt->Firebase.Timestamp.toDate} />
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("stav konta")} </dt>
+            <dd>
+              {switch maybePersonDoc {
+              | None => React.string("načítám…")
+              | Some(personDoc) =>
+                <FormattedCurrency
+                  format={FormattedCurrency.formatAccounting} value=personDoc.balance
+                />
+              }}
+            </dd>
+          </div>
+        </dl>
+      </section>
       <section ariaLabelledby="unfinished_consumptions">
         {unfinishedConsumptions->Array.length === 0
           ? <p> {React.string("Prázdné")} </p>
@@ -57,14 +100,7 @@ let make = (
                       )}
                     </td>
                     <td>
-                      <ReactIntl.FormattedDate
-                        year=#numeric
-                        month=#numeric
-                        day=#numeric
-                        hour=#numeric
-                        minute=#numeric
-                        value=consumption.createdAt
-                      />
+                      <FormattedDateTime value=consumption.createdAt />
                     </td>
                     <td>
                       <button

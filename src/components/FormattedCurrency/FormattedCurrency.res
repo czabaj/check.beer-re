@@ -1,3 +1,6 @@
+type classesType = {accounting: string}
+@module("./FormattedCurrency.module.css") external classes: classesType = "default"
+
 let context = React.createContext("CZK")
 
 @module("./minorUnits.js")
@@ -15,12 +18,26 @@ let useCurrency = () => {
 }
 
 @react.component
-let make = (~value) => {
+let make = (~value, ~format=?) => {
   let {currency, minorUnit} = useCurrency()
 
-  <ReactIntl.FormattedNumber currency style=#currency value={value->Float.fromInt /. minorUnit} />
+  <ReactIntl.FormattedNumber currency style=#currency value={value->Float.fromInt /. minorUnit}>
+    {format->Option.map(fn => fn(value))->Option.getUnsafe}
+  </ReactIntl.FormattedNumber>
 }
 
 module Provider = {
   let make = context->React.Context.provider
+}
+
+let formatAccounting = (value, ~formattedNumber: string) => {
+  let negative = value < 0
+  React.cloneElement(
+    <span />,
+    {
+      "className": classes.accounting,
+      "children": formattedNumber,
+      "data-negative": negative->string_of_bool,
+    },
+  )
 }

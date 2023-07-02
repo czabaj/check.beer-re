@@ -397,6 +397,8 @@ let make = (~placeId) => {
               onNextPerson={_ => handleSwitchPerson(true)}
               onPreviousPerson={_ => handleSwitchPerson(false)}
               person
+              personId
+              placeId
               unfinishedConsumptions
             />
           }

@@ -142,7 +142,10 @@ type reactFireOptions<'a> = {
 }
 
 @module("reactfire")
-external useFirestoreDocData: documentReference<'a> => observableStatus<'a> = "useFirestoreDocData"
+external useFirestoreDocData: (
+  . documentReference<'a>,
+  option<reactFireOptions<'a>>,
+) => observableStatus<'a> = "useFirestoreDocData"
 
 @module("reactfire")
 external useFirestoreCollectionData: (

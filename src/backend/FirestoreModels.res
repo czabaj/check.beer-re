@@ -2,13 +2,6 @@ type personName = string
 type personUID = string
 type tapName = string
 
-type personShort = {
-  id: personUID,
-  lastUpdateAt: Firebase.Timestamp.t,
-  name: personName,
-  preferredTap: Null.t<tapName>,
-}
-
 type userAccount = {
   email: string,
   name: string,

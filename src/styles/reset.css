@@ -32,6 +32,10 @@ button {
   }
 }
 
+dl:where(.reset) dd {
+  margin: 0;
+}
+
 fieldset:where(.reset) {
   border: 0;
   padding: 0;
@@ -39,15 +43,16 @@ fieldset:where(.reset) {
   min-inline-size: 0;
 }
 
+legend:where(.reset) > legend,
+legend:where(.reset) {
+  display: table;
+  padding: 0;
+}
+
 :is(h1, h2, h3, h4, h5, h6):where(.reset) {
   font-size: 100%;
   font-weight: inherit;
   margin: 0;
-}
-
-legend:where(.reset) {
-  display: table;
-  padding: 0;
 }
 
 :is(ol, ul):where(.reset) {

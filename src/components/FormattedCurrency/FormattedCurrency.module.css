@@ -1,0 +1,7 @@
+.accounting {
+  color: var(--text-success);
+}
+
+.accounting[data-negative="true"] {
+  color: var(--text-danger);
+}
