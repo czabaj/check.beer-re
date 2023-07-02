@@ -1,19 +1,49 @@
-.root {
+.root > :global(.dialogWindow) {
+  inline-size: 60ch;
+  block-size: 30rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.root section[aria-labelledby="unfinished_consumptions"] table caption {
+.root header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: 1rem;
+  border-bottom: 1px solid var(--surface-1);
+}
+
+.root header > button:first-of-type {
+  order: -1;
+}
+
+.scrollContent {
+  flex: 1;
+  overflow: auto;
+}
+
+.unfinishedConcumptionsTable {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.unfinishedConcumptionsTable caption {
   text-align: left;
   font-size: var(--font-size-18);
   font-weight: var(--font-weight-medium);
 }
 
-.root section[aria-labelledby="unfinished_consumptions"] table :where(td, th) {
+.unfinishedConcumptionsTable :where(td, th) {
   text-align: right;
+  padding-inline: 0.5rem;
 }
 
-.root
-  section[aria-labelledby="unfinished_consumptions"]
-  table
-  :where(td, th):where(:nth-child(1)) {
+.unfinishedConcumptionsTable :where(td, th):where(:nth-child(1)) {
   text-align: left;
+}
+
+.unfinishedConcumptionsTable tbody > tr:nth-child(odd) {
+  background-color: var(--surface-1);
 }

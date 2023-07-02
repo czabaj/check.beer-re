@@ -146,6 +146,7 @@ let make = (~placeId) => {
   | Some(place, tapsWithKegs, kegsWithRecentConsumption, recentConsumptionsByUserId) => {
       let (activePersons, inactivePersons) =
         place.personsAll->Belt.Map.String.partition((_, {preferredTap}) => preferredTap !== None)
+      let sortedActivePersons = toSortedArray(activePersons)
       <div className={classes.root}>
         <PlaceHeader
           placeName={place.name}
@@ -168,8 +169,7 @@ let make = (~placeId) => {
             headerSlot={React.string("Zápisník")}
             headerId="active-persons">
             <ol className={`reset ${classes.list}`}>
-              {activePersons
-              ->toSortedArray
+              {sortedActivePersons
               ->Array.map(activePerson => {
                 let (personId, person) = activePerson
                 let consumptions =
@@ -361,6 +361,28 @@ let make = (~placeId) => {
             unfinishedConsumptions->Array.sortInPlace((a, b) =>
               (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
             )
+            let handleSwitchPerson = increase => {
+              let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
+              if currentIdx === -1 {
+                ()
+              } else {
+                let nextIdx = ref(currentIdx + (increase ? 1 : -1))
+                let maxIdx = Array.length(sortedActivePersons) - 1
+                if nextIdx.contents < 0 {
+                  nextIdx := maxIdx
+                } else if nextIdx.contents > maxIdx {
+                  nextIdx := 0
+                }
+                let (nextPersonId, nextPerson) =
+                  sortedActivePersons->Belt.Array.getExn(nextIdx.contents)
+                sendDialog(
+                  ShowPersonDetail({
+                    person: nextPerson,
+                    personId: nextPersonId,
+                  }),
+                )
+              }
+            }
             <PersonDetail
               onDeleteConsumption={consumption => {
                 Db.deleteConsumption(
@@ -372,6 +394,8 @@ let make = (~placeId) => {
                 )->ignore
               }}
               onDismiss={hideDialog}
+              onNextPerson={_ => handleSwitchPerson(true)}
+              onPreviousPerson={_ => handleSwitchPerson(false)}
               person
               unfinishedConsumptions
             />
