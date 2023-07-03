@@ -88,7 +88,7 @@ let placeDocumentConverted = (firestore, placeId) => {
 
 type kegConverted = {
   beer: string,
-  consumptions: array<consumption>,
+  consumptions: Belt.Map.String.t<consumption>,
   consumptionsSum: int, // added by converter
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
@@ -103,12 +103,15 @@ type kegConverted = {
 let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
   fromFirestore: (. snapshot, options) => {
     let keg = snapshot.data(. options)
+    let consumptionsMap = keg.consumptions->Js.Dict.entries->Belt.Map.String.fromArray
     let consumptionsSum =
-      keg.consumptions->Belt.Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
+      consumptionsMap->Belt.Map.String.reduceU(0, (. sum, _, consumption) =>
+        sum + consumption.milliliters
+      )
     let serialFormatted = "#" ++ keg.serial->Int.toString->String.padStart(3, "0")
     {
       beer: keg.beer,
-      consumptions: keg.consumptions,
+      consumptions: consumptionsMap,
       consumptionsSum,
       createdAt: keg.createdAt,
       depletedAt: keg.depletedAt,
@@ -132,9 +135,10 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       priceNew,
       serial,
     } = keg
+    let consumptionsDict = consumptions->Belt.Map.String.toArray->Js.Dict.fromArray
     {
       beer,
-      consumptions,
+      consumptions: consumptionsDict,
       createdAt,
       depletedAt,
       milliliters,
@@ -299,14 +303,24 @@ let updatePlacePersonsAll = (firestore, placeId, persons: array<(string, persons
 }
 
 let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
-  Firebase.updateDoc(
-    placeKegDocument(firestore, placeId, kegId),
-    {
-      "consumptions": Firebase.arrayUnion(consumption),
+  let now = Date.now()
+  let updateData = ObjectUtils.setIn(
+    Some({
       "recentConsumptionAt": Firebase.serverTimestamp(),
-    },
+    }),
+    `consumptions.${now->Js.Float.toString}`,
+    consumption,
   )
+  Firebase.updateDoc(placeKegDocument(firestore, placeId, kegId), updateData)
 }
+
+// let firstBumpedTapOrFirstTapName = (place: placeConverted) => {
+//   let placeTapsPairs = place.taps->Belt.Map.String.toArray
+//   placeTapsPairs
+//   ->Array.find(((_, kegRef)) => kegRef !== Null.null)
+//   ->Option.getWithDefault(placeTapsPairs->Belt.Array.getExn(0))
+//   ->fst
+// }
 
 let addPerson = async (firestore, placeId, personName) => {
   let placeSnapshot = await Firebase.getDocFromCache(placeDocument(firestore, placeId))
@@ -330,15 +344,8 @@ let addPerson = async (firestore, placeId, personName) => {
   await updatePlacePersonsAll(firestore, placeId, [(personId, placeShortcutRecord)])
 }
 
-let deleteConsumption = async (firestore, placeId, kegId, personId, createdAt) => {
+let deleteConsumption = async (firestore, placeId, kegId, consumptionId) => {
   let kegRef = kegDoc(firestore, placeId, kegId)
-  let kegSnapshot = await Firebase.getDocFromCache(kegRef)
-  let keg = kegSnapshot.data(. {})
-  let createMillis = createdAt->Js.Date.getTime
-  let newConsumptions =
-    keg.consumptions->Belt.Array.keep(c =>
-      c.person.id !== personId || c.createdAt->Firebase.Timestamp.toMillis !== createMillis
-    )
-  let updateData = ObjectUtils.setIn(None, `consumptions`, newConsumptions)
+  let updateData = ObjectUtils.setIn(None, `consumptions.${consumptionId}`, Firebase.deleteField())
   await Firebase.updateDoc(kegRef, updateData)
 }

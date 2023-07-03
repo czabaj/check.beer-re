@@ -87,8 +87,8 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
-                consumptions: [],
-                createdAt: Firebase.serverTimestamp(),
+                consumptions: Js.Dict.empty(),
+                createdAt: Firebase.Timestamp.now(),
                 depletedAt: Null.null,
                 milliliters: (liters *. 1000.0)->Int.fromFloat,
                 priceEnd: Null.null,

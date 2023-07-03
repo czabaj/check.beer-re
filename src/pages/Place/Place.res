@@ -61,6 +61,8 @@ let dialogReducer = (_, event) => {
   }
 }
 
+type userConsumption = {milliliters: int, timestamp: float}
+
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Firebase.docDataRx(placeRef, {idField: "uid"})
@@ -100,16 +102,27 @@ let pageDataRx = (firestore, placeId) => {
   let recentConsumptionsByUserIdRx = kegsWithRecentConsumptionRx->Rxjs.pipe(
     Rxjs.map(.(kegs, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
+      // TODO: show only past XY hours, filter the older out
       kegs->Array.forEach((keg: FirestoreModels.keg) => {
-        keg.consumptions->Array.forEach(
-          consumption => {
+        keg.consumptions
+        ->Js.Dict.entries
+        ->Array.forEach(
+          ((timestampStr, consumption)) => {
+            let userCons = {
+              timestamp: timestampStr->Float.fromString->Option.getExn,
+              milliliters: consumption.milliliters,
+            }
             switch Belt.MutableMap.String.get(consumptionsByUser, consumption.person.id) {
-            | Some(consumptions) => consumptions->Array.push(consumption)
+            | Some(consumptions) => consumptions->Array.push(userCons)
             | None =>
-              Belt.MutableMap.String.set(consumptionsByUser, consumption.person.id, [consumption])
+              Belt.MutableMap.String.set(consumptionsByUser, consumption.person.id, [userCons])
             }
           },
         )
+      })
+      // sort consumptions ty timestamp ascending
+      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+        consumptions->Array.sortInPlace((a, b) => (a.timestamp -. b.timestamp)->Int.fromFloat)
       })
       consumptionsByUser
     }),
@@ -281,7 +294,6 @@ let make = (~placeId) => {
                 placeId,
                 kegRef.id,
                 {
-                  createdAt: Firebase.Timestamp.now(),
                   milliliters: values.consumption,
                   person: Db.placePersonDocument(firestore, placeId, personId),
                 },
@@ -343,7 +355,9 @@ let make = (~placeId) => {
               kegsWithRecentConsumption
               ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
               ->Belt.Array.flatMap(keg =>
-                keg.consumptions->Belt.Array.keepMap((consumption): option<
+                keg.consumptions
+                ->Js.Dict.entries
+                ->Belt.Array.keepMap(((timestampStr, consumption)): option<
                   PersonDetail.unfinishedConsumptionsRecord,
                 > => {
                   switch consumption.person.id === personId {
@@ -351,9 +365,10 @@ let make = (~placeId) => {
                   | true =>
                     Some({
                       beer: keg.beer,
+                      consumptionId: timestampStr,
+                      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
                       kegId: Db.getUid(keg)->Option.getExn,
                       milliliters: consumption.milliliters,
-                      createdAt: consumption.createdAt->Firebase.Timestamp.toDate,
                     })
                   }
                 })
@@ -389,8 +404,7 @@ let make = (~placeId) => {
                   firestore,
                   placeId,
                   consumption.kegId,
-                  personId,
-                  consumption.createdAt,
+                  consumption.consumptionId,
                 )->ignore
               }}
               onDismiss={hideDialog}

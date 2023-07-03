@@ -9,13 +9,12 @@ type userAccount = {
 }
 
 type rec consumption = {
-  createdAt: Firebase.Timestamp.t,
   milliliters: int,
   person: Firebase.documentReference<person>,
 }
 and keg = {
   beer: string,
-  consumptions: array<consumption>,
+  consumptions: Js.Dict.t<consumption>,
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,

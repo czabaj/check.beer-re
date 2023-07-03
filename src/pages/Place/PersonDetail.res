@@ -7,6 +7,7 @@ type classesType = {
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
 type unfinishedConsumptionsRecord = {
+  consumptionId: string,
   kegId: string,
   beer: string,
   milliliters: int,

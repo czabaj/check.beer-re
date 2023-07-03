@@ -86,6 +86,9 @@ external startAfter: 'a => queryConstraint = "startAfter"
 type snapshotOptions = {serverTimestamps?: @string [#estimate | #previous | #none]}
 
 @module("firebase/firestore")
+external deleteField: unit => 'a = "deleteField"
+
+@module("firebase/firestore")
 external serverTimestamp: unit => 'a = "serverTimestamp"
 
 type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. snapshotOptions) => 'a}
