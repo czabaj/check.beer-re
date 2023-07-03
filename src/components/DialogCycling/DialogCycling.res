@@ -1,6 +1,10 @@
+type classesType = {root: string}
+
+@module("./DialogCycling.module.css") external classes: classesType = "default"
+
 @react.component
 let make = (~children, ~className=?, ~header, ~onDismiss, ~onNext, ~onPrevious, ~visible) => {
-  <Dialog ?className visible>
+  <Dialog className={`${classes.root} ${className->Option.getWithDefault("")}`} visible>
     <header>
       <h3> {React.string(header)} </h3>
       <button

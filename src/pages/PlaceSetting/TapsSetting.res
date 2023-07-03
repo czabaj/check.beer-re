@@ -102,7 +102,7 @@ let make = (
               </button>
             | Some(keg) =>
               <button
-                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantDanger}`}
                 onClick={_ => sendDialog(ShowUntapKeg(tapName, keg))}
                 type_="button">
                 {React.string("Odrazit")}
