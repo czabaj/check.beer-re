@@ -60,3 +60,14 @@
 .unfinishedConcumptionsTable tbody > tr:nth-child(odd) {
   background-color: var(--surface-1);
 }
+
+.deletePersonDialog > :global(.dialogWindow) {
+  inline-size: 40ch;
+}
+
+.deletePersonDialog header + p {
+  text-align: justify;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  word-break: break-word;
+}

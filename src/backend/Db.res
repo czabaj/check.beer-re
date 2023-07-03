@@ -314,14 +314,6 @@ let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
   Firebase.updateDoc(placeKegDocument(firestore, placeId, kegId), updateData)
 }
 
-// let firstBumpedTapOrFirstTapName = (place: placeConverted) => {
-//   let placeTapsPairs = place.taps->Belt.Map.String.toArray
-//   placeTapsPairs
-//   ->Array.find(((_, kegRef)) => kegRef !== Null.null)
-//   ->Option.getWithDefault(placeTapsPairs->Belt.Array.getExn(0))
-//   ->fst
-// }
-
 let addPerson = async (firestore, placeId, personName) => {
   let placeSnapshot = await Firebase.getDocFromCache(placeDocument(firestore, placeId))
   let place = placeSnapshot.data(. {})
@@ -344,8 +336,18 @@ let addPerson = async (firestore, placeId, personName) => {
   await updatePlacePersonsAll(firestore, placeId, [(personId, placeShortcutRecord)])
 }
 
-let deleteConsumption = async (firestore, placeId, kegId, consumptionId) => {
+let deleteConsumption = (firestore, placeId, kegId, consumptionId) => {
   let kegRef = kegDoc(firestore, placeId, kegId)
   let updateData = ObjectUtils.setIn(None, `consumptions.${consumptionId}`, Firebase.deleteField())
-  await Firebase.updateDoc(kegRef, updateData)
+  Firebase.updateDoc(kegRef, updateData)
+}
+
+let deletePerson = async (firestore, placeId, personId) => {
+  let updatePersonAllData = ObjectUtils.setIn(
+    None,
+    `personsAll.${personId}`,
+    Firebase.deleteField(),
+  )
+  await Firebase.updateDoc(placeDocument(firestore, placeId), updatePersonAllData)
+  await Firebase.deleteDoc(placePersonDocument(firestore, placeId, personId))
 }

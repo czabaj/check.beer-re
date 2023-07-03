@@ -1,6 +1,6 @@
 @react.component
-let make = (~children, ~heading, ~onConfirm, ~onDismiss, ~visible) => {
-  <Dialog visible>
+let make = (~children, ~className=?, ~heading, ~onConfirm, ~onDismiss, ~visible) => {
+  <Dialog ?className visible>
     <header>
       <h3> {React.string(heading)} </h3>
     </header>

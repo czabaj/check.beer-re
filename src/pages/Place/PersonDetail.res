@@ -1,5 +1,6 @@
 type classesType = {
   basicsDescriptionList: string,
+  deletePersonDialog: string,
   root: string,
   scrollContent: string,
   unfinishedConcumptionsTable: string,
@@ -18,6 +19,7 @@ type unfinishedConsumptionsRecord = {
 let make = (
   ~onDismiss,
   ~onDeleteConsumption,
+  ~onDeletePerson,
   ~onNextPerson,
   ~onPreviousPerson,
   ~person: Db.personsAllRecord,
@@ -30,13 +32,18 @@ let make = (
     placeId,
     personId,
   )
+  let (showDeletePersonConfirmation, setShowDeletePersonConfirmation) = React.useState(_ => false)
   <Dialog className={classes.root} visible={true}>
     <header>
       <h3> {React.string(person.name)} </h3>
-      <button className={`${Styles.buttonClasses.button}`} onClick=onPreviousPerson type_="button">
+      <button
+        className={`${Styles.buttonClasses.button}`}
+        onClick={_ => onPreviousPerson()}
+        type_="button">
         {React.string("⬅️ Předchozí")}
       </button>
-      <button className={`${Styles.buttonClasses.button}`} onClick=onNextPerson type_="button">
+      <button
+        className={`${Styles.buttonClasses.button}`} onClick={_ => onNextPerson()} type_="button">
         {React.string("Následující ➡️")}
       </button>
     </header>
@@ -47,7 +54,7 @@ let make = (
             <dt> {React.string("již od")} </dt>
             <dd>
               {switch maybePersonDoc {
-              | None => React.string("načítám…")
+              | None => <LoadingInline />
               | Some(personDoc) =>
                 <FormattedDateTime value={personDoc.createdAt->Firebase.Timestamp.toDate} />
               }}
@@ -63,7 +70,7 @@ let make = (
             <dt> {React.string("stav konta")} </dt>
             <dd>
               {switch maybePersonDoc {
-              | None => React.string("načítám…")
+              | None => <LoadingInline />
               | Some(personDoc) =>
                 <FormattedCurrency
                   format={FormattedCurrency.formatAccounting} value=personDoc.balance
@@ -75,7 +82,23 @@ let make = (
       </section>
       <section ariaLabelledby="unfinished_consumptions">
         {unfinishedConsumptions->Array.length === 0
-          ? <p> {React.string("Prázdné")} </p>
+          ? <p>
+              {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
+              {switch maybePersonDoc {
+              | Some({transactions: []}) =>
+                <>
+                  {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní`)}
+                  <button
+                    className={Styles.linkClasses.base}
+                    onClick={_ => setShowDeletePersonConfirmation(_ => true)}
+                    type_="button">
+                    {React.string(" zcela odebrat z aplikace.")}
+                  </button>
+                  {React.string(" S účetním záznamem to později již není možné ☝️")}
+                </>
+              | _ => React.null
+              }}
+            </p>
           : <table className={classes.unfinishedConcumptionsTable}>
               <caption> {React.string("Nezaúčtovaná piva")} </caption>
               <thead>
@@ -119,9 +142,26 @@ let make = (
       </section>
     </div>
     <footer>
-      <button className={`${Styles.buttonClasses.button}`} onClick={onDismiss}>
+      <button className={`${Styles.buttonClasses.button}`} onClick={_ => onDismiss()}>
         {React.string("Zavřít")}
       </button>
     </footer>
+    {!showDeletePersonConfirmation
+      ? React.null
+      : <DialogConfirmation
+          className={classes.deletePersonDialog}
+          heading="Odstranit osobu ?"
+          onConfirm={() => {
+            onDismiss()
+            onDeletePerson()
+          }}
+          onDismiss={() => setShowDeletePersonConfirmation(_ => false)}
+          visible=showDeletePersonConfirmation>
+          <p>
+            {React.string(`Chystáte se odstranit osobu `)}
+            <b> {React.string(person.name)} </b>
+            {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetních transakcí. Chcete pokračovat?`)}
+          </p>
+        </DialogConfirmation>}
   </Dialog>
 }

@@ -89,6 +89,9 @@ type snapshotOptions = {serverTimestamps?: @string [#estimate | #previous | #non
 external deleteField: unit => 'a = "deleteField"
 
 @module("firebase/firestore")
+external deleteDoc: documentReference<'a> => promise<unit> = "deleteDoc"
+
+@module("firebase/firestore")
 external serverTimestamp: unit => 'a = "serverTimestamp"
 
 type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. snapshotOptions) => 'a}

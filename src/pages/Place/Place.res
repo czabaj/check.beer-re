@@ -34,7 +34,7 @@ module ActiveCheckbox = {
 module DetailButton = {
   @react.component
   let make = (~onClick) => {
-    <button className={classes.detailButton} title="Detail osoby" type_="button" onClick={onClick}>
+    <button className={classes.detailButton} title="Osobní karta" type_="button" onClick={onClick}>
       {React.string("👀")}
     </button>
   }
@@ -406,6 +406,9 @@ let make = (~placeId) => {
                   consumption.kegId,
                   consumption.consumptionId,
                 )->ignore
+              }}
+              onDeletePerson={_ => {
+                Db.deletePerson(firestore, placeId, personId)->ignore
               }}
               onDismiss={hideDialog}
               onNextPerson={_ => handleSwitchPerson(true)}

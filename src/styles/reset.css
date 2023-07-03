@@ -15,8 +15,10 @@ button {
   line-height: normal;
   margin: 0;
   overflow: visible;
+  overflow-wrap: break-word;
   padding: 0;
   inline-size: auto;
+  white-space: break-spaces;
   /* Corrects font smoothing for webkit */
   -webkit-font-smoothing: inherit;
   -moz-osx-font-smoothing: inherit;
