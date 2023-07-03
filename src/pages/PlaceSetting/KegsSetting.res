@@ -1,14 +1,15 @@
 type classesType = {emptyTableMessage: string, table: string}
 @module("./KegsSetting.module.css") external classes: classesType = "default"
 
-type dialogState = Hidden | AddKeg
+type dialogState = Hidden | AddKeg | KegDetail(string)
 
-type dialogEvent = Hide | ShowAddKeg
+type dialogEvent = Hide | ShowAddKeg | ShowKegDetail(string)
 
 let dialogReducer = (_, event) => {
   switch event {
   | Hide => Hidden
   | ShowAddKeg => AddKeg
+  | ShowKegDetail(kegId) => KegDetail(kegId)
   }
 }
 
@@ -41,13 +42,17 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
             <th scope="col"> {React.string("Cena")} </th>
             <th scope="col"> {React.string("Objem")} </th>
             <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
+            <th scope="col">
+              <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+            </th>
           </tr>
         </thead>
         <tbody>
           {kegs
           ->Array.map(keg => {
             let volume = keg.milliliters
-            <tr key={keg.serial->Int.toString}>
+            let kegId = Db.getUid(keg)->Option.getExn
+            <tr key={kegId}>
               <th scope="row"> {React.string(keg.serialFormatted)} </th>
               <td> {React.string(keg.beer)} </td>
               <td>
@@ -69,6 +74,12 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
                     `${Int.toString(volume / 1000)} / ${Int.toString(volume / 1000)} litrů`,
                   )}
                 </meter>
+              </td>
+              <td>
+                <button
+                  title="Karta sudu" type_="button" onClick={_ => sendDialog(ShowKegDetail(kegId))}>
+                  {React.string("👀")}
+                </button>
               </td>
             </tr>
           })
@@ -102,6 +113,27 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
         }}
         placeId
       />
+    | KegDetail(kegId) => {
+        let kegIdx = chargedKegs->Array.findIndex(keg => Db.getUid(keg)->Option.getExn === kegId)
+        let keg = chargedKegs->Belt.Array.getExn(kegIdx)
+        let handleCycleKeg = increase => {
+          let nextIdx = ref(kegIdx + (increase ? 1 : -1))
+          let maxIdx = Array.length(chargedKegs) - 1
+          if nextIdx.contents < 0 {
+            nextIdx := maxIdx
+          } else if nextIdx.contents > maxIdx {
+            nextIdx := 0
+          }
+          let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx.contents)->Db.getUid->Option.getExn
+          sendDialog(ShowKegDetail(nextKegId))
+        }
+        <KegDetail
+          keg
+          onDismiss={hideDialog}
+          onNextKeg={_ => handleCycleKeg(true)}
+          onPreviousKeg={_ => handleCycleKeg(false)}
+        />
+      }
     }}
   </SectionWithHeader>
 }

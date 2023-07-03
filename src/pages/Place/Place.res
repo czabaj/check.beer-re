@@ -376,7 +376,7 @@ let make = (~placeId) => {
             unfinishedConsumptions->Array.sortInPlace((a, b) =>
               (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
             )
-            let handleSwitchPerson = increase => {
+            let handleCyclePerson = increase => {
               let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
               if currentIdx === -1 {
                 ()
@@ -411,8 +411,8 @@ let make = (~placeId) => {
                 Db.deletePerson(firestore, placeId, personId)->ignore
               }}
               onDismiss={hideDialog}
-              onNextPerson={_ => handleSwitchPerson(true)}
-              onPreviousPerson={_ => handleSwitchPerson(false)}
+              onNextPerson={_ => handleCyclePerson(true)}
+              onPreviousPerson={_ => handleCyclePerson(false)}
               person
               personId
               placeId

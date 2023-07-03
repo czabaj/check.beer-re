@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {scrollContent: string, root: string}
 
 @module("./Dialog.module.css") external classes: classesType = "default"
 
@@ -49,4 +49,11 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
     // so I must have a container for just the content of the window
     <div className={`dialogWindow`} ref={dialogWindowRef}> {children} </div>
   </dialog>
+}
+
+module DialogBody = {
+  @react.component
+  let make = (~children) => {
+    <div className={classes.scrollContent}> {children} </div>
+  }
 }
