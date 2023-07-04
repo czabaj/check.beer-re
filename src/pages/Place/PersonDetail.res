@@ -1,8 +1,6 @@
 type classesType = {
   deletePersonDialog: string,
   root: string,
-  scrollContent: string,
-  unfinishedConcumptionsTable: string,
 }
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
@@ -90,7 +88,7 @@ let make = (
             | _ => React.null
             }}
           </p>
-        : <table className={classes.unfinishedConcumptionsTable}>
+        : <table className={Styles.tableClasses.consumptions}>
             <caption> {React.string("Nezaúčtovaná piva")} </caption>
             <thead>
               <tr>

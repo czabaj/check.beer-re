@@ -6,27 +6,6 @@
   overflow: hidden;
 }
 
-.unfinishedConcumptionsTable {
-  width: 100%;
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-.unfinishedConcumptionsTable caption {
-  text-align: left;
-  font-size: var(--font-size-18);
-  font-weight: var(--font-weight-medium);
-}
-.unfinishedConcumptionsTable :where(td, th) {
-  text-align: right;
-  padding-inline: 0.5rem;
-}
-.unfinishedConcumptionsTable :where(td, th):where(:nth-child(1)) {
-  text-align: left;
-}
-.unfinishedConcumptionsTable tbody > tr:nth-child(odd) {
-  background-color: var(--surface-1);
-}
-
 .deletePersonDialog > :global(.dialogWindow) {
   inline-size: 40ch;
 }

@@ -23,6 +23,9 @@ type fieldsetClassesType = {grid: string}
 type linkClassesType = {base: string}
 @module("./link.module.css") external linkClasses: linkClassesType = "default"
 
+type tableClassesType = {consumptions: string, stretch: string}
+@module("./table.module.css") external tableClasses: tableClassesType = "default"
+
 type utilityClassesType = {
   breakout: string,
   srOnly: string,

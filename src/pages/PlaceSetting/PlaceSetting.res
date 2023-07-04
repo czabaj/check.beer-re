@@ -66,7 +66,7 @@ let make = (~placeId) => {
                 />
               }}
           <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
-          <KegsSetting chargedKegs placeId />
+          <KegsSetting chargedKegs place placeId />
           <AccountingOverview chargedKegs untappedChargedKegs />
         </main>
       </div>

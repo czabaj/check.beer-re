@@ -1,0 +1,34 @@
+.stretch {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.consumptions {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-inline: calc(-1 * var(--dialog-padding-inline));
+  width: calc(100% + 2 * var(--dialog-padding-inline));
+}
+.consumptions caption {
+  text-align: left;
+  font-size: var(--font-size-18);
+  font-weight: var(--font-weight-medium);
+  padding-inline: var(--dialog-padding-inline);
+}
+.consumptions :where(td, th):first-child {
+  padding-inline-start: var(--dialog-padding-inline);
+}
+.consumptions :where(td, th):last-child {
+  padding-inline-end: var(--dialog-padding-inline);
+}
+.consumptions :where(td, th) {
+  text-align: right;
+  padding-inline: 0.5rem;
+}
+.consumptions :where(td, th):where(:nth-child(1)) {
+  text-align: left;
+}
+.consumptions tbody > tr:nth-child(odd) {
+  background-color: var(--surface-1);
+}

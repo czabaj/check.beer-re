@@ -1,5 +1,12 @@
 @react.component
-let make = (~keg: Db.kegConverted, ~onDismiss, ~onPreviousKeg, ~onNextKeg) => {
+let make = (
+  ~keg: Db.kegConverted,
+  ~place: Db.placeConverted,
+  ~onDeleteConsumption,
+  ~onDismiss,
+  ~onPreviousKeg,
+  ~onNextKeg,
+) => {
   let firstConsumption =
     keg.consumptions
     ->Belt.Map.String.keysToArray
@@ -85,8 +92,48 @@ let make = (~keg: Db.kegConverted, ~onDismiss, ~onPreviousKeg, ~onNextKeg) => {
         }
       }}
     </dl>
-    {React.string(
-      "Naraženo, naskladněno, cena nákup, cena finální, všechny konzumace, možnost odstranit pokud je nedotčený, ...",
-    )}
+    <table className={Styles.tableClasses.consumptions}>
+      <caption> {React.string("Natočená piva")} </caption>
+      <thead>
+        <tr>
+          <th scope="col"> {React.string("Jméno")} </th>
+          <th scope="col"> {React.string("Objem")} </th>
+          <th scope="col"> {React.string("Kdy")} </th>
+          <th scope="col">
+            <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {keg.consumptions
+        ->Belt.Map.String.toArray
+        // The map is sorted by timestamp ascending, we want descending
+        ->Array.reverse
+        ->Array.map(((timestampStr, consumption)) => {
+          let person = place.personsAll->Belt.Map.String.getExn(consumption.person.id)
+          let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
+          <tr>
+            <td> {React.string(person.name)} </td>
+            <td>
+              <FormattedVolume milliliters=consumption.milliliters />
+            </td>
+            <td>
+              <FormattedDateTime value={createdData} />
+            </td>
+            <td>
+              {keg.depletedAt !== Null.null
+                ? React.null
+                : <button
+                    className={`${Styles.buttonClasses.button}`}
+                    onClick={_ => onDeleteConsumption(timestampStr)}
+                    type_="button">
+                    {React.string("🗑️ Smáznout")}
+                  </button>}
+            </td>
+          </tr>
+        })
+        ->React.array}
+      </tbody>
+    </table>
   </DialogCycling>
 }

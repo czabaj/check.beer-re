@@ -14,7 +14,7 @@ let dialogReducer = (_, event) => {
 }
 
 @react.component
-let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
+let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
   let firestore = Firebase.useFirestore()
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
@@ -130,9 +130,13 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
         }
         <KegDetail
           keg
+          onDeleteConsumption={consumptionId => {
+            Db.deleteConsumption(firestore, placeId, kegId, consumptionId)->ignore
+          }}
           onDismiss={hideDialog}
           onNextKeg={_ => handleCycleKeg(true)}
           onPreviousKeg={_ => handleCycleKeg(false)}
+          place
         />
       }
     }}
