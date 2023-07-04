@@ -63,10 +63,6 @@ li:last-child .detailButton {
   border-end-end-radius: var(--radius-2);
 }
 
-.detailButton:hover {
-  background-color: var(--surface-3);
-}
-
 .activeCheckbox {
   align-items: center;
   display: flex;

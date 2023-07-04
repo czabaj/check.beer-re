@@ -1,9 +1,6 @@
 .root > :global(.dialogWindow) {
   inline-size: 60ch;
-  block-size: 30rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  block-size: min(30rem, 80vh);
 }
 
 .deletePersonDialog > :global(.dialogWindow) {

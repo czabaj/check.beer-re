@@ -1,4 +1,4 @@
-type classesType = {emptyTableMessage: string, table: string}
+type classesType = {detailButtonCell: string, emptyTableMessage: string, table: string}
 @module("./KegsSetting.module.css") external classes: classesType = "default"
 
 type dialogState = Hidden | AddKeg | KegDetail(string)
@@ -77,11 +77,8 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
                   )}
                 </meter>
               </td>
-              <td>
-                <button
-                  title="Karta sudu" type_="button" onClick={_ => sendDialog(ShowKegDetail(kegId))}>
-                  {React.string("👀")}
-                </button>
+              <td className={classes.detailButtonCell}>
+                <ButtonDetail onClick={_ => sendDialog(ShowKegDetail(kegId))} title="Karta sudu" />
               </td>
             </tr>
           })

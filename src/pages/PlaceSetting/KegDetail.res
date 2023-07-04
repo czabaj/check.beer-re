@@ -1,3 +1,6 @@
+type classesType = {root: string}
+@module("./KegDetail.module.css") external classes: classesType = "default"
+
 @react.component
 let make = (
   ~keg: Db.kegConverted,
@@ -19,6 +22,7 @@ let make = (
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
   <DialogCycling
+    className=classes.root
     header={`${keg.serialFormatted} ${keg.beer}`}
     onDismiss
     onNext=onNextKeg

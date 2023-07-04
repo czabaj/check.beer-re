@@ -34,9 +34,7 @@ module ActiveCheckbox = {
 module DetailButton = {
   @react.component
   let make = (~onClick) => {
-    <button className={classes.detailButton} title="Osobní karta" type_="button" onClick={onClick}>
-      {React.string("👀")}
-    </button>
+    <ButtonDetail className={classes.detailButton} onClick={onClick} title="Osobní karta" />
   }
 }
 
