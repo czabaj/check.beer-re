@@ -4,41 +4,45 @@
   inline-size: 60ch;
 }
 
+.root h3 {
+  font-size: 150%;
+  text-align: center;
+}
+
 .root form {
   font-size: 200%;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: var(--dialog-padding-inline);
   justify-content: space-between;
 }
 
-.root form > fieldset {
+.consumptions {
   display: grid;
   border-style: none;
   grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
   padding: 0;
 }
-
-.root form > fieldset legend {
-  padding-block: 1rem;
-  width: 100%;
-  text-align: center;
-}
-
-.root form > fieldset > label {
+.consumptions > label {
   background-color: var(--surface-1);
   border-radius: var(--radius-2);
   box-shadow: var(--inner-shadow-4);
   padding-block: 1rem;
   text-align: center;
 }
-
-.root form > fieldset input {
+.consumptions input {
   display: none;
 }
 
-.root form > :global(.inputWrapper) {
-  justify-content: space-between;
-  flex-wrap: wrap;
+.taps {
+  border-style: none;
+  margin-inline: calc(-1 * var(--dialog-padding-inline));
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+.taps > label {
+  border-block-start: var(--border-size-1) solid var(--surface-1);
+  padding-inline: var(--dialog-padding-inline);
 }

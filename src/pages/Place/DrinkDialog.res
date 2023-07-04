@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {consumptions: string, root: string, taps: string}
 
 @module("./DrinkDialog.module.css") external classes: classesType = "default"
 
@@ -23,7 +23,7 @@ let make = (
     ->Belt.Map.String.toArray
     ->Array.map(((tapName, keg)) => {
       {
-        text: `${tapName}: ${keg.beer}`,
+        text: `${tapName}: ${keg.beer} ${keg.serialFormatted}`,
         value: tapName,
       }
     })
@@ -62,6 +62,9 @@ let make = (
     (),
   )
   <Dialog className={classes.root} onClickOutside={onDismiss} visible={true}>
+    <header>
+      <h3> {React.string(personName)} </h3>
+    </header>
     {tapsEmpty
       ? <p> {React.string("Naražte sudy!")} </p>
       : {
@@ -70,20 +73,23 @@ let make = (
               {<Form.Field
                 field=Tap
                 render={field => {
-                  <InputWrapper
-                    inputError=?{field.error}
-                    inputName="tap"
-                    inputSlot={<select
-                      onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                      value={field.value}>
-                      {options
-                      ->Array.map(({text, value}) => {
-                        <option key={value} value={value}> {React.string(text)} </option>
-                      })
-                      ->React.array}
-                    </select>}
-                    labelSlot={React.string(`Z${HtmlEntities.nbsp}pípy:`)}
-                  />
+                  let handleChange = ReForm.Helpers.handleChange(field.handleChange)
+                  <fieldset className={classes.taps}>
+                    {options
+                    ->Array.map(({text, value}) => {
+                      <label>
+                        <input
+                          type_="radio"
+                          name="tap"
+                          value={value}
+                          checked={field.value === value}
+                          onChange={handleChange}
+                        />
+                        <span> {React.string(text)} </span>
+                      </label>
+                    })
+                    ->React.array}
+                  </fieldset>
                 }}
               />}
               <Form.Field
@@ -95,8 +101,7 @@ let make = (
                     field.handleChange(value)
                     form.submit()
                   }
-                  <fieldset>
-                    <legend> {React.string(personName)} </legend>
+                  <fieldset className={classes.consumptions}>
                     <label>
                       <SvgComponents.BeerGlassLarge />
                       <input

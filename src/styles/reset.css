@@ -34,6 +34,10 @@ button {
   }
 }
 
+dialog:modal {
+  color: var(--text-2);
+}
+
 dl:where(.reset) dd {
   margin: 0;
 }

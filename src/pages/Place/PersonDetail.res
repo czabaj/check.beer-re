@@ -79,14 +79,14 @@ let make = (
             {switch maybePersonDoc {
             | Some({transactions: []}) =>
               <>
-                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní`)}
+                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
                 <button
                   className={Styles.linkClasses.base}
                   onClick={_ => setShowDeletePersonConfirmation(_ => true)}
                   type_="button">
-                  {React.string(" zcela odebrat z aplikace.")}
+                  {React.string("zcela odebrat z aplikace")}
                 </button>
-                {React.string(" S účetním záznamem to později již není možné ☝️")}
+                {React.string(". S účetním záznamem to později již není možné ☝️")}
               </>
             | _ => React.null
             }}

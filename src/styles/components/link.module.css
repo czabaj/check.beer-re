@@ -1,4 +1,8 @@
 .base {
-  color: var(--text-2);
+  color: var(--text-3);
+  letter-spacing: 0.02em;
   text-decoration: underline;
+}
+.base:hover {
+  color: currentColor;
 }

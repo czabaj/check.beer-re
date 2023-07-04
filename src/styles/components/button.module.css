@@ -9,6 +9,7 @@
   font-weight: var(--_font-weight, var(--font-weight-medium));
   gap: 0.5rem;
   justify-content: center;
+  letter-spacing: 0.02em;
   min-block-size: var(--_block-size, 2rem);
   min-inline-size: 10ch;
   user-select: none;

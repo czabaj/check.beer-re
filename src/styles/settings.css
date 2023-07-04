@@ -19,7 +19,7 @@ html.themeDark {
 }
 
 html {
-  --surface-1: var(--light, hsl(210 17% 93%)) var(--dark, hsl(210deg 14% 7%));
+  --surface-1: var(--light, hsl(86deg 3% 93%)) var(--dark, hsl(210deg 14% 7%));
   --surface-2: hsl(210deg 17% 98%);
   --surface-3: hsl(210deg 17% 95%);
   --surface-4: hsl(210deg 14% 83%);
@@ -28,9 +28,9 @@ html {
   --surface-brand-l: 36%;
   --surface-danger: hsl(0deg 63% 54%);
 
-  --text-1: hsl(210deg 10% 23%);
-  --text-2: hsl(210deg 9% 31%);
-  --text-3: hsl(210deg 14% 83%);
+  --text-1: hsl(210deg 7% 13%);
+  --text-2: hsl(210, 7%, 23%);
+  --text-3: hsl(0, 0%, 52%);
   --text-brand-1: hsl(210deg 17% 98%);
   --text-brand-2: hsl(47deg 100% 62%);
   --text-danger: hsl(210deg 17% 98%);
