@@ -198,7 +198,7 @@ let make = (
             ->React.array}
           </tbody>
         </table>
-        {keg.depletedAt === Null.null
+        {keg.depletedAt !== Null.null
           ? React.null
           : <button
               className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantDanger}`}

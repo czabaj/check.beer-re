@@ -70,10 +70,14 @@
   --_border: hsl(var(--surface-danger) / 20%);
   --_text: var(--text-danger);
   --_active-background: var(--surface-danger);
-  --_active-border: hsl(var(--surface-danger-hsl) / 20%);
+  --_active-border: hsl(var(--surface-danger-hs) var(--surface-danger-l) / 20%);
   --_active-text: var(--text-danger);
-  --_disabled-background: hsl(var(--surface-danger-hsl) / 30%);
-  --_disabled-border: hsl(var(--surface-danger-hsl) / 20%);
+  --_disabled-background: hsl(
+    var(--surface-danger-hs) var(--surface-danger-l) / 30%
+  );
+  --_disabled-border: hsl(
+    var(--surface-danger-hs) var(--surface-danger-l) / 20%
+  );
   --_disabled-text: var(--text-danger);
   --_hover-background: hsl(
     var(--surface-danger-hs) calc(var(--surface-danger-l) + 5%)

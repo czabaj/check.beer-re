@@ -177,7 +177,7 @@ let make = (~placeId) => {
               onClick={_ => sendDialog(ShowAddPerson)}>
               {React.string("Přidat osobu")}
             </button>}
-            headerSlot={React.string("Zápisník")}
+            headerSlot={React.string("Lístek")}
             headerId="active-persons">
             <ol className={`reset ${classes.list}`}>
               {sortedActivePersons
