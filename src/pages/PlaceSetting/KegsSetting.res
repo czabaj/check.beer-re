@@ -130,6 +130,10 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
           onDeleteConsumption={consumptionId => {
             Db.deleteConsumption(firestore, placeId, kegId, consumptionId)->ignore
           }}
+          onDeleteKeg={_ => {
+            Db.deleteKeg(firestore, placeId, kegId)->ignore
+            hideDialog()
+          }}
           onDismiss={hideDialog}
           onNextKeg={_ => handleCycleKeg(true)}
           onPreviousKeg={_ => handleCycleKeg(false)}

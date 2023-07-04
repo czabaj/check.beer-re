@@ -1,3 +1,7 @@
+type classesType = {deleteConfirmation: string}
+
+@module("./DialogConfirmation.module.css") external classes: classesType = "default"
+
 @react.component
 let make = (~children, ~className=?, ~heading, ~onConfirm, ~onDismiss, ~visible) => {
   <Dialog ?className visible>

@@ -1,0 +1,11 @@
+.info {
+  background-color: var(--surface-info);
+  color: var(--text-on-info);
+  border-radius: var(--radius-2);
+  padding-block: 0.5rem;
+  padding-inline: 1rem;
+  display: flow-root;
+}
+.info::before {
+  content: "☝️ ";
+}

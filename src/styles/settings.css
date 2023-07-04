@@ -27,6 +27,7 @@ html {
   --surface-brand-hs: 86deg 84%;
   --surface-brand-l: 36%;
   --surface-danger: hsl(0deg 63% 54%);
+  --surface-info: hsl(197, 82%, 92%);
 
   --text-1: hsl(210deg 7% 13%);
   --text-2: hsl(210, 7%, 23%);
@@ -35,6 +36,7 @@ html {
   --text-brand-2: hsl(47deg 100% 62%);
   --text-danger: hsl(210deg 17% 98%);
   --text-success: hsl(120deg 100% 27%);
+  --text-on-info: hsl(210deg 7% 13%);
 
   --shadow-color: var(--light, 220 3% 15%) var(--dark, 220 40% 2%);
   --shadow-strength: var(--light, 1%) var(--dark, 25%);

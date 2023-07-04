@@ -1,0 +1,9 @@
+.deleteConfirmation > :global(.dialogWindow) {
+  inline-size: 40ch;
+}
+.deleteConfirmation header + p {
+  text-align: justify;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  word-break: break-word;
+}

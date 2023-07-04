@@ -23,6 +23,9 @@ type fieldsetClassesType = {grid: string}
 type linkClassesType = {base: string}
 @module("./link.module.css") external linkClasses: linkClassesType = "default"
 
+type messageBarClassesType = {info: string}
+@module("./messageBar.module.css") external messageBarClasses: messageBarClassesType = "default"
+
 type tableClassesType = {consumptions: string, stretch: string}
 @module("./table.module.css") external tableClasses: tableClassesType = "default"
 

@@ -1,7 +1,4 @@
-type classesType = {
-  deletePersonDialog: string,
-  root: string,
-}
+type classesType = {root: string}
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
 type unfinishedConsumptionsRecord = {
@@ -129,14 +126,14 @@ let make = (
     {!showDeletePersonConfirmation
       ? React.null
       : <DialogConfirmation
-          className={classes.deletePersonDialog}
+          className={DialogConfirmation.classes.deleteConfirmation}
           heading="Odstranit osobu ?"
           onConfirm={() => {
             onDismiss()
             onDeletePerson()
           }}
           onDismiss={() => setShowDeletePersonConfirmation(_ => false)}
-          visible=showDeletePersonConfirmation>
+          visible=true>
           <p>
             {React.string(`Chystáte se odstranit osobu `)}
             <b> {React.string(person.name)} </b>

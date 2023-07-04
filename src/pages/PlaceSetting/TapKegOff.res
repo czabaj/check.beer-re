@@ -54,6 +54,7 @@ let make = (~keg: Db.kegConverted, ~onSubmit, ~onDismiss, ~tapName) => {
             {React.string("Pozor, dopitý a rozúčtovaný sud nejde odúčtovat!")}
           </strong>
         </p>
+        // TODO: ban finalizing of keg without consumptions
         <form id="tap_keg_off" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
           <Form.Field
             field=UntapOption

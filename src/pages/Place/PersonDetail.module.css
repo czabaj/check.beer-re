@@ -2,13 +2,3 @@
   inline-size: 60ch;
   block-size: min(30rem, 80vh);
 }
-
-.deletePersonDialog > :global(.dialogWindow) {
-  inline-size: 40ch;
-}
-.deletePersonDialog header + p {
-  text-align: justify;
-  overflow-wrap: break-word;
-  hyphens: auto;
-  word-break: break-word;
-}

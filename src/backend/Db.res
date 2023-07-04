@@ -347,3 +347,8 @@ let deletePerson = async (firestore, placeId, personId) => {
   await Firebase.updateDoc(placeDocument(firestore, placeId), updatePersonAllData)
   await Firebase.deleteDoc(placePersonDocument(firestore, placeId, personId))
 }
+
+let deleteKeg = async (firestore, placeId, kegId) => {
+  let kegRef = kegDoc(firestore, placeId, kegId)
+  await Firebase.deleteDoc(kegRef)
+}
