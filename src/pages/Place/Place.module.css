@@ -54,9 +54,13 @@
 .detailButton {
   margin-inline-end: calc(-1 * var(--place-list-padding-inline));
   padding-inline: var(--place-list-padding-inline);
-  border-start-end-radius: var(--radius-2);
-  border-end-end-radius: var(--radius-2);
   z-index: 1;
+}
+li:first-child .detailButton {
+  border-start-end-radius: var(--radius-2);
+}
+li:last-child .detailButton {
+  border-end-end-radius: var(--radius-2);
 }
 
 .detailButton:hover {

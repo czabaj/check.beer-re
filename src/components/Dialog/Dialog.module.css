@@ -1,6 +1,6 @@
 .root {
   border-radius: var(--radius-2);
-  border-style: none;
+  border: 1px solid var(--surface-4);
   box-shadow: var(--shadow-4);
   padding: 0;
 }

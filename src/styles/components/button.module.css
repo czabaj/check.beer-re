@@ -49,7 +49,7 @@
 
 .variantPrimary {
   --_background: var(--surface-brand);
-  --_border: hsl(var(--surface-brand-hsl) / 20%);
+  --_border: var(--_background);
   --_text: var(--text-brand-1);
   --_active-background: var(--surface-brand);
   --_active-border: hsl(var(--surface-brand-hsl) / 20%);
@@ -60,9 +60,7 @@
   --_hover-background: hsl(
     var(--surface-brand-hs) calc(var(--surface-brand-l) + 5%)
   );
-  --_hover-border: hsl(
-    var(--surface-brand-hs) calc(var(--surface-brand-l) + 5%) / 20%
-  );
+  --_hover-border: var(--_hover-background);
   --_hover-text: var(--text-brand-1);
   --_separator: var(--text-brand-1);
 }
