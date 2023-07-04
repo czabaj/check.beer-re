@@ -11,9 +11,11 @@ type unfinishedConsumptionsRecord = {
 
 @react.component
 let make = (
-  ~onDismiss,
+  ~hasNext,
+  ~hasPrevious,
   ~onDeleteConsumption,
   ~onDeletePerson,
+  ~onDismiss,
   ~onNextPerson,
   ~onPreviousPerson,
   ~person: Db.personsAllRecord,
@@ -29,6 +31,8 @@ let make = (
   let (showDeletePersonConfirmation, setShowDeletePersonConfirmation) = React.useState(_ => false)
   <DialogCycling
     className={classes.root}
+    hasNext
+    hasPrevious
     header={person.name}
     onDismiss
     onNext=onNextPerson

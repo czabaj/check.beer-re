@@ -1,8 +1,22 @@
 type classesType = {root: string}
 @module("./KegDetail.module.css") external classes: classesType = "default"
 
+type dialogState = Hidden | ConfirmDelete | ConfirmFinalize
+
+type dialogEvent = Hide | ShowConfirmDelete | ShowConfirmFinalize
+
+let dialogReducer = (_, event) => {
+  switch event {
+  | Hide => Hidden
+  | ShowConfirmDelete => ConfirmDelete
+  | ShowConfirmFinalize => ConfirmFinalize
+  }
+}
+
 @react.component
 let make = (
+  ~hasNext,
+  ~hasPrevious,
   ~keg: Db.kegConverted,
   ~place: Db.placeConverted,
   ~onDeleteConsumption,
@@ -23,9 +37,8 @@ let make = (
     ->Option.flatMap(((timestampStr, _)) => timestampStr->Float.fromString)
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
-  let (showDeleteKegConfirmation, setShowDeleteKegConfirmation) = React.useState(_ => false)
-  let kegName = `${keg.serialFormatted} ${keg.beer}`
   let kegId = Db.getUid(keg)->Option.getExn
+  let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
     place.taps
     ->Belt.Map.String.findFirstBy((_, maybeKegRef) =>
@@ -35,7 +48,11 @@ let make = (
       ->Option.getWithDefault(false)
     )
     ->Option.map(((tapName, _)) => tapName)
+  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
+  let hideDialog = _ => sendDialog(Hide)
   <DialogCycling
+    hasNext
+    hasPrevious
     className=classes.root
     header={kegName}
     onDismiss
@@ -128,7 +145,7 @@ let make = (
             {React.string(" Pokud jste sud přidali omylem můžete ho ")}
             <button
               className={Styles.linkClasses.base}
-              onClick={_ => setShowDeleteKegConfirmation(_ => true)}
+              onClick={_ => sendDialog(ShowConfirmDelete)}
               type_="button">
               {React.string("odebrat z aplikace")}
             </button>
@@ -137,66 +154,94 @@ let make = (
         }}
       </p>
     | _ =>
-      <table className={Styles.tableClasses.consumptions}>
-        <caption> {React.string("Natočená piva")} </caption>
-        <thead>
-          <tr>
-            <th scope="col"> {React.string("Jméno")} </th>
-            <th scope="col"> {React.string("Objem")} </th>
-            <th scope="col"> {React.string("Kdy")} </th>
-            <th scope="col">
-              <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {keg.consumptions
-          ->Belt.Map.String.toArray
-          // The map is sorted by timestamp ascending, we want descending
-          ->Array.reverse
-          ->Array.map(((timestampStr, consumption)) => {
-            let person = place.personsAll->Belt.Map.String.getExn(consumption.person.id)
-            let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
+      <>
+        <table className={Styles.tableClasses.consumptions}>
+          <caption> {React.string("Natočená piva")} </caption>
+          <thead>
             <tr>
-              <td> {React.string(person.name)} </td>
-              <td>
-                <FormattedVolume milliliters=consumption.milliliters />
-              </td>
-              <td>
-                <FormattedDateTime value={createdData} />
-              </td>
-              <td>
-                {keg.depletedAt !== Null.null
-                  ? React.null
-                  : <button
-                      className={`${Styles.buttonClasses.button}`}
-                      onClick={_ => onDeleteConsumption(timestampStr)}
-                      type_="button">
-                      {React.string("🗑️ Smáznout")}
-                    </button>}
-              </td>
+              <th scope="col"> {React.string("Jméno")} </th>
+              <th scope="col"> {React.string("Objem")} </th>
+              <th scope="col"> {React.string("Kdy")} </th>
+              <th scope="col">
+                <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+              </th>
             </tr>
-          })
-          ->React.array}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {keg.consumptions
+            ->Belt.Map.String.toArray
+            // The map is sorted by timestamp ascending, we want descending
+            ->Array.reverse
+            ->Array.map(((timestampStr, consumption)) => {
+              let person = place.personsAll->Belt.Map.String.getExn(consumption.person.id)
+              let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
+              <tr>
+                <td> {React.string(person.name)} </td>
+                <td>
+                  <FormattedVolume milliliters=consumption.milliliters />
+                </td>
+                <td>
+                  <FormattedDateTime value={createdData} />
+                </td>
+                <td>
+                  {keg.depletedAt !== Null.null
+                    ? React.null
+                    : <button
+                        className={`${Styles.buttonClasses.button}`}
+                        onClick={_ => onDeleteConsumption(timestampStr)}
+                        type_="button">
+                        {React.string("🗑️ Smáznout")}
+                      </button>}
+                </td>
+              </tr>
+            })
+            ->React.array}
+          </tbody>
+        </table>
+        {keg.depletedAt === Null.null
+          ? React.null
+          : <button
+              className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantDanger}`}
+              onClick={_ => sendDialog(ShowConfirmFinalize)}
+              type_="button">
+              {React.string("Odepsat ze skladu a rozúčtovat")}
+            </button>}
+      </>
     }}
-    {!showDeleteKegConfirmation
-      ? React.null
-      : <DialogConfirmation
-          className={DialogConfirmation.classes.deleteConfirmation}
-          heading="Odstranit sud ?"
-          onConfirm={() => {
-            onDismiss()
-            onDeleteKeg()
-          }}
-          onDismiss={() => setShowDeleteKegConfirmation(_ => false)}
-          visible=true>
-          <p>
-            {React.string(`Chystáte se odstranit sud `)}
-            <b> {React.string(kegName)} </b>
-            {React.string(` z aplikace. Chcete pokračovat?`)}
-          </p>
-        </DialogConfirmation>}
+    {switch dialogState {
+    | Hidden => React.null
+    | ConfirmDelete =>
+      <DialogConfirmation
+        className={DialogConfirmation.classes.deleteConfirmation}
+        heading="Odstranit sud ?"
+        onConfirm={() => {
+          onDismiss()
+          onDeleteKeg()
+        }}
+        onDismiss={() => hideDialog()}
+        visible=true>
+        <p>
+          {React.string(`Chystáte se odstranit sud `)}
+          <b> {React.string(kegName)} </b>
+          {React.string(` z aplikace. Chcete pokračovat?`)}
+        </p>
+      </DialogConfirmation>
+    | ConfirmFinalize =>
+      <DialogConfirmation
+        className={DialogConfirmation.classes.deleteConfirmation}
+        heading="Rozúčtovat sud ?"
+        onConfirm={() => {
+          onDismiss()
+          onDeleteKeg()
+        }}
+        onDismiss={() => hideDialog()}
+        visible=true>
+        <p>
+          {React.string(`Chystáte se odstranit sud `)}
+          <b> {React.string(kegName)} </b>
+          {React.string(` z aplikace. Chcete pokračovat?`)}
+        </p>
+      </DialogConfirmation>
+    }}
   </DialogCycling>
 }

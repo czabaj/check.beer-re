@@ -112,20 +112,22 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
         placeId
       />
     | KegDetail(kegId) => {
-        let kegIdx = chargedKegs->Array.findIndex(keg => Db.getUid(keg)->Option.getExn === kegId)
-        let keg = chargedKegs->Belt.Array.getExn(kegIdx)
-        let handleCycleKeg = increase => {
-          let nextIdx = ref(kegIdx + (increase ? 1 : -1))
-          let maxIdx = Array.length(chargedKegs) - 1
-          if nextIdx.contents < 0 {
-            nextIdx := maxIdx
-          } else if nextIdx.contents > maxIdx {
-            nextIdx := 0
+        let currentIdx =
+          chargedKegs->Array.findIndex(keg => Db.getUid(keg)->Option.getExn === kegId)
+        let hasNext = currentIdx !== -1 && currentIdx < Array.length(chargedKegs) - 1
+        let hasPrevious = currentIdx > 0
+        let handleCycle = increase => {
+          let allowed = increase ? hasNext : hasPrevious
+          if allowed {
+            let nextIdx = currentIdx + (increase ? 1 : -1)
+            let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid->Option.getExn
+            sendDialog(ShowKegDetail(nextKegId))
           }
-          let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx.contents)->Db.getUid->Option.getExn
-          sendDialog(ShowKegDetail(nextKegId))
         }
+        let keg = chargedKegs->Belt.Array.getExn(currentIdx)
         <KegDetail
+          hasNext
+          hasPrevious
           keg
           onDeleteConsumption={consumptionId => {
             Db.deleteConsumption(firestore, placeId, kegId, consumptionId)->ignore
@@ -135,8 +137,8 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
             hideDialog()
           }}
           onDismiss={hideDialog}
-          onNextKeg={_ => handleCycleKeg(true)}
-          onPreviousKeg={_ => handleCycleKeg(false)}
+          onNextKeg={_ => handleCycle(true)}
+          onPreviousKeg={_ => handleCycle(false)}
           place
         />
       }

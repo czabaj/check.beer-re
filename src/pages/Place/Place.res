@@ -374,20 +374,14 @@ let make = (~placeId) => {
             unfinishedConsumptions->Array.sortInPlace((a, b) =>
               (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
             )
-            let handleCyclePerson = increase => {
-              let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
-              if currentIdx === -1 {
-                ()
-              } else {
-                let nextIdx = ref(currentIdx + (increase ? 1 : -1))
-                let maxIdx = Array.length(sortedActivePersons) - 1
-                if nextIdx.contents < 0 {
-                  nextIdx := maxIdx
-                } else if nextIdx.contents > maxIdx {
-                  nextIdx := 0
-                }
-                let (nextPersonId, nextPerson) =
-                  sortedActivePersons->Belt.Array.getExn(nextIdx.contents)
+            let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
+            let hasNext = currentIdx !== -1 && currentIdx < Array.length(sortedActivePersons) - 1
+            let hasPrevious = currentIdx > 0
+            let handleCycle = increase => {
+              let allowed = increase ? hasNext : hasPrevious
+              if allowed {
+                let nextIdx = currentIdx + (increase ? 1 : -1)
+                let (nextPersonId, nextPerson) = sortedActivePersons->Belt.Array.getExn(nextIdx)
                 sendDialog(
                   ShowPersonDetail({
                     person: nextPerson,
@@ -397,6 +391,8 @@ let make = (~placeId) => {
               }
             }
             <PersonDetail
+              hasNext
+              hasPrevious
               onDeleteConsumption={consumption => {
                 Db.deleteConsumption(
                   firestore,
@@ -409,8 +405,8 @@ let make = (~placeId) => {
                 Db.deletePerson(firestore, placeId, personId)->ignore
               }}
               onDismiss={hideDialog}
-              onNextPerson={_ => handleCyclePerson(true)}
-              onPreviousPerson={_ => handleCyclePerson(false)}
+              onNextPerson={_ => handleCycle(true)}
+              onPreviousPerson={_ => handleCycle(false)}
               person
               personId
               placeId
