@@ -3,14 +3,18 @@ module FormFields = %lenses(type state = {keg: string})
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
-type selectOption = {text: string, value: string}
+type selectOption = {text: React.element, value: string}
 
 @react.component
 let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegConverted>) => {
   let options = untappedChargedKegs->Belt.Array.keepMap(keg => {
     Db.getUid(keg)->Option.map(uid => {
       {
-        text: `#${keg.serialFormatted} ${keg.beer} (${(keg.milliliters / 1000)->Int.toString} L)`,
+        text: <>
+          {React.string(`${keg.serialFormatted} ${keg.beer} (`)}
+          <FormattedVolume milliliters=keg.milliliters />
+          {React.string(")")}
+        </>,
         value: uid,
       }
     })
@@ -54,7 +58,7 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
                   onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
                   {options
                   ->Array.map(({text, value}) =>
-                    <option key={value} value={value}> {React.string(text)} </option>
+                    <option key={value} value={value}> {text} </option>
                   )
                   ->React.array}
                 </select>}

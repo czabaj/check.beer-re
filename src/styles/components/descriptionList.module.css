@@ -1,0 +1,19 @@
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.inline > div {
+  display: flex;
+  gap: 0.5ch;
+}
+.inline > div:first-child dt::first-letter {
+  text-transform: uppercase;
+}
+.inline dt::after {
+  content: ":";
+}
+.inline > div:not(:last-child) dd::after {
+  content: ",";
+}
+

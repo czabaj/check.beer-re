@@ -16,11 +16,11 @@ module FormComponent = {
           mostResentKegs
           ->Belt.Array.get(0)
           ->Belt.Option.mapWithDefault(emptyState, keg => {
-            let {beer, milliliters, priceNew, serial} = keg
+            let {beer, milliliters, price, serial} = keg
             {
               beer,
               liters: milliliters->Float.fromInt /. 1000.0,
-              price: priceNew->Float.fromInt /. currency.minorUnit,
+              price: price->Float.fromInt /. currency.minorUnit,
               serial: serial + 1,
             }
           })

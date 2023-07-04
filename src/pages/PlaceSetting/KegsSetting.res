@@ -59,9 +59,11 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
                 {<ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />}
               </td>
               <td>
-                <FormattedCurrency value={keg.priceNew} />
+                <FormattedCurrency value={keg.price} />
               </td>
-              <td> {React.string(`${Int.toString(volume / 1000)} l`)} </td>
+              <td>
+                <FormattedVolume milliliters=volume />
+              </td>
               <td>
                 <meter
                   ariaLabelledby="remaining_th"
@@ -102,8 +104,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~placeId) => {
                 createdAt: Firebase.Timestamp.now(),
                 depletedAt: Null.null,
                 milliliters: (liters *. 1000.0)->Int.fromFloat,
-                priceEnd: Null.null,
-                priceNew: (price *. minorUnit)->Int.fromFloat,
+                price: (price *. minorUnit)->Int.fromFloat,
                 recentConsumptionAt: Null.null,
                 serial,
               },

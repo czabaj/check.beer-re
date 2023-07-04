@@ -1,5 +1,4 @@
 type classesType = {
-  basicsDescriptionList: string,
   deletePersonDialog: string,
   root: string,
   scrollContent: string,
@@ -41,7 +40,7 @@ let make = (
     onPrevious=onPreviousPerson
     visible={true}>
     <section ariaLabel="Základní údaje">
-      <dl className={`reset ${classes.basicsDescriptionList}`}>
+      <dl className={`reset ${Styles.descriptionListClasses.inline}`}>
         <div>
           <dt> {React.string("již od")} </dt>
           <dd>
@@ -110,10 +109,7 @@ let make = (
                 <tr key={createdAt}>
                   <td> {React.string(consumption.beer)} </td>
                   <td>
-                    {React.string(
-                      `${(consumption.milliliters->Int.toFloat /. 1000.0)
-                          ->Float.toFixedWithPrecision(~digits=1)} L`,
-                    )}
+                    <FormattedVolume milliliters=consumption.milliliters />
                   </td>
                   <td>
                     <FormattedDateTime value=consumption.createdAt />

@@ -18,8 +18,7 @@ and keg = {
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
-  priceEnd: Null.t<int>,
-  priceNew: int,
+  price: int,
   recentConsumptionAt: Null.t<Firebase.Timestamp.t>,
   serial: int,
 }

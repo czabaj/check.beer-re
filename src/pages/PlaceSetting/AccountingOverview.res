@@ -3,8 +3,8 @@ type classesType = {descriptionList: string}
 
 @react.component
 let make = (~chargedKegs: array<Db.kegConverted>, ~untappedChargedKegs: array<Db.kegConverted>) => {
-  let totalCharged = chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.priceNew)
-  let totalUntapped = untappedChargedKegs->Array.reduce(0, (sum, keg) => sum + keg.priceNew)
+  let totalCharged = chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)
+  let totalUntapped = untappedChargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)
   <SectionWithHeader
     buttonsSlot={React.null}
     headerId="accounting-overview"

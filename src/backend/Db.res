@@ -93,8 +93,7 @@ type kegConverted = {
   createdAt: Firebase.Timestamp.t,
   depletedAt: Null.t<Firebase.Timestamp.t>,
   milliliters: int,
-  priceEnd: Null.t<int>,
-  priceNew: int,
+  price: int,
   recentConsumptionAt: Null.t<Firebase.Timestamp.t>,
   serial: int,
   serialFormatted: string, // added by converter
@@ -117,8 +116,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       depletedAt: keg.depletedAt,
       recentConsumptionAt: keg.recentConsumptionAt,
       milliliters: keg.milliliters,
-      priceEnd: keg.priceEnd,
-      priceNew: keg.priceNew,
+      price: keg.price,
       serial: keg.serial,
       serialFormatted,
     }
@@ -131,8 +129,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       depletedAt,
       recentConsumptionAt,
       milliliters,
-      priceEnd,
-      priceNew,
+      price,
       serial,
     } = keg
     let consumptionsDict = consumptions->Belt.Map.String.toArray->Js.Dict.fromArray
@@ -142,8 +139,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       createdAt,
       depletedAt,
       milliliters,
-      priceEnd,
-      priceNew,
+      price,
       recentConsumptionAt,
       serial,
     }

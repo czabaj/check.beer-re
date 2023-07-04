@@ -13,6 +13,10 @@ type buttonClassesType = {
 }
 @module("./button.module.css") external buttonClasses: buttonClassesType = "default"
 
+type descriptionListClassesType = {inline: string}
+@module("./descriptionList.module.css")
+external descriptionListClasses: descriptionListClassesType = "default"
+
 type fieldsetClassesType = {grid: string}
 @module("./fieldset.module.css") external fieldsetClasses: fieldsetClassesType = "default"
 
