@@ -68,24 +68,24 @@
 .variantDanger {
   --_background: var(--surface-danger);
   --_border: hsl(var(--surface-danger) / 20%);
-  --_text: var(--text-danger);
+  --_text: var(--text-on-danger);
   --_active-background: var(--surface-danger);
   --_active-border: hsl(var(--surface-danger-hs) var(--surface-danger-l) / 20%);
-  --_active-text: var(--text-danger);
+  --_active-text: var(--text-on-danger);
   --_disabled-background: hsl(
     var(--surface-danger-hs) var(--surface-danger-l) / 30%
   );
   --_disabled-border: hsl(
     var(--surface-danger-hs) var(--surface-danger-l) / 20%
   );
-  --_disabled-text: var(--text-danger);
+  --_disabled-text: var(--text-on-danger);
   --_hover-background: hsl(
     var(--surface-danger-hs) calc(var(--surface-danger-l) + 5%)
   );
   --_hover-border: hsl(
     var(--surface-danger-hs) calc(var(--surface-danger-l) + 5%) / 20%
   );
-  --_hover-text: var(--text-danger);
+  --_hover-text: var(--text-on-danger);
 }
 
 .variantStealth {

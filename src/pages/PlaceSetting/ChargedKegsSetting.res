@@ -1,5 +1,5 @@
 type classesType = {detailButtonCell: string, emptyTableMessage: string, table: string}
-@module("./KegsSetting.module.css") external classes: classesType = "default"
+@module("./ChargedKegsSetting.module.css") external classes: classesType = "default"
 
 type dialogState = Hidden | AddKeg | KegDetail(string)
 
@@ -25,7 +25,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
       className={Styles.buttonClasses.button} onClick={_ => sendDialog(ShowAddKeg)} type_="button">
       {React.string("Přidat sud")}
     </button>}
-    headerId="kegs-setting"
+    headerId="charged_kegs_setting"
     headerSlot={React.string("Sudy na skladě")}>
     {switch chargedKegs {
     | [] =>

@@ -156,6 +156,8 @@ let reactFireOptions: Firebase.reactFireOptions<'a> = {idField: "uid"}
 
 let getUid: 'a => option<string> = %raw("data => data?.uid")
 
+let setUid: (. 'a, string) => 'a = %raw("(data, uid) => ({...data, uid})")
+
 let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
   Firebase.query(
     userAccountsCollection(firestore),
@@ -230,34 +232,10 @@ let useCurrentUserAccountDocData = () => {
   )
 }
 
-let usePlaceDocData = (~options=?, placeId) => {
-  let firestore = Firebase.useFirestore()
-  let placeRef = placeDocumentConverted(firestore, placeId)
-  Firebase.useFirestoreDocData(. placeRef, options)
-}
-
 let usePlacePersonDocumentStatus = (~options=?, placeId, personId) => {
   let firestore = Firebase.useFirestore()
   let personRef = placePersonDocument(firestore, placeId, personId)
   Firebase.useFirestoreDocData(. personRef, options)
-}
-
-let useKegsWithRecentConsumptionCollection = placeId => {
-  Firebase.useObservable(
-    ~observableId="kegsWithRecentConsumption",
-    ~source=kegsWithRecentConsumptionRx(Firebase.useFirestore(), placeId),
-  )
-}
-
-let useKegCollectionStatus = (~limit=20, ~startAfter: option<FirestoreModels.keg>=?, placeId) => {
-  let firestore = Firebase.useFirestore()
-  let constraints = [Firebase.orderBy("createdAt", ~direction=#desc), Firebase.limit(limit)]
-  switch startAfter {
-  | None => ()
-  | Some(keg) => constraints->Belt.Array.push(Firebase.startAfter(keg))
-  }
-  let query = Firebase.query(placeKegsCollectionConverted(firestore, placeId), constraints)
-  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
 }
 
 let useMostRecentKegStatus = placeId => {
@@ -265,19 +243,6 @@ let useMostRecentKegStatus = placeId => {
   let query = Firebase.query(
     placeKegsCollection(firestore, placeId),
     [Firebase.orderBy("serial", ~direction=#desc), Firebase.limit(1)],
-  )
-  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
-}
-
-let useChargedKegsStatus = placeId => {
-  let firestore = Firebase.useFirestore()
-  let query = Firebase.query(
-    placeKegsCollectionConverted(firestore, placeId),
-    [
-      Firebase.where("depletedAt", #"==", null),
-      // limit to 50 to avoid expensive calls, but 50 kegs on stock is a lot
-      Firebase.limit(50),
-    ],
   )
   Firebase.useFirestoreCollectionData(. query, reactFireOptions)
 }

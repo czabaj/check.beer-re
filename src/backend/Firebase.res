@@ -97,9 +97,16 @@ external deleteDoc: documentReference<'a> => promise<unit> = "deleteDoc"
 @module("firebase/firestore")
 external serverTimestamp: unit => 'a = "serverTimestamp"
 
-type documentSnapshot<'a> = {exists: (. unit) => bool, data: (. snapshotOptions) => 'a}
+type documentSnapshot<'a> = {data: (. snapshotOptions) => 'a, exists: (. unit) => bool, id: string}
 @module("firebase/firestore")
 external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDoc"
+
+type querySnapshot<'a> = {
+  docs: array<documentSnapshot<'a>>,
+  forEach: (. documentSnapshot<'a> => unit) => unit,
+}
+@module("firebase/firestore")
+external getDocs: query<'a> => promise<querySnapshot<'a>> = "getDocs"
 
 @module("firebase/firestore")
 external getDocFromCache: documentReference<'a> => promise<documentSnapshot<'a>> = "getDocFromCache"
@@ -134,7 +141,7 @@ external addDoc: (collectionReference<'a>, 'a) => promise<documentReference<'a>>
 @module("firebase/firestore")
 external where: (
   string,
-  [#"<" | #"<=" | #"==" | #">=" | #">" | #array_contains | #"in"],
+  [#"<" | #"<=" | #"==" | #"!=" | #">=" | #">" | #array_contains | #"in"],
   'a,
 ) => queryConstraint = "where"
 

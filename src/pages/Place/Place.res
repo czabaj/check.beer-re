@@ -144,263 +144,269 @@ let make = (~placeId) => {
       let (activePersons, inactivePersons) =
         place.personsAll->Belt.Map.String.partition((_, {preferredTap}) => preferredTap !== None)
       let sortedActivePersons = toSortedArray(activePersons)
-      <div className={classes.root}>
-        <PlaceHeader
-          placeName={place.name}
-          createdTimestamp={place.createdAt}
-          slotRightButton={<a
-            {...RouterUtils.createAnchorProps("./nastaveni")}
-            className={PlaceHeader.classes.iconButton}>
-            <span> {React.string("⚙️")} </span>
-            <span> {React.string("Nastavení")} </span>
-          </a>}
-        />
-        <main>
-          <SectionWithHeader
-            buttonsSlot={<button
-              className={Styles.buttonClasses.button}
-              type_="button"
-              onClick={_ => sendDialog(ShowAddPerson)}>
-              {React.string("Přidat osobu")}
-            </button>}
-            headerSlot={React.string("Lístek")}
-            headerId="active-persons">
-            <ol className={`reset ${classes.list}`}>
-              {sortedActivePersons
-              ->Array.map(activePerson => {
-                let (personId, person) = activePerson
-                let consumptions =
-                  recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(personId, [])
-                <li key={personId}>
-                  <div> {React.string(person.name)} </div>
-                  {switch activePersonsChanges {
-                  | Some(changes) =>
-                    <ActiveCheckbox
-                      changes initialActive=true personId setChanges=setActivePersonsChanges
-                    />
-                  | None =>
-                    <div className={classes.consumption}>
-                      <button
-                        className={Styles.utilityClasses.breakout}
-                        onClick={_ => sendDialog(ShowAddConsumption({personId, person}))}
-                        title="Otevřít kartu"
-                        type_="button"
+      <FormattedCurrency.Provider value={place.currency}>
+        <div className={classes.root}>
+          <PlaceHeader
+            placeName={place.name}
+            createdTimestamp={place.createdAt}
+            slotRightButton={<a
+              {...RouterUtils.createAnchorProps("./nastaveni")}
+              className={PlaceHeader.classes.iconButton}>
+              <span> {React.string("⚙️")} </span>
+              <span> {React.string("Nastavení")} </span>
+            </a>}
+          />
+          <main>
+            <SectionWithHeader
+              buttonsSlot={<button
+                className={Styles.buttonClasses.button}
+                type_="button"
+                onClick={_ => sendDialog(ShowAddPerson)}>
+                {React.string("Přidat osobu")}
+              </button>}
+              headerId="active_persons"
+              headerSlot={React.string("Lístek")}>
+              <ol className={`reset ${classes.list}`}>
+                {sortedActivePersons
+                ->Array.map(activePerson => {
+                  let (personId, person) = activePerson
+                  let consumptions =
+                    recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(personId, [])
+                  <li key={personId}>
+                    <div> {React.string(person.name)} </div>
+                    {switch activePersonsChanges {
+                    | Some(changes) =>
+                      <ActiveCheckbox
+                        changes initialActive=true personId setChanges=setActivePersonsChanges
                       />
-                      {consumptions
-                      ->Array.map(consumption => {
-                        React.string(consumption.milliliters > 400 ? "X" : "I")
-                      })
-                      ->React.array}
-                    </div>
-                  }}
-                  <DetailButton onClick={_ => sendDialog(ShowPersonDetail({person, personId}))} />
-                </li>
-              })
-              ->React.array}
-            </ol>
-          </SectionWithHeader>
-          {switch activePersonsChanges {
-          | None =>
-            <button
-              className={Styles.buttonClasses.button}
-              onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
-              type_="button">
-              {React.string("Nepřítomní")}
-            </button>
-          | Some(changes) =>
-            <>
-              <button
-                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
-                onClick={_ => {
-                  if changes->Belt.Map.String.size > 0 {
-                    let firstTap = place.taps->Belt.Map.String.keysToArray->Belt.Array.getExn(0)
-                    Db.updatePlacePersonsAll(
-                      firestore,
-                      placeId,
-                      changes
-                      ->Belt.Map.String.mapWithKey((personId, newActive) => {
-                        let person = place.personsAll->Belt.Map.String.getExn(personId)
-                        let newPerson = {
-                          ...person,
-                          preferredTap: newActive ? Some(firstTap) : None,
-                        }
-                        newPerson
-                      })
-                      ->Belt.Map.String.toArray,
-                    )->ignore
-                  }
-                  setActivePersonsChanges(_ => None)
-                }}
-                type_="button">
-                {React.string("Uložit")}
-              </button>
-              <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
-                {Belt.Map.String.size(inactivePersons) === 0
-                  ? <p> {React.string("Nikdo nechybí 👌")} </p>
-                  : <ol className={`reset ${classes.list}`}>
-                      {inactivePersons
-                      ->toSortedArray
-                      ->Array.map(inactivePerson => {
-                        let (personId, person) = inactivePerson
-                        let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
-                        <li key={personId}>
-                          <div>
-                            {React.string(`${person.name} `)}
-                            <time dateTime={recentActivityDate->Js.Date.toISOString}>
-                              {React.string(`byl tu `)}
-                              <FormattedRelativeTime dateTime={recentActivityDate} />
-                            </time>
-                          </div>
-                          <ActiveCheckbox
-                            changes initialActive=false personId setChanges=setActivePersonsChanges
-                          />
-                          <DetailButton
-                            onClick={_ => sendDialog(ShowPersonDetail({person, personId}))}
-                          />
-                        </li>
-                      })
-                      ->React.array}
-                    </ol>}
-              </div>
-            </>
-          }}
-        </main>
-        {switch dialogState {
-        | Hidden => React.null
-        | AddConsumption({personId, person}) =>
-          <DrinkDialog
-            onDismiss={hideDialog}
-            onSubmit={async values => {
-              let kegRef =
-                place.taps->Belt.Map.String.getExn(values.tap)->Js.Null.toOption->Option.getExn
-              let addConsumptionPromise = Db.addConsumption(
-                firestore,
-                placeId,
-                kegRef.id,
-                {
-                  milliliters: values.consumption,
-                  person: Db.placePersonDocument(firestore, placeId, personId),
-                },
-              )
-              let updatePlacePersonPromise = Db.updatePlacePersonsAll(
-                firestore,
-                placeId,
-                [
-                  (
-                    personId,
-                    {
-                      ...person,
-                      preferredTap: Some(values.tap),
-                      recentActivityAt: Firebase.Timestamp.now(),
-                    },
-                  ),
-                ],
-              )
-              try {
-                let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
-                hideDialog()
-              } catch {
-              | e => Js.log2("Error while adding consumption", e)
-              }
-            }}
-            personName={person.name}
-            preferredTap={person.preferredTap->Option.getExn}
-            tapsWithKegs
-          />
-        | AddPerson =>
-          let existingActive =
-            activePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
-          let existingInactive =
-            inactivePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
-          <PersonAddNew
-            existingActive
-            existingInactive
-            onDismiss={hideDialog}
-            onMoveToActive={personName => {
-              let (personId, person) =
-                inactivePersons
-                ->Belt.Map.String.findFirstBy((_, {name}) => name === personName)
-                ->Option.getExn
-              let firstTap = place.taps->Belt.Map.String.keysToArray->Belt.Array.getExn(0)
-              Db.updatePlacePersonsAll(
-                firestore,
-                placeId,
-                [(personId, {...person, preferredTap: Some(firstTap)})],
-              )->ignore
-              hideDialog()
-            }}
-            onSubmit={async values => {
-              await Db.addPerson(firestore, placeId, values.name)
-              hideDialog()
-            }}
-          />
-        | PersonDetail({person, personId}) => {
-            let unfinishedConsumptions =
-              kegsWithRecentConsumption
-              ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
-              ->Belt.Array.flatMap(keg =>
-                keg.consumptions
-                ->Belt.Map.String.toArray
-                ->Belt.Array.keepMap(((timestampStr, consumption)): option<
-                  PersonDetail.unfinishedConsumptionsRecord,
-                > => {
-                  switch consumption.person.id === personId {
-                  | false => None
-                  | true =>
-                    Some({
-                      beer: keg.beer,
-                      consumptionId: timestampStr,
-                      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
-                      kegId: Db.getUid(keg)->Option.getExn,
-                      milliliters: consumption.milliliters,
-                    })
-                  }
+                    | None =>
+                      <div className={classes.consumption}>
+                        <button
+                          className={Styles.utilityClasses.breakout}
+                          onClick={_ => sendDialog(ShowAddConsumption({personId, person}))}
+                          title="Otevřít kartu"
+                          type_="button"
+                        />
+                        {consumptions
+                        ->Array.map(consumption => {
+                          React.string(consumption.milliliters > 400 ? "X" : "I")
+                        })
+                        ->React.array}
+                      </div>
+                    }}
+                    <DetailButton onClick={_ => sendDialog(ShowPersonDetail({person, personId}))} />
+                  </li>
                 })
-              )
-            unfinishedConsumptions->Array.sortInPlace((a, b) =>
-              (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
-            )
-            let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
-            let hasNext = currentIdx !== -1 && currentIdx < Array.length(sortedActivePersons) - 1
-            let hasPrevious = currentIdx > 0
-            let handleCycle = increase => {
-              let allowed = increase ? hasNext : hasPrevious
-              if allowed {
-                let nextIdx = currentIdx + (increase ? 1 : -1)
-                let (nextPersonId, nextPerson) = sortedActivePersons->Belt.Array.getExn(nextIdx)
-                sendDialog(
-                  ShowPersonDetail({
-                    person: nextPerson,
-                    personId: nextPersonId,
-                  }),
-                )
-              }
-            }
-            <PersonDetail
-              hasNext
-              hasPrevious
-              onDeleteConsumption={consumption => {
-                Db.deleteConsumption(
+                ->React.array}
+              </ol>
+            </SectionWithHeader>
+            {switch activePersonsChanges {
+            | None =>
+              <button
+                className={Styles.buttonClasses.button}
+                onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
+                type_="button">
+                {React.string("Nepřítomní")}
+              </button>
+            | Some(changes) =>
+              <>
+                <button
+                  className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                  onClick={_ => {
+                    if changes->Belt.Map.String.size > 0 {
+                      let firstTap = place.taps->Belt.Map.String.keysToArray->Belt.Array.getExn(0)
+                      Db.updatePlacePersonsAll(
+                        firestore,
+                        placeId,
+                        changes
+                        ->Belt.Map.String.mapWithKey((personId, newActive) => {
+                          let person = place.personsAll->Belt.Map.String.getExn(personId)
+                          let newPerson = {
+                            ...person,
+                            preferredTap: newActive ? Some(firstTap) : None,
+                          }
+                          newPerson
+                        })
+                        ->Belt.Map.String.toArray,
+                      )->ignore
+                    }
+                    setActivePersonsChanges(_ => None)
+                  }}
+                  type_="button">
+                  {React.string("Uložit")}
+                </button>
+                <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
+                  {Belt.Map.String.size(inactivePersons) === 0
+                    ? <p> {React.string("Nikdo nechybí 👌")} </p>
+                    : <ol className={`reset ${classes.list}`}>
+                        {inactivePersons
+                        ->toSortedArray
+                        ->Array.map(inactivePerson => {
+                          let (personId, person) = inactivePerson
+                          let recentActivityDate =
+                            person.recentActivityAt->Firebase.Timestamp.toDate
+                          <li key={personId}>
+                            <div>
+                              {React.string(`${person.name} `)}
+                              <time dateTime={recentActivityDate->Js.Date.toISOString}>
+                                {React.string(`byl tu `)}
+                                <FormattedRelativeTime dateTime={recentActivityDate} />
+                              </time>
+                            </div>
+                            <ActiveCheckbox
+                              changes
+                              initialActive=false
+                              personId
+                              setChanges=setActivePersonsChanges
+                            />
+                            <DetailButton
+                              onClick={_ => sendDialog(ShowPersonDetail({person, personId}))}
+                            />
+                          </li>
+                        })
+                        ->React.array}
+                      </ol>}
+                </div>
+              </>
+            }}
+          </main>
+          {switch dialogState {
+          | Hidden => React.null
+          | AddConsumption({personId, person}) =>
+            <DrinkDialog
+              onDismiss={hideDialog}
+              onSubmit={async values => {
+                let kegRef =
+                  place.taps->Belt.Map.String.getExn(values.tap)->Js.Null.toOption->Option.getExn
+                let addConsumptionPromise = Db.addConsumption(
                   firestore,
                   placeId,
-                  consumption.kegId,
-                  consumption.consumptionId,
-                )->ignore
+                  kegRef.id,
+                  {
+                    milliliters: values.consumption,
+                    person: Db.placePersonDocument(firestore, placeId, personId),
+                  },
+                )
+                let updatePlacePersonPromise = Db.updatePlacePersonsAll(
+                  firestore,
+                  placeId,
+                  [
+                    (
+                      personId,
+                      {
+                        ...person,
+                        preferredTap: Some(values.tap),
+                        recentActivityAt: Firebase.Timestamp.now(),
+                      },
+                    ),
+                  ],
+                )
+                try {
+                  let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
+                  hideDialog()
+                } catch {
+                | e => Js.log2("Error while adding consumption", e)
+                }
               }}
-              onDeletePerson={_ => {
-                Db.deletePerson(firestore, placeId, personId)->ignore
-              }}
-              onDismiss={hideDialog}
-              onNextPerson={_ => handleCycle(true)}
-              onPreviousPerson={_ => handleCycle(false)}
-              person
-              personId
-              placeId
-              unfinishedConsumptions
+              personName={person.name}
+              preferredTap={person.preferredTap->Option.getExn}
+              tapsWithKegs
             />
-          }
-        }}
-      </div>
+          | AddPerson =>
+            let existingActive =
+              activePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
+            let existingInactive =
+              inactivePersons->Belt.Map.String.map(({name}) => name)->Belt.Map.String.valuesToArray
+            <PersonAddNew
+              existingActive
+              existingInactive
+              onDismiss={hideDialog}
+              onMoveToActive={personName => {
+                let (personId, person) =
+                  inactivePersons
+                  ->Belt.Map.String.findFirstBy((_, {name}) => name === personName)
+                  ->Option.getExn
+                let firstTap = place.taps->Belt.Map.String.keysToArray->Belt.Array.getExn(0)
+                Db.updatePlacePersonsAll(
+                  firestore,
+                  placeId,
+                  [(personId, {...person, preferredTap: Some(firstTap)})],
+                )->ignore
+                hideDialog()
+              }}
+              onSubmit={async values => {
+                await Db.addPerson(firestore, placeId, values.name)
+                hideDialog()
+              }}
+            />
+          | PersonDetail({person, personId}) => {
+              let unfinishedConsumptions =
+                kegsWithRecentConsumption
+                ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
+                ->Belt.Array.flatMap(keg =>
+                  keg.consumptions
+                  ->Belt.Map.String.toArray
+                  ->Belt.Array.keepMap(((timestampStr, consumption)): option<
+                    PersonDetail.unfinishedConsumptionsRecord,
+                  > => {
+                    switch consumption.person.id === personId {
+                    | false => None
+                    | true =>
+                      Some({
+                        beer: keg.beer,
+                        consumptionId: timestampStr,
+                        createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
+                        kegId: Db.getUid(keg)->Option.getExn,
+                        milliliters: consumption.milliliters,
+                      })
+                    }
+                  })
+                )
+              unfinishedConsumptions->Array.sortInPlace((a, b) =>
+                (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
+              )
+              let currentIdx = sortedActivePersons->Array.findIndex(((id, _)) => id === personId)
+              let hasNext = currentIdx !== -1 && currentIdx < Array.length(sortedActivePersons) - 1
+              let hasPrevious = currentIdx > 0
+              let handleCycle = increase => {
+                let allowed = increase ? hasNext : hasPrevious
+                if allowed {
+                  let nextIdx = currentIdx + (increase ? 1 : -1)
+                  let (nextPersonId, nextPerson) = sortedActivePersons->Belt.Array.getExn(nextIdx)
+                  sendDialog(
+                    ShowPersonDetail({
+                      person: nextPerson,
+                      personId: nextPersonId,
+                    }),
+                  )
+                }
+              }
+              <PersonDetail
+                hasNext
+                hasPrevious
+                onDeleteConsumption={consumption => {
+                  Db.deleteConsumption(
+                    firestore,
+                    placeId,
+                    consumption.kegId,
+                    consumption.consumptionId,
+                  )->ignore
+                }}
+                onDeletePerson={_ => {
+                  Db.deletePerson(firestore, placeId, personId)->ignore
+                }}
+                onDismiss={hideDialog}
+                onNextPerson={_ => handleCycle(true)}
+                onPreviousPerson={_ => handleCycle(false)}
+                person
+                personId
+                placeId
+                unfinishedConsumptions
+              />
+            }
+          }}
+        </div>
+      </FormattedCurrency.Provider>
     }
   | _ => React.null
   }

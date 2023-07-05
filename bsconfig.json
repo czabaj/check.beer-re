@@ -29,6 +29,7 @@
     "@rescriptbr/reform",
     "@rescriptbr/reschema",
     "rescript-react-intl",
+    "rescript-react-update",
     "rescript-webapi"
   ],
   "bs-dev-dependencies": ["rescript-vitest"],

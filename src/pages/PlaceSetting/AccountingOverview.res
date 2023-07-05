@@ -7,7 +7,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~untappedChargedKegs: array<Db
   let totalUntapped = untappedChargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)
   <SectionWithHeader
     buttonsSlot={React.null}
-    headerId="accounting-overview"
+    headerId="accounting_overview"
     headerSlot={React.string("Účetnictví")}>
     <dl className={classes.descriptionList}>
       <dt> {React.string("Na skladě")} </dt>

@@ -67,7 +67,7 @@ let make = (
       className={Styles.buttonClasses.button} onClick={_ => sendDialog(ShowAddTap)} type_="button">
       {React.string("Přidat pípu")}
     </button>}
-    headerId="taps-setting"
+    headerId="taps_setting"
     headerSlot={React.string("Pípy")}>
     <ul className={`reset ${classes.list}`}>
       {
