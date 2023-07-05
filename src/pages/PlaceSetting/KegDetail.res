@@ -22,6 +22,7 @@ let make = (
   ~onDeleteConsumption,
   ~onDeleteKeg,
   ~onDismiss,
+  ~onFinalizeKeg,
   ~onPreviousKeg,
   ~onNextKeg,
 ) => {
@@ -37,6 +38,7 @@ let make = (
     ->Option.flatMap(((timestampStr, _)) => timestampStr->Float.fromString)
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
+  let effectivity = keg.consumptionsSum->Int.toFloat /. keg.milliliters->Int.toFloat
   let kegId = Db.getUid(keg)->Option.getExn
   let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
@@ -96,35 +98,35 @@ let make = (
       }}
       {switch keg.depletedAt->Null.toOption {
       | None => React.null
-      | Some(depletedAt) => {
-          let effectivity = keg.consumptionsSum->Int.toFloat /. keg.milliliters->Int.toFloat
-          <>
-            <div>
-              <dt> {React.string("dopito")} </dt>
-              <dd>
-                <FormattedDateTime value={depletedAt->Firebase.Timestamp.toDate} />
-              </dd>
-            </div>
-            <div>
-              <dt> {React.string("ze sudu se vytočilo")} </dt>
-              <dd>
-                <FormattedVolume milliliters={keg.milliliters} />
-              </dd>
-            </div>
-            <div>
-              <dt> {React.string("efektivita")} </dt>
-              <dd> {React.string(`${effectivity->Float.toFixedWithPrecision(~digits=2)}%`)} </dd>
-            </div>
-            <div>
-              <dt> {React.string("výsledná cena za velké pivo")} </dt>
-              <dd>
-                <FormattedCurrency
-                  value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
-                />
-              </dd>
-            </div>
-          </>
-        }
+      | Some(depletedAt) =>
+        <>
+          <div>
+            <dt> {React.string("dopito")} </dt>
+            <dd>
+              <FormattedDateTime value={depletedAt->Firebase.Timestamp.toDate} />
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("ze sudu se vytočilo")} </dt>
+            <dd>
+              <FormattedVolume milliliters={keg.milliliters} />
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("efektivita")} </dt>
+            <dd>
+              <FormattedPercent value={effectivity *. 100.0} />
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("výsledná cena za velké pivo")} </dt>
+            <dd>
+              <FormattedCurrency
+                value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
+              />
+            </dd>
+          </div>
+        </>
       }}
     </dl>
     {switch maybeTapName {
@@ -175,7 +177,7 @@ let make = (
             ->Array.map(((timestampStr, consumption)) => {
               let person = place.personsAll->Belt.Map.String.getExn(consumption.person.id)
               let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
-              <tr>
+              <tr key={timestampStr}>
                 <td> {React.string(person.name)} </td>
                 <td>
                   <FormattedVolume milliliters=consumption.milliliters />
@@ -229,17 +231,35 @@ let make = (
     | ConfirmFinalize =>
       <DialogConfirmation
         className={DialogConfirmation.classes.deleteConfirmation}
-        heading="Rozúčtovat sud ?"
+        heading="Chystáte se rozúčtovat sud"
         onConfirm={() => {
           onDismiss()
-          onDeleteKeg()
+          onFinalizeKeg()
         }}
         onDismiss={() => hideDialog()}
         visible=true>
+        <dl>
+          <dt> {React.string("Název sudu")} </dt>
+          <dd> {React.string(kegName)} </dd>
+          <dt> {React.string("Celkem vytočeno")} </dt>
+          <dd>
+            <FormattedVolume milliliters=keg.consumptionsSum />
+            {React.string(" z ")}
+            <FormattedVolume milliliters=keg.milliliters />
+            {React.string(" (efektivita ")}
+            <FormattedPercent value={effectivity *. 100.0} />
+            {React.string(")")}
+          </dd>
+          <dt> {React.string(`Výsledná cena velkého piva${HtmlEntities.nbsp}*`)} </dt>
+          <dd>
+            <FormattedCurrency
+              value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
+            />
+          </dd>
+        </dl>
         <p>
-          {React.string(`Chystáte se odstranit sud `)}
-          <b> {React.string(kegName)} </b>
-          {React.string(` z aplikace. Chcete pokračovat?`)}
+          {React.string(`* Mezi konzumenty se rozpočítává cena sudu, výslednou cenu velkého piva tak ovlivňuje
+          efektivita výtoče.`)}
         </p>
       </DialogConfirmation>
     }}

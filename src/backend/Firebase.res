@@ -61,6 +61,9 @@ type updateTag = ArrayUnion | ArrayRemove | Increment
 @module("firebase/firestore")
 external arrayUnion: 'a => updateTag = "arrayUnion"
 
+@module("firebase/firestore")
+external incrementInt: int => updateTag = "increment"
+
 type documentReference<'a> = {id: string}
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"
@@ -101,11 +104,11 @@ external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDo
 @module("firebase/firestore")
 external getDocFromCache: documentReference<'a> => promise<documentSnapshot<'a>> = "getDocFromCache"
 
-type sendOptions = {merge?: bool, mergeFields?: array<string>}
+type setOptions = {merge?: bool, mergeFields?: array<string>}
 
 type dataConverter<'a, 'b> = {
   fromFirestore: (. documentSnapshot<'a>, snapshotOptions) => 'b,
-  toFirestore: (. 'b, sendOptions) => 'a,
+  toFirestore: (. 'b, setOptions) => 'a,
 }
 
 @send
@@ -140,6 +143,22 @@ type aggregateQuerySnapshot = {data: (. unit) => aggregateSpecData}
 @module("firebase/firestore")
 external getCountFromServer: collectionReference<'a> => promise<aggregateQuerySnapshot> =
   "getCountFromServer"
+
+module Transaction = {
+  type t
+  @send
+  external delete: (t, documentReference<'a>) => unit = "delete"
+  @send
+  external get: (t, documentReference<'a>) => promise<documentSnapshot<'a>> = "get"
+  @send
+  external set: (t, documentReference<'a>, 'a, setOptions) => unit = "set"
+  @send
+  external update: (t, documentReference<'a>, {..}) => unit = "update"
+}
+
+@module("firebase/firestore")
+external runTransaction: (. firestore, Transaction.t => promise<'a>) => promise<'a> =
+  "runTransaction"
 
 type reactFireOptions<'a> = {
   idField?: string,

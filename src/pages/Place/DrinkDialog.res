@@ -77,7 +77,7 @@ let make = (
                   <fieldset className={classes.taps}>
                     {options
                     ->Array.map(({text, value}) => {
-                      <label>
+                      <label key=value>
                         <input
                           type_="radio"
                           name="tap"

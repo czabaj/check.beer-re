@@ -101,23 +101,9 @@ let pageDataRx = (firestore, placeId) => {
     Rxjs.map(.(kegs, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       // TODO: show only past XY hours, filter the older out
-      kegs->Array.forEach((keg: FirestoreModels.keg) => {
-        keg.consumptions
-        ->Js.Dict.entries
-        ->Array.forEach(
-          ((timestampStr, consumption)) => {
-            let userCons = {
-              timestamp: timestampStr->Float.fromString->Option.getExn,
-              milliliters: consumption.milliliters,
-            }
-            switch Belt.MutableMap.String.get(consumptionsByUser, consumption.person.id) {
-            | Some(consumptions) => consumptions->Array.push(userCons)
-            | None =>
-              Belt.MutableMap.String.set(consumptionsByUser, consumption.person.id, [userCons])
-            }
-          },
-        )
-      })
+      kegs->Array.forEach(keg =>
+        Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
+      )
       // sort consumptions ty timestamp ascending
       consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
         consumptions->Array.sortInPlace((a, b) => (a.timestamp -. b.timestamp)->Int.fromFloat)
@@ -354,7 +340,7 @@ let make = (~placeId) => {
               ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
               ->Belt.Array.flatMap(keg =>
                 keg.consumptions
-                ->Js.Dict.entries
+                ->Belt.Map.String.toArray
                 ->Belt.Array.keepMap(((timestampStr, consumption)): option<
                   PersonDetail.unfinishedConsumptionsRecord,
                 > => {

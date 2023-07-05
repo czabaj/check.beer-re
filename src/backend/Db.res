@@ -197,12 +197,28 @@ let kegsWithRecentConsumptionRx = (firestore, placeId) => {
       let monthAgo = Js.Date.setMonth(now, Js.Date.getMonth(now) -. 1.0)
       let firebaseTimestamp = Firebase.Timestamp.fromMillis(monthAgo)
       let query = Firebase.query(
-        placeKegsCollection(firestore, placeId),
+        placeKegsCollectionConverted(firestore, placeId),
         [Firebase.where("recentConsumptionAt", #">=", firebaseTimestamp)],
       )
       Firebase.collectionDataRx(query, reactFireOptions)
     }),
   )
+}
+
+type userConsumption = {milliliters: int, timestamp: float}
+
+let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: kegConverted) => {
+  keg.consumptions->Belt.Map.String.forEach((timestampStr, consumption) => {
+    let userCons = {
+      timestamp: timestampStr->Float.fromString->Option.getExn,
+      milliliters: consumption.milliliters,
+    }
+    switch Belt.MutableMap.String.get(target, consumption.person.id) {
+    | Some(consumptions) => consumptions->Array.push(userCons)
+    | None => Belt.MutableMap.String.set(target, consumption.person.id, [userCons])
+    }
+  })
+  target
 }
 
 // Hooks
@@ -258,7 +274,6 @@ let useChargedKegsStatus = placeId => {
   let query = Firebase.query(
     placeKegsCollectionConverted(firestore, placeId),
     [
-      Firebase.orderBy("serial", ~direction=#desc),
       Firebase.where("depletedAt", #"==", null),
       // limit to 50 to avoid expensive calls, but 50 kegs on stock is a lot
       Firebase.limit(50),
@@ -351,4 +366,63 @@ let deletePerson = async (firestore, placeId, personId) => {
 let deleteKeg = async (firestore, placeId, kegId) => {
   let kegRef = kegDoc(firestore, placeId, kegId)
   await Firebase.deleteDoc(kegRef)
+}
+
+let finalizeKeg = async (firestore, placeId, kegId) => {
+  Firebase.runTransaction(.firestore, async transaction => {
+    let kegRef = kegDoc(firestore, placeId, kegId)
+    let kegDoc =
+      await transaction->Firebase.Transaction.get(kegRef->Firebase.withConterterDoc(kegConverter))
+    if !kegDoc.exists(.) {
+      Js.Exn.raiseError("Keg not found")
+    }
+    // untap keg if on tap
+    let placeRef = placeDocument(firestore, placeId)
+    let placeDoc =
+      await transaction->Firebase.Transaction.get(
+        placeRef->Firebase.withConterterDoc(placeConverter),
+      )
+    let place = placeDoc.data(. {})
+    let kegOnTap =
+      place.taps->Belt.Map.String.findFirstBy((_, maybeKegRef) =>
+        maybeKegRef
+        ->Null.toOption
+        ->Option.map(kegRef => kegRef.id === kegId)
+        ->Option.getWithDefault(false)
+      )
+    switch kegOnTap {
+    | Some((tapName, _)) =>
+      transaction->Firebase.Transaction.update(
+        placeRef,
+        ObjectUtils.setIn(None, `taps.${tapName}`, Firebase.deleteField()),
+      )
+    | _ => ()
+    }
+    // create financial transactions in persons documents
+    let keg = kegDoc.data(. {})
+    let kegPricePerMilliliter = keg.price->Float.fromInt /. keg.consumptionsSum->Float.fromInt
+    let nowTimestamp = Firebase.Timestamp.now()
+    groupKegConsumptionsByUser(keg)->Belt.MutableMap.String.forEach((personId, consumptions) => {
+      let personConsumptionSum =
+        consumptions->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
+      let priceShare = (personConsumptionSum->Float.fromInt *. kegPricePerMilliliter)->Int.fromFloat
+      let financialTransaction: FirestoreModels.financialTransaction = {
+        amount: -1 * priceShare,
+        createdAt: nowTimestamp,
+        keg: Null.make(kegRef),
+        note: Null.null,
+      }
+      let personRef = placePersonDocument(firestore, placeId, personId)
+      transaction->Firebase.Transaction.update(
+        personRef,
+        {
+          "balance": Firebase.incrementInt(-1 * financialTransaction.amount),
+          "transactions": Firebase.arrayUnion(financialTransaction),
+        },
+      )
+    })
+    // mark keg as depleted
+    transaction->Firebase.Transaction.update(kegRef, {"depletedAt": nowTimestamp})
+    ()
+  })
 }

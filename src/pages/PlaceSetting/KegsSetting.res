@@ -137,6 +137,10 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~place, ~placeId) => {
             hideDialog()
           }}
           onDismiss={hideDialog}
+          onFinalizeKeg={() => {
+            Db.finalizeKeg(firestore, placeId, kegId)->ignore
+            hideDialog()
+          }}
           onNextKeg={_ => handleCycle(true)}
           onPreviousKeg={_ => handleCycle(false)}
           place
