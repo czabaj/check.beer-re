@@ -11,9 +11,13 @@ type currencyInfo = {
   minorUnit: float,
 }
 
+let getMinorUnit = currency => {
+  minorUnits->Dict.get(currency)->Option.getWithDefault(100.0)
+}
+
 let useCurrency = () => {
   let currency = React.useContext(context)
-  let minorUnit = minorUnits->Dict.get(currency)->Option.getWithDefault(100.0)
+  let minorUnit = getMinorUnit(currency)
   {currency, minorUnit}
 }
 

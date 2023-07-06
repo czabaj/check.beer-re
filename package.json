@@ -21,6 +21,13 @@
   "devDependencies": {
     "@csstools/postcss-relative-color-syntax": "^1.0.2",
     "@jihchi/vite-plugin-rescript": "^5.3.0",
+    "@storybook/addon-essentials": "^7.0.26",
+    "@storybook/addon-interactions": "^7.0.26",
+    "@storybook/addon-links": "^7.0.26",
+    "@storybook/blocks": "^7.0.26",
+    "@storybook/react": "^7.0.26",
+    "@storybook/react-vite": "^7.0.26",
+    "@storybook/testing-library": "^0.0.14-next.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@vitejs/plugin-react": "^4.0.0",
@@ -29,8 +36,10 @@
     "lenses-ppx": "^6.1.10",
     "postcss-combine-duplicated-selectors": "^10.0.3",
     "postcss-preset-env": "^8.5.0",
+    "prop-types": "^15.8.1",
     "rescript": "^10.1.4",
     "rescript-vitest": "^1.2.0",
+    "storybook": "^7.0.26",
     "vite": "^4.3.5",
     "vite-plugin-svgr": "^3.2.0",
     "vitest": "^0.31.0"
@@ -42,7 +51,9 @@
     "format": "rescript format -all",
     "serve": "vite preview",
     "start": "vite",
-    "test": "vitest"
+    "test": "vitest",
+    "storybook": "storybook dev --no-open --port 6006",
+    "build-storybook": "storybook build"
   },
   "version": "0.0.0"
 }
