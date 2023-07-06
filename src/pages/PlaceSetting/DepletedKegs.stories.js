@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-import { make } from "./ChargedKegs.bs.js";
+import { make } from "./DepletedKegs.bs.js";
 
 const getKegMock = (consumptionLevel) => {
   let volume = 30000;
@@ -8,7 +8,7 @@ const getKegMock = (consumptionLevel) => {
     beer: "Pilsner Urquell",
     consumptionsSum: consumptionLevel * volume,
     createdAt: Timestamp.fromMillis(1688481980 * 1000),
-    depletedAt: null,
+    depletedAt: Timestamp.now(),
     milliliters: volume,
     price: 120000,
     recentConsumptionAt: null,
@@ -19,19 +19,20 @@ const getKegMock = (consumptionLevel) => {
 };
 
 export default {
-  title: "ChargedKegs",
+  title: "DepletedKegs",
   component: make,
 };
 
-export const Base = {
+export const Loading = {
   args: {
-    chargedKegs: [
-      getKegMock(0),
-      getKegMock(0.3),
-      getKegMock(0.5),
-      getKegMock(0.7),
-      getKegMock(0.9),
-      getKegMock(1),
-    ],
+    maybeFetchMoreDepletedKegs: undefined,
+    maybeDepletedKegs: undefined,
+  },
+};
+
+export const Loaded = {
+  args: {
+    maybeFetchMoreDepletedKegs: undefined,
+    maybeDepletedKegs: [getKegMock(0.9)],
   },
 };

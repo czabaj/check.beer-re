@@ -6,9 +6,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~untappedChargedKegs: array<Db
   let totalCharged = chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)
   let totalUntapped = untappedChargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)
   <SectionWithHeader
-    buttonsSlot={React.null}
-    headerId="accounting_overview"
-    headerSlot={React.string("Účetnictví")}>
+    buttonsSlot={React.null} headerId="accounting_overview" headerSlot={React.string("Statistika")}>
     <dl className={classes.descriptionList}>
       <dt> {React.string("Na skladě")} </dt>
       <dd>

@@ -32,10 +32,7 @@ let make = (
     // The map is sorted by timestamp ascending, we want descending
     ->Array.reverse
   , [keg.consumptions])
-  let firstConsumption =
-    consumptionsByTimestampDesc
-    ->Array.get(consumptionsByTimestampDesc->Array.length - 1)
-    ->Option.flatMap(((timestampStr, _)) => timestampStr->Float.fromString)
+  let firstConsumption = Db.kegFirstConsumptionTimestamp(keg)
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
   let effectivity = keg.consumptionsSum->Int.toFloat /. keg.milliliters->Int.toFloat

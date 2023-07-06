@@ -1,5 +1,5 @@
 type classesType = {detailButtonCell: string, emptyTableMessage: string, table: string}
-@module("./ChargedKegsSetting.module.css") external classes: classesType = "default"
+@module("./ChargedKegs.module.css") external classes: classesType = "default"
 
 @react.component
 let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) => {
@@ -21,9 +21,9 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
           <tr>
             <th scope="col"> {React.string("No.")} </th>
             <th scope="col"> {React.string("Pivo")} </th>
+            <th scope="col"> {React.string("Objem")} </th>
             <th scope="col"> {React.string("Naskladněno")} </th>
             <th scope="col"> {React.string("Cena")} </th>
-            <th scope="col"> {React.string("Objem")} </th>
             <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
             <th scope="col">
               <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
@@ -33,32 +33,32 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
         <tbody>
           {kegs
           ->Array.map(keg => {
-            let volume = keg.milliliters
             let kegId = Db.getUid(keg)->Option.getExn
+            let volume = keg.milliliters
             <tr key={kegId}>
               <th scope="row"> {React.string(keg.serialFormatted)} </th>
               <td> {React.string(keg.beer)} </td>
               <td>
-                {<ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />}
+                <FormattedVolume milliliters=volume />
+              </td>
+              <td>
+                <ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />
               </td>
               <td>
                 <FormattedCurrency value={keg.price} />
               </td>
               <td>
-                <FormattedVolume milliliters=volume />
-              </td>
-              <td>
-                <meter
-                  ariaLabelledby="remaining_th"
-                  min="0"
-                  max={volume->Int.toString}
-                  low={volume / 5}
-                  optimum={volume / 2}
-                  value={(volume - keg.consumptionsSum)->Int.toString}>
-                  {React.string(
-                    `${Int.toString(volume / 1000)} / ${Int.toString(volume / 1000)} litrů`,
-                  )}
-                </meter>
+                <FormattedVolume milliliters={Math.Int.max(volume - keg.consumptionsSum, 0)}>
+                  {(~formattedNumber) =>
+                    <meter
+                      ariaLabelledby="remaining_th"
+                      low={volume / 3}
+                      max={volume->Int.toString}
+                      min="0"
+                      title={formattedNumber}
+                      value={(volume - keg.consumptionsSum)->Int.toString}
+                    />}
+                </FormattedVolume>
               </td>
               <td className={classes.detailButtonCell}>
                 <ButtonDetail onClick={_ => onKegDetail(kegId)} title="Karta sudu" />

@@ -33,6 +33,8 @@ let dialogReducer = (_, event) => {
 @react.component
 let make = (~placeId) => {
   let firestore = Firebase.useFirestore()
+  // this paginated call do not use suspense, call it above the placePageStatus which _is_ suspended
+  let (maybeDepletedKegs, maybeFetchMoreDepletedKegs) = UsePaginatedDepletedKegsData.use(placeId)
   let placePageStatus = Firebase.useObservable(
     ~observableId="PlaceSettingPage",
     ~source=pageDataRx(firestore, placeId),
@@ -68,14 +70,14 @@ let make = (~placeId) => {
           </button>}
         />
         <main>
-          <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
           <AccountingOverview chargedKegs untappedChargedKegs />
-          <ChargedKegsSetting
+          <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
+          <ChargedKegs
             chargedKegs
             onAddNewKeg={_ => sendDialog(ShowAddKeg)}
             onKegDetail={kegId => sendDialog(ShowKegDetail(kegId))}
           />
-          <DepletedKegs placeId />
+          <DepletedKegs maybeFetchMoreDepletedKegs maybeDepletedKegs />
         </main>
       </div>
       {switch dialogState {

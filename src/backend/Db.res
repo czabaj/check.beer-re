@@ -207,6 +207,11 @@ let kegsWithRecentConsumptionRx = (firestore, placeId) => {
   )
 }
 
+let kegFirstConsumptionTimestamp = (keg: kegConverted) =>
+  keg.consumptions
+  ->Belt.Map.String.minKey
+  ->Option.flatMap(timestampStr => timestampStr->Float.fromString)
+
 type userConsumption = {milliliters: int, timestamp: float}
 
 let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: kegConverted) => {
