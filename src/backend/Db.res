@@ -91,10 +91,10 @@ type kegConverted = {
   consumptions: Belt.Map.String.t<consumption>,
   consumptionsSum: int, // added by converter
   createdAt: Firebase.Timestamp.t,
-  depletedAt: Null.t<Firebase.Timestamp.t>,
+  depletedAt: Js.null<Firebase.Timestamp.t>,
   milliliters: int,
   price: int,
-  recentConsumptionAt: Null.t<Firebase.Timestamp.t>,
+  recentConsumptionAt: Js.null<Firebase.Timestamp.t>,
   serial: int,
   serialFormatted: string, // added by converter
 }

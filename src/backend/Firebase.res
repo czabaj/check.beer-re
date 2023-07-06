@@ -64,6 +64,7 @@ external arrayUnion: 'a => updateTag = "arrayUnion"
 @module("firebase/firestore")
 external incrementInt: int => updateTag = "increment"
 
+@genType.import("firebase/firestore") @genType.as("DocumentReference")
 type documentReference<'a> = {id: string}
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"
@@ -262,6 +263,7 @@ module AppCheckProvider = {
 }
 
 module Timestamp = {
+  @genType.import("firebase/firestore") @genType.as("Timestamp")
   type t
   @new @module("firebase/firestore")
   external make: unit => t = "Timestamp"
