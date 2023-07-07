@@ -30,6 +30,7 @@ html {
   --surface-danger-hs: 0deg 63%;
   --surface-danger-l: 54%;
   --surface-info: hsl(197 82% 92%);
+  --surface-warning: hsl(47deg 100% 62%);
   --text-1: hsl(210deg 7% 13%);
   --text-2: hsl(210 7% 23%);
   --text-3: hsl(0 0% 52%);

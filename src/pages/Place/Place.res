@@ -38,6 +38,70 @@ module DetailButton = {
   }
 }
 
+module ActivePersonListItem = {
+  @react.component
+  let make = (
+    ~activeCheckbox: option<React.element>,
+    ~consumptions: array<Db.userConsumption>,
+    ~onAddConsumption,
+    ~onShowDetail,
+    ~personName,
+  ) => {
+    let listItemEl = React.useRef(Js.Nullable.null)
+    let consumptionsStr =
+      consumptions
+      ->Array.map(consumption => {
+        React.string(consumption.milliliters > 400 ? "X" : "I")
+      })
+      ->Array.joinWith("")
+    let lastConsumptionsStr = React.useRef(consumptionsStr)
+    let changeActive = React.useRef(false)
+    changeActive.current = activeCheckbox !== None
+    React.useEffect1(() => {
+      switch (
+        consumptionsStr === lastConsumptionsStr.current,
+        changeActive.current,
+        Js.Nullable.toOption(listItemEl.current),
+      ) {
+      | (false, false, Some(el)) =>
+        lastConsumptionsStr.current = consumptionsStr
+        el
+        ->Webapi.Dom.Element.animate(
+          {
+            "backgroundColor": "var(--surface-warning)",
+          },
+          {
+            "duration": 500,
+            "iterations": 4,
+            "direction": "alternate-reverse",
+          },
+        )
+        ->ignore
+      | _ => ()
+      }
+      None
+    }, [consumptionsStr])
+
+    <li ref={ReactDOM.Ref.domRef(listItemEl)}>
+      <div> {React.string(personName)} </div>
+      {switch activeCheckbox {
+      | Some(node) => node
+      | None =>
+        <div className={classes.consumption}>
+          <button
+            className={Styles.utilityClasses.breakout}
+            onClick={_ => onAddConsumption()}
+            title="Otevřít kartu"
+            type_="button"
+          />
+          {React.string(consumptionsStr)}
+        </div>
+      }}
+      <DetailButton onClick={_ => onShowDetail()} />
+    </li>
+  }
+}
+
 type dialogState =
   | Hidden
   | AddConsumption({personId: string, person: Db.personsAllRecord})
@@ -172,30 +236,22 @@ let make = (~placeId) => {
                   let (personId, person) = activePerson
                   let consumptions =
                     recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(personId, [])
-                  <li key={personId}>
-                    <div> {React.string(person.name)} </div>
-                    {switch activePersonsChanges {
-                    | Some(changes) =>
+                  <ActivePersonListItem
+                    activeCheckbox={activePersonsChanges->Option.map(changes =>
                       <ActiveCheckbox
                         changes initialActive=true personId setChanges=setActivePersonsChanges
                       />
-                    | None =>
-                      <div className={classes.consumption}>
-                        <button
-                          className={Styles.utilityClasses.breakout}
-                          onClick={_ => sendDialog(ShowAddConsumption({personId, person}))}
-                          title="Otevřít kartu"
-                          type_="button"
-                        />
-                        {consumptions
-                        ->Array.map(consumption => {
-                          React.string(consumption.milliliters > 400 ? "X" : "I")
-                        })
-                        ->React.array}
-                      </div>
+                    )}
+                    consumptions={consumptions}
+                    key={personId}
+                    onAddConsumption={() => {
+                      sendDialog(ShowAddConsumption({personId, person}))
                     }}
-                    <DetailButton onClick={_ => sendDialog(ShowPersonDetail({person, personId}))} />
-                  </li>
+                    onShowDetail={() => {
+                      sendDialog(ShowPersonDetail({person, personId}))
+                    }}
+                    personName={person.name}
+                  />
                 })
                 ->React.array}
               </ol>
