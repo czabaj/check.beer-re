@@ -152,11 +152,9 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 // Queries and helpers
 
-let reactFireOptions: Firebase.reactFireOptions<'a> = {idField: "uid"}
+let reactFireOptions: Firebase.reactfireOptions<'a> = {idField: "uid"}
 
 let getUid: 'a => option<string> = %raw("data => data?.uid")
-
-let setUid: (. 'a, string) => 'a = %raw("(data, uid) => ({...data, uid})")
 
 let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
   Firebase.query(

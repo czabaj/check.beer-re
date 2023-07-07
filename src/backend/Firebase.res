@@ -168,7 +168,7 @@ module Transaction = {
 external runTransaction: (. firestore, Transaction.t => promise<'a>) => promise<'a> =
   "runTransaction"
 
-type reactFireOptions<'a> = {
+type reactfireOptions<'a> = {
   idField?: string,
   initialData?: 'a,
   suspense?: bool,
@@ -177,13 +177,13 @@ type reactFireOptions<'a> = {
 @module("reactfire")
 external useFirestoreDocData: (
   . documentReference<'a>,
-  option<reactFireOptions<'a>>,
+  option<reactfireOptions<'a>>,
 ) => observableStatus<'a> = "useFirestoreDocData"
 
 @module("reactfire")
 external useFirestoreCollectionData: (
   . query<'a>,
-  reactFireOptions<'a>,
+  reactfireOptions<'a>,
 ) => observableStatus<array<'a>> = "useFirestoreCollectionData"
 
 module User = {
@@ -312,15 +312,28 @@ external useObservable: (
 external userRx: Auth.t => Rxjs.t<Rxjs.foreign, Rxjs.void, Js.Nullable.t<User.t>> = "user"
 
 @module("rxfire/firestore")
+external collectionRx: (
+  query<'a>,
+  reactfireOptions<'a>,
+) => Rxjs.t<Rxjs.foreign, Rxjs.void, array<querySnapshot<'a>>> = "collection"
+
+@module("rxfire/firestore")
 external collectionDataRx: (
   query<'a>,
-  reactFireOptions<'a>,
+  reactfireOptions<'a>,
 ) => Rxjs.t<Rxjs.foreign, Rxjs.void, array<'a>> = "collectionData"
+
+@module("rxfire/firestore")
+external docRx: documentReference<'a> => Rxjs.t<Rxjs.foreign, Rxjs.void, documentSnapshot<'a>> =
+  "doc"
+
+@module("rxfire/firestore")
+external snapToData: (documentSnapshot<'a>, reactfireOptions<'a>) => 'a = "snapToData"
 
 @module("rxfire/firestore")
 external docDataRx: (
   documentReference<'a>,
-  reactFireOptions<'a>,
+  reactfireOptions<'a>,
 ) => Rxjs.t<Rxjs.foreign, Rxjs.void, 'a> = "docData"
 
 type authProvider
