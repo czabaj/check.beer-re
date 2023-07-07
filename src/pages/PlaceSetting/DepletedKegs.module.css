@@ -1,31 +1,60 @@
 .table {
   --_cell-inline-padding: 0.5rem;
 
-  border-collapse: collapse;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
 }
-.table tr > :where(th, td) {
+.table :where(tbody, thead) {
+  display: contents;
+}
+.table tr {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-areas:
+    "serial volume created price"
+    "name consumed firstTap largeBeer"
+    "name wasted depleted effectivity";
+  grid-template-columns: subgrid;
+}
+.table :where(th, td) {
   padding-inline: var(--_cell-inline-padding);
-}
-.table tr > :where(th, td):where(:nth-child(2), :nth-child(3)) {
-  text-align: left;
-}
-.table tr > :where(th, td):where(:nth-child(4), :nth-child(5), :nth-child(6)) {
   text-align: right;
 }
-
-td.detailButtonCell {
-  padding-inline: 0;
-  position: relative;
-  inline-size: 3rem;
+.table :where(th, td):nth-child(1) {
+  grid-area: serial;
+  text-align: left;
 }
-td.detailButtonCell button {
-  inset: 0;
-  padding-inline: var(--_cell-inline-padding);
-  position: absolute;
+.table :where(th, td):nth-child(2) {
+  grid-area: name;
+  text-align: left;
+  grid-row: span 2;
 }
-tr:last-child > .detailButtonCell button {
-  border-end-end-radius: var(--radius-2);
+.table :where(th, td):nth-child(3) {
+  grid-area: volume;
+}
+.table :where(th, td):nth-child(4) {
+  grid-area: consumed;
+}
+.table :where(th, td):nth-child(5) {
+  grid-area: wasted;
+}
+.table :where(th, td):nth-child(6) {
+  grid-area: created;
+}
+.table :where(th, td):nth-child(7) {
+  grid-area: firstTap;
+}
+.table :where(th, td):nth-child(8) {
+  grid-area: depleted;
+}
+.table :where(th, td):nth-child(9) {
+  grid-area: price;
+}
+.table :where(th, td):nth-child(10) {
+  grid-area: largeBeer;
+}
+.table :where(th, td):nth-child(11) {
+  grid-area: effectivity;
 }
 
 .emptyTableMessage {
