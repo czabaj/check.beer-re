@@ -55,6 +55,7 @@ let make = (~placeId) => {
       | None => false
       }
     })
+    let personsAllEntries = place.personsAll->Js.Dict.entries
 
     <FormattedCurrency.Provider value={place.currency}>
       <div className={classes.root}>
@@ -62,7 +63,7 @@ let make = (~placeId) => {
           placeName={place.name}
           createdTimestamp={place.createdAt}
           slotRightButton={<button
-            className={PlaceHeader.classes.iconButton}
+            className={PlaceHeader.classes.buttonMore}
             onClick={_ => sendDialog(ShowBasicInfoEdit)}
             type_="button">
             <span> {React.string("✏️")} </span>
@@ -70,7 +71,13 @@ let make = (~placeId) => {
           </button>}
         />
         <main>
-          <AccountingOverview chargedKegs untappedChargedKegs />
+          <PlaceStats
+            chargedKegsValue={chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)}
+            personsCount={personsAllEntries->Array.length}
+            totalBalance={personsAllEntries->Array.reduce(0, (sum, (_, person)) =>
+              sum + person.balance
+            )}
+          />
           <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
           <ChargedKegs
             chargedKegs

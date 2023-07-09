@@ -11,23 +11,8 @@
   align-self: center;
 }
 
-.list {
-  --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
-}
-.list li {
-  --place-list-padding-inline: 0.5rem;
-  font-size: 150%;
-  display: flex;
-  flex-flow: row wrap;
-  gap: 1rem;
-  position: relative;
-  padding-inline: var(--place-list-padding-inline);
-}
 .list li > div:first-child {
   margin-inline-end: auto;
-}
-.list li + li {
-  border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
 .listEmpty {

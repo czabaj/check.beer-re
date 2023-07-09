@@ -1,6 +1,5 @@
 .root > :global(.dialogWindow) {
   --dialog-padding-inline: 3rem;
-  padding-block-end: var(--dialog-padding-inline);
   inline-size: 60ch;
 }
 
@@ -15,6 +14,7 @@
   flex-direction: column;
   gap: var(--dialog-padding-inline);
   justify-content: space-between;
+  padding-block-end: var(--dialog-padding-inline);
 }
 
 .consumptions {
@@ -45,4 +45,12 @@
 .taps > label {
   border-block-start: var(--border-size-1) solid var(--surface-1);
   padding-inline: var(--dialog-padding-inline);
+}
+
+.unfinishedConsumptions {
+  background-color: var(--surface-3);
+}
+.unfinishedConsumptions summary {
+  padding-block: 1rem;
+  text-align: center;
 }

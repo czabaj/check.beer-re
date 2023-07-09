@@ -1,0 +1,17 @@
+.root {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
+}
+
+.table {
+  --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
+}
+.table tr {
+  position: relative;
+}
+.table :where(td, th) {
+  text-align: left;
+}
+.table :where(td, th):last-child {
+  text-align: right;
+}

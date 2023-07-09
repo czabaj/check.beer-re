@@ -1,4 +1,4 @@
-type classesType = {iconButton: string, root: string}
+type classesType = {buttonBack:string, buttonMore: string, root: string}
 
 @module("./PlaceHeader.module.css") external classes: classesType = "default"
 
@@ -22,7 +22,7 @@ let make = (~className=?, ~createdTimestamp, ~placeName, ~slotRightButton) => {
         }}
       />
     </p>
-    <a {...RouterUtils.createAnchorProps("../")} className={classes.iconButton}>
+    <a {...RouterUtils.createAnchorProps("../")} className={classes.buttonBack}>
       <span> {React.string("↩️")} </span>
       <span> {React.string("Zpět")} </span>
     </a>

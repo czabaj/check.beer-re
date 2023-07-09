@@ -1,9 +1,9 @@
-a {
+:where(a) {
   text-decoration: none;
   color: inherit;
 }
 
-button {
+:where(button) {
   /* Corrects inability to style clickable `input` types in iOS */
   appearance: none;
   background-color: transparent;

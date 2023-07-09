@@ -32,20 +32,12 @@ module ActiveCheckbox = {
   }
 }
 
-module DetailButton = {
-  @react.component
-  let make = (~onClick) => {
-    <ButtonDetail className={classes.detailButton} onClick={onClick} title="Osobní karta" />
-  }
-}
-
 module ActivePersonListItem = {
   @react.component
   let make = (
     ~activeCheckbox: option<React.element>,
     ~consumptions: array<Db.userConsumption>,
     ~onAddConsumption,
-    ~onShowDetail,
     ~personName,
   ) => {
     let listItemEl = React.useRef(Js.Nullable.null)
@@ -92,13 +84,12 @@ module ActivePersonListItem = {
           <button
             className={Styles.utilityClasses.breakout}
             onClick={_ => onAddConsumption()}
-            title="Otevřít kartu"
+            title="Detail konzumace"
             type_="button"
           />
           {React.string(consumptionsStr)}
         </div>
       }}
-      <DetailButton onClick={_ => onShowDetail()} />
     </li>
   }
 }
@@ -107,20 +98,17 @@ type dialogState =
   | Hidden
   | AddConsumption({personId: string, person: Db.personsAllRecord})
   | AddPerson
-  | PersonDetail({personId: string, person: Db.personsAllRecord})
 
 type dialogEvent =
   | Hide
   | ShowAddConsumption({personId: string, person: Db.personsAllRecord})
   | ShowAddPerson
-  | ShowPersonDetail({personId: string, person: Db.personsAllRecord})
 
 let dialogReducer = (_, event) => {
   switch event {
   | Hide => Hidden
   | ShowAddConsumption({personId, person}) => AddConsumption({personId, person})
   | ShowAddPerson => AddPerson
-  | ShowPersonDetail({personId, person}) => PersonDetail({personId, person})
   }
 }
 
@@ -220,7 +208,7 @@ let make = (~placeId) => {
           createdTimestamp={place.createdAt}
           slotRightButton={<a
             {...RouterUtils.createAnchorProps("./nastaveni")}
-            className={PlaceHeader.classes.iconButton}>
+            className={PlaceHeader.classes.buttonMore}>
             <span> {React.string("⚙️")} </span>
             <span> {React.string("Nastavení")} </span>
           </a>}
@@ -239,7 +227,7 @@ let make = (~placeId) => {
               ? <p className=classes.listEmpty>
                   {React.string("Nikdo tu není, zkontrolujte nepřítomnost ⤵")}
                 </p>
-              : <ol className={`reset ${classes.list}`}>
+              : <ol className={`${Styles.listClasses.base} ${classes.list}`}>
                   {activePersonEntries
                   ->Array.map(activePerson => {
                     let (personId, person) = activePerson
@@ -258,9 +246,6 @@ let make = (~placeId) => {
                       key={personId}
                       onAddConsumption={() => {
                         sendDialog(ShowAddConsumption({personId, person}))
-                      }}
-                      onShowDetail={() => {
-                        sendDialog(ShowPersonDetail({person, personId}))
                       }}
                       personName={person.name}
                     />
@@ -306,7 +291,7 @@ let make = (~placeId) => {
               <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
                 {inactivePersonEntries->Array.length === 0
                   ? <p className=classes.listEmpty> {React.string("Nikdo nechybí 👌")} </p>
-                  : <ol className={`reset ${classes.list}`}>
+                  : <ol className={`${Styles.listClasses.base} ${classes.list}`}>
                       {inactivePersonEntries
                       ->Array.map(inactivePerson => {
                         let (personId, person) = inactivePerson
@@ -322,9 +307,6 @@ let make = (~placeId) => {
                           <ActiveCheckbox
                             changes initialActive=false personId setChanges=setActivePersonsChanges
                           />
-                          <DetailButton
-                            onClick={_ => sendDialog(ShowPersonDetail({person, personId}))}
-                          />
                         </li>
                       })
                       ->React.array}
@@ -335,46 +317,81 @@ let make = (~placeId) => {
         </main>
         {switch dialogState {
         | Hidden => React.null
-        | AddConsumption({personId, person}) =>
-          <DrinkDialog
-            onDismiss={hideDialog}
-            onSubmit={async values => {
-              let kegRef =
-                place.taps->Js.Dict.unsafeGet(values.tap)->Js.Null.toOption->Option.getExn
-              let addConsumptionPromise = Db.addConsumption(
-                firestore,
-                placeId,
-                kegRef.id,
-                {
-                  milliliters: values.consumption,
-                  person: Db.placePersonDocument(firestore, placeId, personId),
-                },
+        | AddConsumption({personId, person}) => {
+            let unfinishedConsumptions =
+              kegsWithRecentConsumption
+              ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
+              ->Belt.Array.flatMap(keg =>
+                keg.consumptions
+                ->Belt.Map.String.toArray
+                ->Belt.Array.keepMap(((timestampStr, consumption)): option<
+                  DrinkDialog.unfinishedConsumptionsRecord,
+                > => {
+                  switch consumption.person.id === personId {
+                  | false => None
+                  | true =>
+                    Some({
+                      beer: keg.beer,
+                      consumptionId: timestampStr,
+                      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
+                      kegId: Db.getUid(keg)->Option.getExn,
+                      milliliters: consumption.milliliters,
+                    })
+                  }
+                })
               )
-              let updatePlacePersonPromise = Db.updatePlacePersonsAll(
-                firestore,
-                placeId,
-                [
-                  (
-                    personId,
-                    {
-                      ...person,
-                      preferredTap: Some(values.tap),
-                      recentActivityAt: Firebase.Timestamp.now(),
-                    },
-                  ),
-                ],
-              )
-              try {
-                let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
-                hideDialog()
-              } catch {
-              | e => Js.log2("Error while adding consumption", e)
-              }
-            }}
-            personName={person.name}
-            preferredTap={person.preferredTap->Option.getExn}
-            tapsWithKegs
-          />
+            unfinishedConsumptions->Array.sortInPlace((a, b) =>
+              (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
+            )
+            <DrinkDialog
+              onDeleteConsumption={consumption => {
+                Db.deleteConsumption(
+                  firestore,
+                  placeId,
+                  consumption.kegId,
+                  consumption.consumptionId,
+                )->ignore
+              }}
+              onDismiss={hideDialog}
+              onSubmit={async values => {
+                let kegRef =
+                  place.taps->Js.Dict.unsafeGet(values.tap)->Js.Null.toOption->Option.getExn
+                let addConsumptionPromise = Db.addConsumption(
+                  firestore,
+                  placeId,
+                  kegRef.id,
+                  {
+                    milliliters: values.consumption,
+                    person: Db.placePersonDocument(firestore, placeId, personId),
+                  },
+                )
+                let updatePlacePersonPromise = Db.updatePlacePersonsAll(
+                  firestore,
+                  placeId,
+                  [
+                    (
+                      personId,
+                      {
+                        ...person,
+                        preferredTap: Some(values.tap),
+                        recentActivityAt: Firebase.Timestamp.now(),
+                      },
+                    ),
+                  ],
+                )
+                try {
+                  let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
+                  hideDialog()
+                } catch {
+                | e => Js.log2("Error while adding consumption", e)
+                }
+              }}
+              personName={person.name}
+              preferredTap={person.preferredTap->Option.getExn}
+              tapsWithKegs
+              unfinishedConsumptions
+            />
+          }
         | AddPerson =>
           let existingActive = activePersonEntries->Array.map(((_, {name})) => name)
           let existingInactive = inactivePersonEntries->Array.map(((_, {name})) => name)
@@ -400,71 +417,6 @@ let make = (~placeId) => {
               hideDialog()
             }}
           />
-        | PersonDetail({person, personId}) => {
-            let unfinishedConsumptions =
-              kegsWithRecentConsumption
-              ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
-              ->Belt.Array.flatMap(keg =>
-                keg.consumptions
-                ->Belt.Map.String.toArray
-                ->Belt.Array.keepMap(((timestampStr, consumption)): option<
-                  PersonDetail.unfinishedConsumptionsRecord,
-                > => {
-                  switch consumption.person.id === personId {
-                  | false => None
-                  | true =>
-                    Some({
-                      beer: keg.beer,
-                      consumptionId: timestampStr,
-                      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
-                      kegId: Db.getUid(keg)->Option.getExn,
-                      milliliters: consumption.milliliters,
-                    })
-                  }
-                })
-              )
-            unfinishedConsumptions->Array.sortInPlace((a, b) =>
-              (b.createdAt->Js.Date.getTime -. a.createdAt->Js.Date.getTime)->Int.fromFloat
-            )
-            let currentIdx = activePersonEntries->Array.findIndex(((id, _)) => id === personId)
-            let hasNext = currentIdx !== -1 && currentIdx < Array.length(activePersonEntries) - 1
-            let hasPrevious = currentIdx > 0
-            let handleCycle = increase => {
-              let allowed = increase ? hasNext : hasPrevious
-              if allowed {
-                let nextIdx = currentIdx + (increase ? 1 : -1)
-                let (nextPersonId, nextPerson) = activePersonEntries->Belt.Array.getExn(nextIdx)
-                sendDialog(
-                  ShowPersonDetail({
-                    person: nextPerson,
-                    personId: nextPersonId,
-                  }),
-                )
-              }
-            }
-            <PersonDetail
-              hasNext
-              hasPrevious
-              onDeleteConsumption={consumption => {
-                Db.deleteConsumption(
-                  firestore,
-                  placeId,
-                  consumption.kegId,
-                  consumption.consumptionId,
-                )->ignore
-              }}
-              onDeletePerson={_ => {
-                Db.deletePerson(firestore, placeId, personId)->ignore
-              }}
-              onDismiss={hideDialog}
-              onNextPerson={_ => handleCycle(true)}
-              onPreviousPerson={_ => handleCycle(false)}
-              person
-              personId
-              placeId
-              unfinishedConsumptions
-            />
-          }
         }}
       </div>
     </FormattedCurrency.Provider>

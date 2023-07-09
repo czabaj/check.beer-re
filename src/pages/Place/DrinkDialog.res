@@ -1,4 +1,9 @@
-type classesType = {consumptions: string, root: string, taps: string}
+type classesType = {
+  consumptions: string,
+  root: string,
+  taps: string,
+  unfinishedConsumptions: string,
+}
 
 @module("./DrinkDialog.module.css") external classes: classesType = "default"
 
@@ -9,13 +14,23 @@ module Validators = Validators.CustomValidators(FormFields)
 
 type selectOption = {text: string, value: string}
 
+type unfinishedConsumptionsRecord = {
+  consumptionId: string,
+  kegId: string,
+  beer: string,
+  milliliters: int,
+  createdAt: Js.Date.t,
+}
+
 @react.component
 let make = (
   ~personName,
   ~preferredTap,
+  ~onDeleteConsumption,
   ~onDismiss,
   ~onSubmit,
   ~tapsWithKegs: Js.Dict.t<Db.kegConverted>,
+  ~unfinishedConsumptions: array<unfinishedConsumptionsRecord>,
 ) => {
   let tapsEntries = tapsWithKegs->Js.Dict.entries
   let tapsOptions = tapsEntries->Array.map(((tapName, keg)) => {
@@ -127,5 +142,47 @@ let make = (
             </form>
           </Form.Provider>
         }}
+    <details className=classes.unfinishedConsumptions>
+      <summary id="unfinished_consumptions"> {React.string("Nezaúčtovaná piva")} </summary>
+      {unfinishedConsumptions->Array.length === 0
+        ? <p> {React.string(`${personName} nemá nezaúčtovaná piva.`)} </p>
+        : <table
+            ariaLabelledby="unfinished_consumptions" className={Styles.tableClasses.consumptions}>
+            <thead>
+              <tr>
+                <th scope="col"> {React.string("Pivo")} </th>
+                <th scope="col"> {React.string("Objem")} </th>
+                <th scope="col"> {React.string("Kdy")} </th>
+                <th scope="col">
+                  <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {unfinishedConsumptions
+              ->Array.map(consumption => {
+                let createdAt = consumption.createdAt->Js.Date.toISOString
+                <tr key={createdAt}>
+                  <td> {React.string(consumption.beer)} </td>
+                  <td>
+                    <FormattedVolume milliliters=consumption.milliliters />
+                  </td>
+                  <td>
+                    <FormattedDateTime value=consumption.createdAt />
+                  </td>
+                  <td>
+                    <button
+                      className={`${Styles.buttonClasses.button}`}
+                      onClick={_ => onDeleteConsumption(consumption)}
+                      type_="button">
+                      {React.string("🗑️ Smáznout")}
+                    </button>
+                  </td>
+                </tr>
+              })
+              ->React.array}
+            </tbody>
+          </table>}
+    </details>
   </Dialog>
 }

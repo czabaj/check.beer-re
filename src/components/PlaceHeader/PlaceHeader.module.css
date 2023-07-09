@@ -5,10 +5,23 @@
   box-shadow: var(--shadow-2);
   column-gap: 0.5rem;
   display: grid;
-  grid-auto-flow: row dense;
+  grid-template-areas: "back title more" "back subtitle more";
   grid-template-columns: auto 1fr auto;
   margin-block-start: 0.5rem;
   padding: var(--border-size-2);
+}
+.buttonBack {
+  border-inline-end: var(--border-size-2) solid var(--surface-1);
+  grid-area: back;
+}
+.buttonMore {
+  grid-area: more;
+}
+.root > h2 {
+  grid-area: title;
+}
+.root > h2 + p {
+  grid-area: subtitle;
 }
 
 .root > h2,
@@ -16,17 +29,8 @@
   margin: 0;
 }
 
-.root > .iconButton {
-  grid-column: 3 / 3;
-  grid-row: 1 / 3;
-}
-
-.root > .iconButton:nth-child(3) {
-  grid-column: 1 / 1;
-  border-inline-end: var(--border-size-2) solid var(--surface-1);
-}
-
-.iconButton {
+.buttonBack,
+.buttonMore {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -34,16 +38,13 @@
   height: 100%;
   padding-inline: 0.5rem;
 }
-
-.iconButton > span:first-child {
+:where(.buttonBack, .buttonMore) > span:first-child {
   font-size: 150%;
 }
-
-.iconButton > span:last-child {
+:where(.buttonBack, .buttonMore) > span:last-child {
   font-size: 75%;
   font-variant: all-small-caps;
 }
-
-.iconButton:hover {
+:where(.buttonBack, .buttonMore):hover {
   background-color: var(--surface-3);
 }

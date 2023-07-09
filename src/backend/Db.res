@@ -262,14 +262,14 @@ let updatePlace = (firestore, placeId, data) => {
 
 let updatePlacePersonsAll = (firestore, placeId, persons: array<(string, personsAllRecord)>) => {
   let updateData = persons->Belt.Array.reduce(Object.empty(), (data, (personId, person)) => {
-    ObjectUtils.setIn(Some(data), `personsAll.${personId}`, personsAllRecordToTuple(. person))
+    ObjectUtils.setIn(. Some(data), `personsAll.${personId}`, personsAllRecordToTuple(. person))
   })
   Firebase.updateDoc(placeDocument(firestore, placeId), updateData)
 }
 
 let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
   let now = Date.now()
-  let updateData = ObjectUtils.setIn(
+  let updateData = ObjectUtils.setIn(.
     Some({
       "recentConsumptionAt": Firebase.serverTimestamp(),
     }),
@@ -303,12 +303,16 @@ let addPerson = async (firestore, placeId, personName) => {
 
 let deleteConsumption = (firestore, placeId, kegId, consumptionId) => {
   let kegRef = kegDoc(firestore, placeId, kegId)
-  let updateData = ObjectUtils.setIn(None, `consumptions.${consumptionId}`, Firebase.deleteField())
+  let updateData = ObjectUtils.setIn(.
+    None,
+    `consumptions.${consumptionId}`,
+    Firebase.deleteField(),
+  )
   Firebase.updateDoc(kegRef, updateData)
 }
 
 let deletePerson = async (firestore, placeId, personId) => {
-  let updatePersonAllData = ObjectUtils.setIn(
+  let updatePersonAllData = ObjectUtils.setIn(.
     None,
     `personsAll.${personId}`,
     Firebase.deleteField(),
@@ -350,7 +354,7 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
     | Some((tapName, _)) =>
       transaction->Firebase.Transaction.update(
         placeRef,
-        ObjectUtils.setIn(None, `taps.${tapName}`, Firebase.deleteField()),
+        ObjectUtils.setIn(. None, `taps.${tapName}`, Firebase.deleteField()),
       )
     | _ => ()
     }

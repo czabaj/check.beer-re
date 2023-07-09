@@ -138,7 +138,7 @@ let make = (
             firestore,
             placeId,
             {
-              taps: place.taps->ObjectUtils.setInD(newName, Js.null),
+              taps: ObjectUtils.setInD(. place.taps, newName, Js.null),
             },
           )
           hideDialog()
@@ -147,7 +147,7 @@ let make = (
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          Db.updatePlace(firestore, placeId, {taps: place.taps->ObjectUtils.omitD([tapName])})
+          Db.updatePlace(firestore, placeId, {taps: ObjectUtils.omitD(. place.taps, [tapName])})
           ->Promise.then(_ => {
             hideDialog()
             Promise.resolve()
@@ -184,7 +184,11 @@ let make = (
                 | None => person
                 }
               }, _),
-              taps: place.taps->ObjectUtils.omitD([oldName])->ObjectUtils.setInD(newName, oldValue),
+              taps: ObjectUtils.setInD(.
+                ObjectUtils.omitD(. place.taps, [oldName]),
+                newName,
+                oldValue,
+              ),
             },
           )
           hideDialog()
@@ -199,7 +203,7 @@ let make = (
             firestore,
             placeId,
             {
-              taps: place.taps->ObjectUtils.setInD(tapName, Null.make(kegDoc)),
+              taps: ObjectUtils.setInD(. place.taps, tapName, Null.make(kegDoc)),
             },
           )
           hideDialog()
@@ -217,7 +221,7 @@ let make = (
                 firestore,
                 placeId,
                 {
-                  taps: place.taps->ObjectUtils.setInD(tapName, Null.null),
+                  taps: ObjectUtils.setInD(. place.taps, tapName, Null.null),
                 },
               )
               hideDialog()
