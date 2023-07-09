@@ -45,14 +45,13 @@ export type financialTransaction = {
 // tslint:disable-next-line:interface-over-type-literal
 export type person = {
   readonly account: (null | Firebase_documentReference<userAccount>); 
-  readonly balance: number; 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly name: personName; 
   readonly transactions: financialTransaction[]
 };
 
 // tslint:disable-next-line:interface-over-type-literal
-export type personsAllItem = [personName, Firebase_Timestamp_t, (null | tapName)];
+export type personsAllItem = [personName, Firebase_Timestamp_t, number, (undefined | tapName)];
 
 // tslint:disable-next-line:interface-over-type-literal
 export type place = {

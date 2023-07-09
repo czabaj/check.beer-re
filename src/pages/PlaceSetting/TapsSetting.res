@@ -71,7 +71,7 @@ let make = (
     headerSlot={React.string("Pípy")}>
     <ul className={`reset ${classes.list}`}>
       {
-        let tapsEntries = place.taps->Belt.Map.String.toArray
+        let tapsEntries = place.taps->Js.Dict.entries
         let tapsCount = tapsEntries->Array.length
         tapsEntries
         ->Array.map(((tapName, maybeKegReference)) => {
@@ -130,7 +130,7 @@ let make = (
     | Hidden => React.null
     | AddTap =>
       <TapAddNew
-        existingNames={place.taps->Belt.Map.String.keysToArray}
+        existingNames={place.taps->Js.Dict.keys}
         onDismiss={hideDialog}
         onSubmit={async values => {
           let newName = values.name
@@ -138,7 +138,7 @@ let make = (
             firestore,
             placeId,
             {
-              taps: place.taps->Belt.Map.String.set(newName, Js.null),
+              taps: place.taps->ObjectUtils.setInD(newName, Js.null),
             },
           )
           hideDialog()
@@ -147,7 +147,7 @@ let make = (
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          Db.updatePlace(firestore, placeId, {taps: place.taps->Belt.Map.String.remove(tapName)})
+          Db.updatePlace(firestore, placeId, {taps: place.taps->ObjectUtils.omitD([tapName])})
           ->Promise.then(_ => {
             hideDialog()
             Promise.resolve()
@@ -159,18 +159,18 @@ let make = (
       />
     | RenameTap(tapName) =>
       <TapRename
-        existingNames={place.taps->Belt.Map.String.keysToArray}
+        existingNames={place.taps->Js.Dict.keys}
         initialName=tapName
         onDismiss={hideDialog}
         onSubmit={async values => {
           let oldName = tapName
-          let oldValue = place.taps->Belt.Map.String.getExn(oldName)
+          let oldValue = place.taps->Js.Dict.unsafeGet(oldName)
           let newName = values.name
           await Db.updatePlace(
             firestore,
             placeId,
             {
-              personsAll: place.personsAll->Belt.Map.String.map(person => {
+              personsAll: place.personsAll->Js.Dict.map((. person: Db.personsAllRecord) => {
                 switch person.preferredTap {
                 | Some(preferredTap) =>
                   if preferredTap == oldName {
@@ -183,10 +183,8 @@ let make = (
                   }
                 | None => person
                 }
-              }),
-              taps: place.taps
-              ->Belt.Map.String.remove(oldName)
-              ->Belt.Map.String.set(newName, oldValue),
+              }, _),
+              taps: place.taps->ObjectUtils.omitD([oldName])->ObjectUtils.setInD(newName, oldValue),
             },
           )
           hideDialog()
@@ -201,7 +199,7 @@ let make = (
             firestore,
             placeId,
             {
-              taps: place.taps->Belt.Map.String.set(tapName, Some(kegDoc)->Js.Null.fromOption),
+              taps: place.taps->ObjectUtils.setInD(tapName, Null.make(kegDoc)),
             },
           )
           hideDialog()
@@ -219,7 +217,7 @@ let make = (
                 firestore,
                 placeId,
                 {
-                  taps: place.taps->Belt.Map.String.set(tapName, Null.null),
+                  taps: place.taps->ObjectUtils.setInD(tapName, Null.null),
                 },
               )
               hideDialog()

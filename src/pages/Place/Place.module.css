@@ -2,13 +2,11 @@
   max-inline-size: var(--measure);
   margin-inline: auto;
 }
-
 .root main {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
 .root main > button {
   align-self: center;
 }
@@ -16,7 +14,6 @@
 .list {
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
 }
-
 .list li {
   --place-list-padding-inline: 0.5rem;
   font-size: 150%;
@@ -26,19 +23,17 @@
   position: relative;
   padding-inline: var(--place-list-padding-inline);
 }
-
 .list li > div:first-child {
   margin-inline-end: auto;
 }
-
 .list li + li {
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.inactiveUsers > p {
-  padding-inline: 1rem;
-  color: var(--text-2);
-  font-style: italic;
+.listEmpty {
+  font-family: var(--font-cursive);
+  padding-block: 0.5rem;
+  padding-inline: 0.5rem;
 }
 
 .inactiveUsers ol > li time {

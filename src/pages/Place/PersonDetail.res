@@ -59,13 +59,7 @@ let make = (
         <div>
           <dt> {React.string("stav konta")} </dt>
           <dd>
-            {switch maybePersonDoc {
-            | None => <LoadingInline />
-            | Some(personDoc) =>
-              <FormattedCurrency
-                format={FormattedCurrency.formatAccounting} value=personDoc.balance
-              />
-            }}
+            <FormattedCurrency format={FormattedCurrency.formatAccounting} value=person.balance />
           </dd>
         </div>
       </dl>

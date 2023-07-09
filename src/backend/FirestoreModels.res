@@ -35,13 +35,12 @@ and financialTransaction = {
 @genType
 and person = {
   account: Js.null<Firebase.documentReference<userAccount>>,
-  balance: int,
   createdAt: Firebase.Timestamp.t,
   name: personName,
   transactions: array<financialTransaction>,
 }
 
-type personsAllItem = (personName, Firebase.Timestamp.t, Js.null<tapName>)
+type personsAllItem = (personName, Firebase.Timestamp.t, int, option<tapName>)
 
 @genType
 type place = {

@@ -33,52 +33,47 @@ let placeKegDocument = (firestore, placeId, kegId): Firebase.documentReference<k
 // Converters
 
 type personsAllRecord = {
+  balance: int,
   name: string,
   preferredTap: option<string>,
   recentActivityAt: Firebase.Timestamp.t,
 }
 
-let personsAllRecordToTuple = ({
+let personsAllRecordToTuple = (. {
+  balance,
   name,
   preferredTap,
   recentActivityAt,
-}): FirestoreModels.personsAllItem => (name, recentActivityAt, preferredTap->Null.fromOption)
+}): FirestoreModels.personsAllItem => (name, recentActivityAt, balance, preferredTap)
 
+@genType
 type placeConverted = {
   createdAt: Firebase.Timestamp.t,
   currency: string,
   name: string,
   // the key is the person's UUID
-  personsAll: Belt.Map.String.t<personsAllRecord>, // converted to Map.String
-  taps: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>, // converted to Map.String
+  personsAll: Js.Dict.t<personsAllRecord>, // covert tuple to record
+  taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
 }
 
 let placeConverter: Firebase.dataConverter<place, placeConverted> = {
   fromFirestore: (. snapshot, options) => {
     let {createdAt, currency, name, personsAll, taps} = snapshot.data(. options)
-    let personsAllMap =
-      personsAll
-      ->Js.Dict.entries
-      ->Belt.Map.String.fromArray
-      ->Belt.Map.String.map(((name, recentActivityAt, preferredTap)) => {
+    let personsAllWithRecord =
+      personsAll->Js.Dict.map((. (name, recentActivityAt, balance, preferredTap)) => {
         {
+          balance,
           name,
-          preferredTap: preferredTap->Null.toOption,
+          preferredTap,
           recentActivityAt,
         }
-      })
-    let tapsMap = taps->Js.Dict.entries->Belt.Map.String.fromArray
-    {createdAt, currency, name, personsAll: personsAllMap, taps: tapsMap}
+      }, _)
+    {createdAt, currency, name, personsAll: personsAllWithRecord, taps}
   },
   toFirestore: (. place, _) => {
     let {createdAt, currency, name, personsAll, taps} = place
-    let tapsDict = taps->Belt.Map.String.toArray->Js.Dict.fromArray
-    let personsAllDict =
-      personsAll
-      ->Belt.Map.String.map(personsAllRecordToTuple)
-      ->Belt.Map.String.toArray
-      ->Js.Dict.fromArray
-    {createdAt, currency, name, personsAll: personsAllDict, taps: tapsDict}
+    let parsonsAllTuple = personsAll->Js.Dict.map(personsAllRecordToTuple, _)
+    {createdAt, currency, name, personsAll: parsonsAllTuple, taps}
   },
 }
 
@@ -253,30 +248,21 @@ let useMostRecentKegStatus = placeId => {
 // Mutations
 
 type placeUpdate = {
-  personsAll?: Belt.Map.String.t<personsAllRecord>,
-  taps?: Belt.Map.String.t<Js.null<Firebase.documentReference<keg>>>,
+  personsAll?: Js.Dict.t<personsAllRecord>,
+  taps?: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
 }
 
 let updatePlace = (firestore, placeId, data) => {
-  let maybePersonsDict =
-    data.personsAll->Option.map(personsAll =>
-      personsAll
-      ->Belt.Map.String.map(personsAllRecordToTuple)
-      ->Belt.Map.String.toArray
-      ->Js.Dict.fromArray
-    )
-  let maybeTapsDict = data.taps->Option.map(taps => {
-    taps->Belt.Map.String.toArray->Js.Dict.fromArray
-  })
+  let maybePersonsDict = data.personsAll->Option.map(Js.Dict.map(personsAllRecordToTuple, _))
   Firebase.updateDoc(
     placeDocument(firestore, placeId),
-    ObjectUtils.omitUndefined({"taps": maybeTapsDict, "personsAll": maybePersonsDict}),
+    ObjectUtils.omitUndefined({"taps": data.taps, "personsAll": maybePersonsDict}),
   )
 }
 
 let updatePlacePersonsAll = (firestore, placeId, persons: array<(string, personsAllRecord)>) => {
   let updateData = persons->Belt.Array.reduce(Object.empty(), (data, (personId, person)) => {
-    ObjectUtils.setIn(Some(data), `personsAll.${personId}`, personsAllRecordToTuple(person))
+    ObjectUtils.setIn(Some(data), `personsAll.${personId}`, personsAllRecordToTuple(. person))
   })
   Firebase.updateDoc(placeDocument(firestore, placeId), updateData)
 }
@@ -299,7 +285,6 @@ let addPerson = async (firestore, placeId, personName) => {
   let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
   let newPerson: FirestoreModels.person = {
     account: Null.null,
-    balance: 0,
     createdAt: Firebase.serverTimestamp(),
     name: personName,
     transactions: [],
@@ -307,6 +292,7 @@ let addPerson = async (firestore, placeId, personName) => {
   let addedPerson = await Firebase.addDoc(placePersonsCollection(firestore, placeId), newPerson)
   let personId = addedPerson.id
   let placeShortcutRecord: personsAllRecord = {
+    balance: 0,
     name: personName,
     preferredTap: Some(firstTap),
     // the nested objects do not support serverTimestamp() :(
@@ -352,7 +338,9 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
       )
     let place = placeDoc.data(. {})
     let kegOnTap =
-      place.taps->Belt.Map.String.findFirstBy((_, maybeKegRef) =>
+      place.taps
+      ->Js.Dict.entries
+      ->Array.find(((_, maybeKegRef)) =>
         maybeKegRef
         ->Null.toOption
         ->Option.map(kegRef => kegRef.id === kegId)

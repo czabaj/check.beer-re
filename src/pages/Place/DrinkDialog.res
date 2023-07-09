@@ -15,25 +15,22 @@ let make = (
   ~preferredTap,
   ~onDismiss,
   ~onSubmit,
-  ~tapsWithKegs: Belt.Map.String.t<Db.kegConverted>,
+  ~tapsWithKegs: Js.Dict.t<Db.kegConverted>,
 ) => {
-  let tapsEmpty = tapsWithKegs->Belt.Map.String.isEmpty
-  let options =
-    tapsWithKegs
-    ->Belt.Map.String.toArray
-    ->Array.map(((tapName, keg)) => {
-      {
-        text: `${tapName}: ${keg.beer} ${keg.serialFormatted}`,
-        value: tapName,
-      }
-    })
-  let preferredTapHasKeg = options->Array.some(({value}) => value === preferredTap)
+  let tapsEntries = tapsWithKegs->Js.Dict.entries
+  let tapsOptions = tapsEntries->Array.map(((tapName, keg)) => {
+    {
+      text: `${tapName}: ${keg.beer} ${keg.serialFormatted}`,
+      value: tapName,
+    }
+  })
+  let preferredTapHasKeg = tapsOptions->Array.some(({value}) => value === preferredTap)
   let form = Form.use(
     ~initialState={
       {
         tap: preferredTapHasKeg
           ? preferredTap
-          : options->Array.get(0)->Option.map(({value}) => value)->Option.getWithDefault(""),
+          : tapsOptions->Array.get(0)->Option.map(({value}) => value)->Option.getWithDefault(""),
         consumption: -1,
       }
     },
@@ -65,7 +62,7 @@ let make = (
     <header>
       <h3> {React.string(personName)} </h3>
     </header>
-    {tapsEmpty
+    {tapsOptions->Array.length === 0
       ? <p> {React.string("Naražte sudy!")} </p>
       : {
           <Form.Provider value=Some(form)>
@@ -75,7 +72,7 @@ let make = (
                 render={field => {
                   let handleChange = ReForm.Helpers.handleChange(field.handleChange)
                   <fieldset className={classes.taps}>
-                    {options
+                    {tapsOptions
                     ->Array.map(({text, value}) => {
                       <label key=value>
                         <input

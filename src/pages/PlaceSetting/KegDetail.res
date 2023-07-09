@@ -40,7 +40,8 @@ let make = (
   let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
     place.taps
-    ->Belt.Map.String.findFirstBy((_, maybeKegRef) =>
+    ->Js.Dict.entries
+    ->Array.find(((_, maybeKegRef)) =>
       maybeKegRef
       ->Null.toOption
       ->Option.map(kegRef => kegRef.id === kegId)
@@ -172,7 +173,7 @@ let make = (
             // The map is sorted by timestamp ascending, we want descending
             ->Array.reverse
             ->Array.map(((timestampStr, consumption)) => {
-              let person = place.personsAll->Belt.Map.String.getExn(consumption.person.id)
+              let person = place.personsAll->Js.Dict.unsafeGet(consumption.person.id)
               let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
               <tr key={timestampStr}>
                 <td> {React.string(person.name)} </td>

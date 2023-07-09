@@ -45,7 +45,7 @@ let make = (~placeId) => {
   | Some((place, chargedKegs)) =>
     let kegsOnTapUids =
       place.taps
-      ->Belt.Map.String.valuesToArray
+      ->Js.Dict.values
       ->Belt.Array.keepMap(maybeKegReference =>
         maybeKegReference->Js.Null.toOption->Option.map(ref => ref.id)
       )
