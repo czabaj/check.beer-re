@@ -23,8 +23,38 @@ let dialogReducer = (_, event) => {
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
-  let unfinishedConsumptionsByUserRx = Db.unfinishedConsumptionsByUserRx(firestore, placeId)
-  Rxjs.combineLatest2((placeRx, unfinishedConsumptionsByUserRx))
+  let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
+  let unfinishedConsumptionsByUserRx = allChargedKegsRx->Rxjs.pipe(
+    Rxjs.map(.(chargedKegs, _) => {
+      let consumptionsByUser = Belt.MutableMap.String.make()
+      chargedKegs->Array.forEach(keg =>
+        Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
+      )
+      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+      })
+      consumptionsByUser
+    }),
+  )
+  let chargedKegsByDonorsRx = allChargedKegsRx->Rxjs.pipe(
+    Rxjs.map(.(chargedKegs: array<Db.kegConverted>, _) => {
+      let kegByDonor = Belt.MutableMap.String.make()
+      chargedKegs->Array.forEach(keg => {
+        keg.donors
+        ->Js.Dict.entries
+        ->Array.forEach(
+          ((personId, _)) => {
+            switch kegByDonor->Belt.MutableMap.String.get(personId) {
+            | Some(kegs) => kegs->Array.push(keg)
+            | None => kegByDonor->Belt.MutableMap.String.set(personId, [keg])
+            }
+          },
+        )
+      })
+      kegByDonor
+    }),
+  )
+  Rxjs.combineLatest3((placeRx, unfinishedConsumptionsByUserRx, chargedKegsByDonorsRx))
 }
 
 @react.component
@@ -37,7 +67,7 @@ let make = (~placeId) => {
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
   switch pageDataStatus.data {
-  | Some((place, unfinishedConsumptionsByUser)) => {
+  | Some((place, unfinishedConsumptionsByUser, chargedKegsByDonor)) => {
       let personsEntries = place.personsAll->Js.Dict.entries
       personsEntries->Array.sortInPlace(((_, a), (_, b)) => {
         a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
@@ -125,6 +155,7 @@ let make = (~placeId) => {
                 unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
               <PersonDetail
                 hasNext
+                hasKegDonor={chargedKegsByDonor->Belt.MutableMap.String.has(personId)}
                 hasPrevious
                 onDeleteConsumption={consumption => {
                   Db.deleteConsumption(

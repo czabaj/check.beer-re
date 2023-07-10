@@ -203,18 +203,6 @@ let recentlyFinishedKegsRx = (firestore, placeId) => {
   )
 }
 
-let chargedKegsWithConsumptionRx = (firestore, placeId) =>
-  Firebase.collectionDataRx(
-    Firebase.query(
-      placeKegsCollectionConverted(firestore, placeId),
-      [
-        Firebase.where("depletedAt", #"==", Js.null),
-        Firebase.where("recentConsumptionAt", #"!=", Js.null),
-      ],
-    ),
-    reactFireOptions,
-  )
-
 let kegFirstConsumptionTimestamp = (keg: kegConverted) =>
   keg.consumptions
   ->Js.Dict.keys
@@ -254,19 +242,17 @@ let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: ke
   target
 }
 
-let unfinishedConsumptionsByUserRx = (firestore, placeId) =>
-  chargedKegsWithConsumptionRx(firestore, placeId)->Rxjs.pipe(
-    Rxjs.map(.(chargedKegsWithConsumption, _) => {
-      let consumptionsByUser = Belt.MutableMap.String.make()
-      chargedKegsWithConsumption->Array.forEach(keg =>
-        groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
-      )
-      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
-        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
-      })
-      consumptionsByUser
-    }),
+let allChargedKegsRx = (firestore, placeId) => {
+  let chargedKegsQuery = Firebase.query(
+    placeKegsCollectionConverted(firestore, placeId),
+    [
+      Firebase.where("depletedAt", #"==", null),
+      // limit to 50 to avoid expensive calls, but 50 kegs on stock is a lot
+      Firebase.limit(50),
+    ],
   )
+  Firebase.collectionDataRx(chargedKegsQuery, reactFireOptions)
+}
 
 // Hooks
 

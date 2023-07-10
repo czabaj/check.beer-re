@@ -5,15 +5,7 @@ type classesType = {root: string}
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
-  let chargedKegsQuery = Firebase.query(
-    Db.placeKegsCollectionConverted(firestore, placeId),
-    [
-      Firebase.where("depletedAt", #"==", null),
-      // limit to 50 to avoid expensive calls, but 50 kegs on stock is a lot
-      Firebase.limit(50),
-    ],
-  )
-  let chargedKegsRx = Firebase.collectionDataRx(chargedKegsQuery, Db.reactFireOptions)
+  let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   Rxjs.combineLatest2((placeRx, chargedKegsRx))
 }
 
@@ -35,13 +27,13 @@ let make = (~placeId) => {
   let firestore = Firebase.useFirestore()
   // this paginated call do not use suspense, call it above the placePageStatus which _is_ suspended
   let (maybeDepletedKegs, maybeFetchMoreDepletedKegs) = UsePaginatedDepletedKegsData.use(placeId)
-  let placePageStatus = Firebase.useObservable(
+  let pageDataStatus = Firebase.useObservable(
     ~observableId="PlaceSettingPage",
     ~source=pageDataRx(firestore, placeId),
   )
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
-  switch placePageStatus.data {
+  switch pageDataStatus.data {
   | Some((place, chargedKegs)) =>
     let kegsOnTapUids =
       place.taps

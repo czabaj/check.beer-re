@@ -148,10 +148,31 @@ let pageDataRx = (firestore, placeId) => {
       )
     }),
   )
+  let chargedKegsWithConsumptionRx = Firebase.collectionDataRx(
+    Firebase.query(
+      Db.placeKegsCollectionConverted(firestore, placeId),
+      [
+        Firebase.where("depletedAt", #"==", Js.null),
+        Firebase.where("recentConsumptionAt", #"!=", Js.null),
+      ],
+    ),
+    Db.reactFireOptions,
+  )
+  let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
+    Rxjs.map(.(chargedKegsWithConsumption, _) => {
+      let consumptionsByUser = Belt.MutableMap.String.make()
+      chargedKegsWithConsumption->Array.forEach(keg =>
+        Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
+      )
+      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+      })
+      consumptionsByUser
+    }),
+  )
   let recentlyFinishedKegsRx = Db.recentlyFinishedKegsRx(firestore, placeId)
-  let unfinishedConsumptionsByUserIdRx = Db.unfinishedConsumptionsByUserRx(firestore, placeId)
-  let recentConsumptionsByUserIdRx = Rxjs.combineLatest2((
-    unfinishedConsumptionsByUserIdRx,
+  let recentConsumptionsByUserRx = Rxjs.combineLatest2((
+    unfinishedConsumptionsByUserRx,
     recentlyFinishedKegsRx,
   ))->Rxjs.pipe(
     Rxjs.map(.((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
@@ -184,8 +205,8 @@ let pageDataRx = (firestore, placeId) => {
     placeRx,
     personsSorted,
     tapsWithKegsRx,
-    unfinishedConsumptionsByUserIdRx,
-    recentConsumptionsByUserIdRx,
+    unfinishedConsumptionsByUserRx,
+    recentConsumptionsByUserRx,
   ))
 }
 
@@ -206,8 +227,8 @@ let make = (~placeId) => {
       place,
       (activePersonEntries, inactivePersonEntries),
       tapsWithKegs,
-      unfinishedConsumptionsByUserId,
-      recentConsumptionsByUserId,
+      unfinishedConsumptionsByUser,
+      recentConsumptionsByUser,
     ) =>
     <FormattedCurrency.Provider value={place.currency}>
       <div className={classes.root}>
@@ -240,10 +261,7 @@ let make = (~placeId) => {
                   ->Array.map(activePerson => {
                     let (personId, person) = activePerson
                     let consumptions =
-                      recentConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(
-                        personId,
-                        [],
-                      )
+                      recentConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
                     <ActivePersonListItem
                       activeCheckbox={activePersonsChanges->Option.map(changes =>
                         <ActiveCheckbox
@@ -372,7 +390,7 @@ let make = (~placeId) => {
             personName={person.name}
             preferredTap={person.preferredTap->Option.getExn}
             tapsWithKegs
-            unfinishedConsumptions={unfinishedConsumptionsByUserId->Belt.MutableMap.String.getWithDefault(
+            unfinishedConsumptions={unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(
               personId,
               [],
             )}

@@ -4,6 +4,7 @@ type classesType = {root: string}
 @react.component
 let make = (
   ~hasNext,
+  ~hasKegDonor,
   ~hasPrevious,
   ~onDeleteConsumption,
   ~onDeletePerson,
@@ -59,8 +60,8 @@ let make = (
     {unfinishedConsumptions->Array.length === 0
       ? <p>
           {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
-          {switch maybePersonDoc {
-          | Some({transactions: []}) =>
+          {switch (hasKegDonor, maybePersonDoc) {
+          | (false, Some({transactions: []})) =>
             <>
               {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
               <button
