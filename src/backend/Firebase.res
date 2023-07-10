@@ -58,8 +58,8 @@ external enableMultiTabIndexedDbPersistence: firestore => promise<unit> =
   "enableMultiTabIndexedDbPersistence"
 
 type updateTag = ArrayUnion | ArrayRemove | Increment
-@module("firebase/firestore")
-external arrayUnion: 'a => updateTag = "arrayUnion"
+@module("firebase/firestore") @variadic
+external arrayUnion: array<'a> => updateTag = "arrayUnion"
 
 @module("firebase/firestore")
 external incrementInt: int => updateTag = "increment"
