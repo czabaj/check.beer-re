@@ -39,7 +39,7 @@ export type keg = {
 export type financialTransaction = {
   readonly amount: number; 
   readonly createdAt: Firebase_Timestamp_t; 
-  readonly keg: (null | Firebase_documentReference<keg>); 
+  readonly keg: (null | number); 
   readonly note: (null | string)
 };
 

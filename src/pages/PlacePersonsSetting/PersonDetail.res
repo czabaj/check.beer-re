@@ -1,27 +1,47 @@
 type classesType = {root: string}
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
+type dialogState =
+  | Hidden
+  | ConfirmDeletePerson
+  | AddTransaction
+
+type dialogEvent =
+  | Hide
+  | ShowConfirmDeletePerson
+  | ShowAddTransaction
+
+let dialogReducer = (_, event) => {
+  switch event {
+  | Hide => Hidden
+  | ShowAddTransaction => AddTransaction
+  | ShowConfirmDeletePerson => ConfirmDeletePerson
+  }
+}
+
 @react.component
 let make = (
   ~hasNext,
-  ~hasKegDonor,
   ~hasPrevious,
   ~onDeleteConsumption,
   ~onDeletePerson,
   ~onDismiss,
   ~onNextPerson,
   ~onPreviousPerson,
+  ~pendingTransactions: array<FirestoreModels.financialTransaction>,
   ~person: Db.personsAllRecord,
   ~personId,
   ~placeId,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
+  let firestore = Firebase.useFirestore()
   let {data: maybePersonDoc} = Db.usePlacePersonDocumentStatus(
     ~options={suspense: false},
     placeId,
     personId,
   )
-  let (showDeletePersonConfirmation, setShowDeletePersonConfirmation) = React.useState(_ => false)
+  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
+  let hideDialog = _ => sendDialog(Hide)
   <DialogCycling
     className={classes.root}
     hasNext
@@ -60,13 +80,13 @@ let make = (
     {unfinishedConsumptions->Array.length === 0
       ? <p>
           {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
-          {switch (hasKegDonor, maybePersonDoc) {
-          | (false, Some({transactions: []})) =>
+          {switch (pendingTransactions, maybePersonDoc) {
+          | ([], Some({transactions: []})) =>
             <>
               {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
               <button
                 className={Styles.linkClasses.base}
-                onClick={_ => setShowDeletePersonConfirmation(_ => true)}
+                onClick={_ => sendDialog(ShowConfirmDeletePerson)}
                 type_="button">
                 {React.string("zcela odebrat z aplikace")}
               </button>
@@ -80,22 +100,122 @@ let make = (
           onDeleteConsumption
           unfinishedConsumptions
         />}
-    {!showDeletePersonConfirmation
-      ? React.null
-      : <DialogConfirmation
-          className={DialogConfirmation.classes.deleteConfirmation}
-          heading="Odstranit osobu ?"
-          onConfirm={() => {
-            onDismiss()
-            onDeletePerson()
-          }}
-          onDismiss={() => setShowDeletePersonConfirmation(_ => false)}
-          visible=true>
-          <p>
-            {React.string(`Chystáte se odstranit osobu `)}
-            <b> {React.string(person.name)} </b>
-            {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetních transakcí. Chcete pokračovat?`)}
-          </p>
-        </DialogConfirmation>}
+    <section ariaLabelledby="financial_transactions">
+      <header>
+        <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
+        <button
+          className={Styles.buttonClasses.button}
+          onClick={_ => sendDialog(ShowAddTransaction)}
+          type_="button">
+          {React.string("Přidat účetní záznam")}
+        </button>
+      </header>
+      {switch (pendingTransactions, maybePersonDoc) {
+      | (_, None) => <LoadingInline />
+      | ([], Some({transactions: []})) =>
+        <p> {React.string("Tato osoba zatím nemá účetní záznamy.")} </p>
+      | (pending, Some({transactions})) =>
+        <table ariaLabelledby="financial_transactions">
+          <thead>
+            <tr>
+              <th scope="col"> {React.string("Datum")} </th>
+              <th scope="col"> {React.string("Částka")} </th>
+              <th scope="col"> {React.string("Poznámka")} </th>
+            </tr>
+          </thead>
+          <tbody>
+            {pending
+            ->Array.map(pendingTransaction => {
+              let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
+              <tr key={createdDate->Js.Date.getTime->Float.toString}>
+                <td>
+                  <FormattedDateTime value={createdDate} />
+                </td>
+                <td>
+                  <FormattedCurrency value={pendingTransaction.amount} />
+                </td>
+                <td>
+                  {switch pendingTransaction.keg->Null.toOption {
+                  | None => React.null
+                  | Some(kegSerial) =>
+                    React.string(
+                      `Nezaúčtované: věřitelství za sud #${kegSerial->Int.toString}`,
+                    )
+                  }}
+                </td>
+              </tr>
+            })
+            ->React.array}
+            {transactions
+            ->Array.map(finalTransaction => {
+              let createdDate = finalTransaction.createdAt->Firebase.Timestamp.toDate
+              <tr key={createdDate->Js.Date.getTime->Float.toString}>
+                <td>
+                  <FormattedDateTime value={createdDate} />
+                </td>
+                <td>
+                  <FormattedCurrency value={finalTransaction.amount} />
+                </td>
+                <td>
+                  {switch (
+                    finalTransaction.note->Null.toOption,
+                    finalTransaction.keg->Null.toOption,
+                    finalTransaction.amount > 0,
+                  ) {
+                  | (Some(note), _, _) => React.string(note)
+                  | (_, Some(kegSerial), false) =>
+                    React.string(`Konzumace ze sudu #${kegSerial->Int.toString}`)
+                  | (_, Some(kegSerial), true) =>
+                    React.string(`Věřitelství za sud #${kegSerial->Int.toString}`)
+                  | (_, None, false) => React.string("Mimořádná srážka")
+                  | (_, None, true) => React.string("Nabití kreditu")
+                  | _ => React.null
+                  }}
+                </td>
+              </tr>
+            })
+            ->React.array}
+          </tbody>
+        </table>
+      }}
+    </section>
+    {switch dialogState {
+    | Hidden => React.null
+    | AddTransaction =>
+      <AddFinancialTransactions
+        onDismiss={hideDialog}
+        onSubmit={async values => {
+          await Db.addFinancialTransaction(
+            firestore,
+            placeId,
+            personId,
+            {
+              amount: values.amount,
+              createdAt: Firebase.Timestamp.now(),
+              keg: Null.null,
+              note: Null.make(values.note),
+            },
+          )
+          hideDialog()
+        }}
+        personName={person.name}
+      />
+    | ConfirmDeletePerson =>
+      <DialogConfirmation
+        className={DialogConfirmation.classes.deleteConfirmation}
+        heading="Odstranit osobu ?"
+        onConfirm={() => {
+          hideDialog()
+          onDeletePerson()
+        }}
+        onDismiss={() => hideDialog()}
+        visible=true>
+        <p>
+          {React.string(`Chystáte se odstranit osobu `)}
+          <b> {React.string(person.name)} </b>
+          {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetních transakcí. Chcete pokračovat?`)}
+        </p>
+      </DialogConfirmation>
+    }}
   </DialogCycling>
 }

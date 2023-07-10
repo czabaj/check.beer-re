@@ -168,6 +168,21 @@ module Transaction = {
 external runTransaction: (. firestore, Transaction.t => promise<'a>) => promise<'a> =
   "runTransaction"
 
+module WriteBatch = {
+  type t
+  @send
+  external delete: (t, documentReference<'a>) => t = "delete"
+  @send
+  external set: (t, documentReference<'a>, 'a, setOptions) => t = "set"
+  @send
+  external update: (t, documentReference<'a>, {..}) => t = "update"
+  @send
+  external commit: t => promise<unit> = "commit"
+}
+
+@module("firebase/firestore")
+external writeBatch: firestore => WriteBatch.t = "writeBatch"
+
 type reactfireOptions<'a> = {
   idField?: string,
   initialData?: 'a,

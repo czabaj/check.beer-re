@@ -30,7 +30,7 @@ and keg = {
 and financialTransaction = {
   amount: int,
   createdAt: Firebase.Timestamp.t,
-  keg: Js.null<Firebase.documentReference<keg>>,
+  keg: Js.null<int>,
   note: Js.null<string>,
 }
 @genType

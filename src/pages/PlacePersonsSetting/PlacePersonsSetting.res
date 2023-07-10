@@ -36,17 +36,23 @@ let pageDataRx = (firestore, placeId) => {
       consumptionsByUser
     }),
   )
-  let chargedKegsByDonorsRx = allChargedKegsRx->Rxjs.pipe(
+  let pendingTransactionsByUserRx = allChargedKegsRx->Rxjs.pipe(
     Rxjs.map(.(chargedKegs: array<Db.kegConverted>, _) => {
       let kegByDonor = Belt.MutableMap.String.make()
       chargedKegs->Array.forEach(keg => {
         keg.donors
         ->Js.Dict.entries
         ->Array.forEach(
-          ((personId, _)) => {
+          ((personId, amount)) => {
+            let transaction: FirestoreModels.financialTransaction = {
+              amount,
+              createdAt: keg.createdAt,
+              keg: Null.make(keg.serial),
+              note: Null.null,
+            }
             switch kegByDonor->Belt.MutableMap.String.get(personId) {
-            | Some(kegs) => kegs->Array.push(keg)
-            | None => kegByDonor->Belt.MutableMap.String.set(personId, [keg])
+            | Some(kegs) => kegs->Array.push(transaction)
+            | None => kegByDonor->Belt.MutableMap.String.set(personId, [transaction])
             }
           },
         )
@@ -54,7 +60,7 @@ let pageDataRx = (firestore, placeId) => {
       kegByDonor
     }),
   )
-  Rxjs.combineLatest3((placeRx, unfinishedConsumptionsByUserRx, chargedKegsByDonorsRx))
+  Rxjs.combineLatest3((placeRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx))
 }
 
 @react.component
@@ -67,7 +73,7 @@ let make = (~placeId) => {
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
   switch pageDataStatus.data {
-  | Some((place, unfinishedConsumptionsByUser, chargedKegsByDonor)) => {
+  | Some((place, unfinishedConsumptionsByUser, pendingTransactionsByUser)) => {
       let personsEntries = place.personsAll->Js.Dict.entries
       personsEntries->Array.sortInPlace(((_, a), (_, b)) => {
         a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
@@ -86,13 +92,13 @@ let make = (~placeId) => {
                 {React.string("Přidat osobu")}
               </button>}
               headerId="persons_accounts"
-              headerSlot={React.string("Účetnictví osob")}>
+              headerSlot={React.string("Účetnictví")}>
               <table
                 ariaLabelledby="persons_accounts"
                 className={`${Styles.tableClasses.stretch} ${classes.table}`}>
                 <thead>
                   <tr>
-                    <th scope="col"> {React.string("Osoba")} </th>
+                    <th scope="col"> {React.string("Návštěvník")} </th>
                     <th scope="col"> {React.string("Poslední aktivita")} </th>
                     <th scope="col"> {React.string("Bilance")} </th>
                   </tr>
@@ -155,7 +161,6 @@ let make = (~placeId) => {
                 unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
               <PersonDetail
                 hasNext
-                hasKegDonor={chargedKegsByDonor->Belt.MutableMap.String.has(personId)}
                 hasPrevious
                 onDeleteConsumption={consumption => {
                   Db.deleteConsumption(
@@ -171,6 +176,9 @@ let make = (~placeId) => {
                 onDismiss={hideDialog}
                 onNextPerson={_ => handleCycle(true)}
                 onPreviousPerson={_ => handleCycle(false)}
+                pendingTransactions={pendingTransactionsByUser
+                ->Belt.MutableMap.String.get(personId)
+                ->Belt.Option.getWithDefault([])}
                 person
                 personId
                 placeId

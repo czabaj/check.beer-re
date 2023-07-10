@@ -8,6 +8,14 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
 
   let int = Validation.int
 
+  let intNonZero = (~error="Nesmí být nula", field) => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      switch value {
+      | 0 => Error(error)
+      | _ => Valid
+      }
+    }, field)
+
   let notIn = (~haystack, ~error, field) => Validation.custom(lensState => {
       let value = Lenses.get(lensState, field)
       switch haystack->Array.includes(value) {
