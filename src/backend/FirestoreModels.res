@@ -20,6 +20,7 @@ and keg = {
   consumptions: Js.Dict.t<consumption>,
   createdAt: Firebase.Timestamp.t,
   depletedAt: Js.null<Firebase.Timestamp.t>,
+  donors: Js.Dict.t<int>,
   milliliters: int,
   price: int,
   recentConsumptionAt: Js.null<Firebase.Timestamp.t>,

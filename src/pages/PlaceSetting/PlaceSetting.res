@@ -92,23 +92,24 @@ let make = (~placeId) => {
       | AddKeg =>
         <KegAddNew
           onDismiss={hideDialog}
-          onSubmit={async ({beer, liters, price, serial}) => {
-            let minorUnit = FormattedCurrency.getMinorUnit(place.currency)
+          onSubmit={async ({beer, donors, milliliters, price, serial}) => {
             let _ = await Firebase.addDoc(
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
                 consumptions: Js.Dict.empty(),
                 createdAt: Firebase.Timestamp.now(),
+                donors,
                 depletedAt: Null.null,
-                milliliters: (liters *. 1000.0)->Int.fromFloat,
-                price: (price *. minorUnit)->Int.fromFloat,
+                milliliters,
+                price,
                 recentConsumptionAt: Null.null,
                 serial,
               },
             )
             hideDialog()
           }}
+          place
           placeId
         />
       | BasicInfoEdit =>

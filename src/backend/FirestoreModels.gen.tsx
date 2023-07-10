@@ -28,6 +28,7 @@ export type keg = {
   readonly consumptions: {[id: string]: consumption}; 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly depletedAt: (null | Firebase_Timestamp_t); 
+  readonly donors: {[id: string]: number}; 
   readonly milliliters: number; 
   readonly price: number; 
   readonly recentConsumptionAt: (null | Firebase_Timestamp_t); 

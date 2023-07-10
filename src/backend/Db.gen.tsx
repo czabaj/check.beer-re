@@ -33,6 +33,7 @@ export type kegConverted = {
   readonly consumptions: {[id: string]: FirestoreModels_consumption}; 
   readonly consumptionsSum: number; 
   readonly createdAt: Firebase_Timestamp_t; 
+  readonly donors: {[id: string]: number}; 
   readonly depletedAt: (null | Firebase_Timestamp_t); 
   readonly milliliters: number; 
   readonly price: number; 

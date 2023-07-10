@@ -2,6 +2,8 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
   module ReSchema = ReSchema.Make(Lenses)
   module Validation = ReSchema.Validation
 
+  let custom = Validation.custom
+
   let float = Validation.float
 
   let int = Validation.int
