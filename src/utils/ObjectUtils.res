@@ -1,7 +1,7 @@
 let omitD: (. Js.Dict.t<'a>, array<string>) => Js.Dict.t<'a> = %raw("(data, keys) => {
   const result = {}
   for (const [key, value] of Object.entries(data)) {
-    if (keys.includes(key)) {
+    if (!keys.includes(key)) {
       result[key] = value
     }
   }

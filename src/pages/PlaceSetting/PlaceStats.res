@@ -8,22 +8,22 @@ let make = (~chargedKegsValue, ~personsCount, ~totalBalance) => {
       {...RouterUtils.createAnchorProps("./osob")}
       className={Styles.buttonClasses.button}
       type_="button">
-      {React.string("Správa osob")}
+      {React.string("Osobní účty")}
     </a>}
     headerId="accounting_overview"
-    headerSlot={React.string("Statistika")}>
+    headerSlot={React.string("Účetnictví")}>
     <dl className={classes.descriptionList}>
-      <dt> {React.string("Počet konzumentů")} </dt>
+      <dt> {React.string("Počet návštěvníků")} </dt>
       <dd>
         <ReactIntl.FormattedNumber value={personsCount->Float.fromInt} />
       </dd>
-      <dt> {React.string("Na skladě")} </dt>
+      <dt> {React.string("Hodnota sudů na skladě")} </dt>
       <dd>
         <FormattedCurrency value={chargedKegsValue} />
       </dd>
-      <dt> {React.string("Platby")} </dt>
+      <dt> {React.string("Celková bilance")} </dt>
       <dd>
-        <FormattedCurrency value={totalBalance} />
+        <FormattedCurrency format={FormattedCurrency.formatAccounting} value={totalBalance} />
       </dd>
     </dl>
   </SectionWithHeader>

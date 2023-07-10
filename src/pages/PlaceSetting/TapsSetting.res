@@ -61,6 +61,11 @@ let make = (
     })
     ->Belt.Map.String.fromArray
   , [tappedChargedKegs])
+  let sortedTapEntries = React.useMemo1(() => {
+    let tapsEntries = place.taps->Js.Dict.entries
+    tapsEntries->Array.sortInPlace((a, b) => a->fst->String.localeCompare(b->fst)->Int.fromFloat)
+    tapsEntries
+  }, [place.taps])
 
   <SectionWithHeader
     buttonsSlot={<button
@@ -71,9 +76,8 @@ let make = (
     headerSlot={React.string("Pípy")}>
     <ul className={`reset ${classes.list}`}>
       {
-        let tapsEntries = place.taps->Js.Dict.entries
-        let tapsCount = tapsEntries->Array.length
-        tapsEntries
+        let tapsCount = sortedTapEntries->Array.length
+        sortedTapEntries
         ->Array.map(((tapName, maybeKegReference)) => {
           let tappedKeg =
             maybeKegReference
@@ -147,7 +151,8 @@ let make = (
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          Db.updatePlace(firestore, placeId, {taps: ObjectUtils.omitD(. place.taps, [tapName])})
+          let updateData = ObjectUtils.setIn(. None, `taps.${tapName}`, Firebase.deleteField())
+          Firebase.updateDoc(Db.placeDocument(firestore, placeId), updateData)
           ->Promise.then(_ => {
             hideDialog()
             Promise.resolve()
