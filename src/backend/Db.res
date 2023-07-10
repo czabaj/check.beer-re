@@ -185,7 +185,7 @@ let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
   Rxjs.shareReplay(1),
 )
 
-let kegsWithRecentConsumptionRx = (firestore, placeId) => {
+let recentlyFinishedKegsRx = (firestore, placeId) => {
   slidingWindowRx->Rxjs.pipe(
     Rxjs.switchMap(_slidingWindow => {
       let now = Js.Date.make()
@@ -193,7 +193,7 @@ let kegsWithRecentConsumptionRx = (firestore, placeId) => {
       let firebaseTimestamp = Firebase.Timestamp.fromMillis(monthAgo)
       let query = Firebase.query(
         placeKegsCollectionConverted(firestore, placeId),
-        [Firebase.where("recentConsumptionAt", #">=", firebaseTimestamp)],
+        [Firebase.where("depletedAt", #">=", firebaseTimestamp)],
       )
       Firebase.collectionDataRx(query, reactFireOptions)
     }),

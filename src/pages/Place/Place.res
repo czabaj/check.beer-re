@@ -148,14 +148,27 @@ let pageDataRx = (firestore, placeId) => {
       )
     }),
   )
-  let kegsWithRecentConsumptionRx = Db.kegsWithRecentConsumptionRx(firestore, placeId)
-  let recentConsumptionsByUserIdRx = kegsWithRecentConsumptionRx->Rxjs.pipe(
-    Rxjs.map(.(kegs, _) => {
+  let recentlyFinishedKegsRx = Db.recentlyFinishedKegsRx(firestore, placeId)
+  let chargedKegsWithConsumption = Firebase.collectionDataRx(
+    Firebase.query(
+      Db.placeKegsCollectionConverted(firestore, placeId),
+      [
+        Firebase.where("depletedAt", #"==", Js.null),
+        Firebase.where("recentConsumptionAt", #"!=", Js.null),
+      ],
+    ),
+    Db.reactFireOptions,
+  )
+  let recentConsumptionsByUserIdRx = Rxjs.combineLatest2((
+    chargedKegsWithConsumption,
+    recentlyFinishedKegsRx,
+  ))->Rxjs.pipe(
+    Rxjs.map(.((chargedKegsWithConsumption, recentlyFinishedKegs), _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       // TODO: show only past XY hours, filter the older out
-      kegs->Array.forEach(keg =>
-        Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
-      )
+      chargedKegsWithConsumption
+      ->Array.concat(recentlyFinishedKegs)
+      ->Array.forEach(keg => Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore)
       // sort consumptions ty timestamp ascending
       consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
         consumptions->Array.sortInPlace((a, b) => (a.timestamp -. b.timestamp)->Int.fromFloat)
@@ -176,7 +189,7 @@ let pageDataRx = (firestore, placeId) => {
     placeRx,
     personsSorted,
     tapsWithKegsRx,
-    kegsWithRecentConsumptionRx,
+    chargedKegsWithConsumption,
     recentConsumptionsByUserIdRx,
   ))
 }
@@ -198,7 +211,7 @@ let make = (~placeId) => {
       place,
       (activePersonEntries, inactivePersonEntries),
       tapsWithKegs,
-      kegsWithRecentConsumption,
+      chargedKegsWithConsumption,
       recentConsumptionsByUserId,
     ) =>
     <FormattedCurrency.Provider value={place.currency}>
@@ -319,7 +332,7 @@ let make = (~placeId) => {
         | Hidden => React.null
         | AddConsumption({personId, person}) => {
             let unfinishedConsumptions =
-              kegsWithRecentConsumption
+              chargedKegsWithConsumption
               ->Belt.Array.keep(keg => keg.depletedAt === Null.null)
               ->Belt.Array.flatMap(keg =>
                 keg.consumptions
