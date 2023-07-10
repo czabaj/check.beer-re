@@ -45,7 +45,11 @@ let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~on
     </datalist>
   }, (existingActive, existingInactive))
   <DialogForm
-    className={classes.root} formId="addPerson" heading="Přidat osobu" onDismiss visible=true>
+    className={classes.root}
+    formId="addPerson"
+    heading="Nový návštěvník"
+    onDismiss
+    visible=true>
     <Form.Provider value=Some(form)>
       <form id="addPerson" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className="reset">

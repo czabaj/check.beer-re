@@ -48,17 +48,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
                 <FormattedCurrency value={keg.price} />
               </td>
               <td>
-                <FormattedVolume milliliters={Math.Int.max(volume - keg.consumptionsSum, 0)}>
-                  {(~formattedNumber) =>
-                    <meter
-                      ariaLabelledby="remaining_th"
-                      low={volume / 3}
-                      max={volume->Int.toString}
-                      min="0"
-                      title={formattedNumber}
-                      value={(volume - keg.consumptionsSum)->Int.toString}
-                    />}
-                </FormattedVolume>
+                <MeterKeg ariaLabelledby="remaining_th" keg />
               </td>
               <td className={classes.detailButtonCell}>
                 <ButtonDetail onClick={_ => onKegDetail(kegId)} title="Karta sudu" />

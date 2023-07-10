@@ -46,8 +46,19 @@
   padding: 0;
 }
 .taps > label {
+  align-items: center;
   border-block-start: var(--border-size-1) solid var(--surface-1);
+  display: flex;
+  gap: 1rem;
   padding-inline: var(--dialog-padding-inline);
+}
+.taps > label > span {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+}
+.taps > label meter {
+  width: 100%;
 }
 
 .unfinishedConsumptions {

@@ -12,7 +12,7 @@ module FormFields = %lenses(type state = {tap: string, consumption: int})
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
-type selectOption = {text: string, value: string}
+type selectOption = {text: React.element, value: string}
 
 @react.component
 let make = (
@@ -27,7 +27,10 @@ let make = (
   let tapsEntries = tapsWithKegs->Js.Dict.entries
   let tapsOptions = tapsEntries->Array.map(((tapName, keg)) => {
     {
-      text: `${tapName}: ${keg.beer} ${keg.serialFormatted}`,
+      text: <>
+        {React.string(`${tapName}: ${keg.beer} ${keg.serialFormatted}`)}
+        <MeterKeg keg />
+      </>,
       value: tapName,
     }
   })
@@ -89,7 +92,7 @@ let make = (
                           checked={field.value === value}
                           onChange={handleChange}
                         />
-                        <span> {React.string(text)} </span>
+                        <span> {text} </span>
                       </label>
                     })
                     ->React.array}
