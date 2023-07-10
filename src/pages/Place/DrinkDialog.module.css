@@ -2,6 +2,9 @@
   --dialog-padding-inline: 3rem;
   inline-size: 60ch;
 }
+.root:modal {
+  margin-block-start: 2rem;
+}
 
 .root h3 {
   font-size: 150%;
@@ -49,6 +52,9 @@
 
 .unfinishedConsumptions {
   background-color: var(--surface-3);
+}
+.unfinishedConsumptions[open] {
+  padding-block-end: 1rem;
 }
 .unfinishedConsumptions summary {
   padding-block: 1rem;

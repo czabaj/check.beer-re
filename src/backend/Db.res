@@ -81,9 +81,10 @@ let placeDocumentConverted = (firestore, placeId) => {
   placeDocument(firestore, placeId)->Firebase.withConterterDoc(placeConverter)
 }
 
+@genType
 type kegConverted = {
   beer: string,
-  consumptions: Belt.Map.String.t<consumption>,
+  consumptions: Js.Dict.t<consumption>,
   consumptionsSum: int, // added by converter
   createdAt: Firebase.Timestamp.t,
   depletedAt: Js.null<Firebase.Timestamp.t>,
@@ -97,15 +98,14 @@ type kegConverted = {
 let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
   fromFirestore: (. snapshot, options) => {
     let keg = snapshot.data(. options)
-    let consumptionsMap = keg.consumptions->Js.Dict.entries->Belt.Map.String.fromArray
     let consumptionsSum =
-      consumptionsMap->Belt.Map.String.reduceU(0, (. sum, _, consumption) =>
-        sum + consumption.milliliters
-      )
+      keg.consumptions
+      ->Js.Dict.values
+      ->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
     let serialFormatted = "#" ++ keg.serial->Int.toString->String.padStart(3, "0")
     {
       beer: keg.beer,
-      consumptions: consumptionsMap,
+      consumptions: keg.consumptions,
       consumptionsSum,
       createdAt: keg.createdAt,
       depletedAt: keg.depletedAt,
@@ -127,10 +127,9 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       price,
       serial,
     } = keg
-    let consumptionsDict = consumptions->Belt.Map.String.toArray->Js.Dict.fromArray
     {
       beer,
-      consumptions: consumptionsDict,
+      consumptions,
       createdAt,
       depletedAt,
       milliliters,
@@ -200,18 +199,48 @@ let recentlyFinishedKegsRx = (firestore, placeId) => {
   )
 }
 
+let chargedKegsWithConsumptionRx = (firestore, placeId) =>
+  Firebase.collectionDataRx(
+    Firebase.query(
+      placeKegsCollectionConverted(firestore, placeId),
+      [
+        Firebase.where("depletedAt", #"==", Js.null),
+        Firebase.where("recentConsumptionAt", #"!=", Js.null),
+      ],
+    ),
+    reactFireOptions,
+  )
+
 let kegFirstConsumptionTimestamp = (keg: kegConverted) =>
   keg.consumptions
-  ->Belt.Map.String.minKey
+  ->Js.Dict.keys
+  ->Array.reduce(None, (min, timestampStr) =>
+    switch min {
+    | Some(minTimestampStr) =>
+      timestampStr->String.localeCompare(minTimestampStr) < 0.0 ? Some(timestampStr) : min
+    | None => Some(timestampStr)
+    }
+  )
   ->Option.flatMap(timestampStr => timestampStr->Float.fromString)
 
-type userConsumption = {milliliters: int, timestamp: float}
+type userConsumption = {
+  consumptionId: string,
+  kegId: string,
+  beer: string,
+  milliliters: int,
+  createdAt: Js.Date.t,
+}
 
 let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: kegConverted) => {
-  keg.consumptions->Belt.Map.String.forEach((timestampStr, consumption) => {
+  keg.consumptions
+  ->Js.Dict.entries
+  ->Array.forEach(((timestampStr, consumption)) => {
     let userCons = {
-      timestamp: timestampStr->Float.fromString->Option.getExn,
+      consumptionId: timestampStr,
+      kegId: getUid(keg)->Option.getExn,
+      beer: keg.beer,
       milliliters: consumption.milliliters,
+      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
     }
     switch Belt.MutableMap.String.get(target, consumption.person.id) {
     | Some(consumptions) => consumptions->Array.push(userCons)
@@ -220,6 +249,20 @@ let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: ke
   })
   target
 }
+
+let unfinishedConsumptionsByUserRx = (firestore, placeId) =>
+  chargedKegsWithConsumptionRx(firestore, placeId)->Rxjs.pipe(
+    Rxjs.map(.(chargedKegsWithConsumption, _) => {
+      let consumptionsByUser = Belt.MutableMap.String.make()
+      chargedKegsWithConsumption->Array.forEach(keg =>
+        groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
+      )
+      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+      })
+      consumptionsByUser
+    }),
+  )
 
 // Hooks
 

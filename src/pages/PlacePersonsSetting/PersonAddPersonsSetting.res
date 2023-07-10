@@ -1,6 +1,6 @@
 type classesType = {root: string}
 
-@module("./PersonAddNew.module.css") external classes: classesType = "default"
+@module("./PersonAddPersonsSetting.module.css") external classes: classesType = "default"
 
 module FormFields = %lenses(type state = {name: string})
 
@@ -8,7 +8,7 @@ module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
-let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~onSubmit) => {
+let make = (~existingNames, ~onDismiss, ~onSubmit) => {
   let form = Form.use(
     ~initialState={name: ""},
     ~onSubmit=({state, raiseSubmitFailed}) => {
@@ -32,18 +32,12 @@ let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~on
       open Validators
       schema([
         required(Name),
-        notIn(~haystack=existingActive, ~error="Takové jméno již evidujeme", Name),
-        notIn(~haystack=existingInactive, ~error="Takové jméno již evidujeme", Name),
+        notIn(~haystack=existingNames, ~error="Takové jméno již evidujeme", Name),
       ])
     },
     ~validationStrategy=OnDemand,
     (),
   )
-  let datalist = React.useMemo2(() => {
-    <datalist id="inactiveNames">
-      {existingInactive->Array.map(name => <option key={name} value={name} />)->React.array}
-    </datalist>
-  }, (existingActive, existingInactive))
   <DialogForm
     className={classes.root} formId="addPerson" heading="Přidat osobu" onDismiss visible=true>
     <Form.Provider value=Some(form)>
@@ -55,39 +49,17 @@ let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~on
               <InputWrapper
                 inputError=?field.error
                 inputName="name"
-                inputSlot={<>
-                  <input
-                    list="inactiveNames"
-                    onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                    type_="text"
-                    value={field.value}
-                  />
-                  {datalist}
-                </>}
+                inputSlot={<input
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
+                  type_="text"
+                  value={field.value}
+                />}
                 labelSlot={React.string("Jméno")}
               />
             }}
           />
         </fieldset>
       </form>
-      <Form.Field
-        field=Name
-        render={field => {
-          let name = field.value
-          existingInactive->Array.includes(name)
-            ? <p>
-                {React.string("Toto jméno evidujeme u osob v nepřítomnosti, můžete ")}
-                <button
-                  className={Styles.linkClasses.base}
-                  onClick={_ => onMoveToActive(name)}
-                  type_="button">
-                  {React.string("přenést tuto osobu do pivního zápisníku")}
-                </button>
-                {React.string(".")}
-              </p>
-            : React.null
-        }}
-      />
       {switch form.state.formState {
       | SubmitFailed(maybeErrorMessage) => {
           let errorMessage = switch maybeErrorMessage {

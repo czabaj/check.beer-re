@@ -1,9 +1,10 @@
+import type { Preview } from "@storybook/react";
+import React from "react";
 import { IntlProvider } from "react-intl";
 
 import "../src/styles/index.css";
 
-/** @type { import('@storybook/react').Preview } */
-const preview = {
+const preview: Preview = {
   decorators: [
     (Story) => (
       <IntlProvider

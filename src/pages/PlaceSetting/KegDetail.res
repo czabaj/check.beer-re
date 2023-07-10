@@ -28,7 +28,7 @@ let make = (
 ) => {
   let consumptionsByTimestampDesc = React.useMemo1(() =>
     keg.consumptions
-    ->Belt.Map.String.toArray
+    ->Js.Dict.entries
     // The map is sorted by timestamp ascending, we want descending
     ->Array.reverse
   , [keg.consumptions])
@@ -168,10 +168,7 @@ let make = (
             </tr>
           </thead>
           <tbody>
-            {keg.consumptions
-            ->Belt.Map.String.toArray
-            // The map is sorted by timestamp ascending, we want descending
-            ->Array.reverse
+            {consumptionsByTimestampDesc
             ->Array.map(((timestampStr, consumption)) => {
               let person = place.personsAll->Js.Dict.unsafeGet(consumption.person.id)
               let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat

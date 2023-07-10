@@ -4,30 +4,40 @@ type classesType = {root: string, table: string}
 
 type dialogState =
   | Hidden
+  | AddPerson
   | PersonDetail({personId: string, person: Db.personsAllRecord})
 
 type dialogEvent =
   | Hide
+  | ShowAddPerson
   | ShowPersonDetail({personId: string, person: Db.personsAllRecord})
 
 let dialogReducer = (_, event) => {
   switch event {
   | Hide => Hidden
+  | ShowAddPerson => AddPerson
   | ShowPersonDetail({personId, person}) => PersonDetail({personId, person})
   }
+}
+
+let pageDataRx = (firestore, placeId) => {
+  let placeRef = Db.placeDocumentConverted(firestore, placeId)
+  let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
+  let unfinishedConsumptionsByUserRx = Db.unfinishedConsumptionsByUserRx(firestore, placeId)
+  Rxjs.combineLatest2((placeRx, unfinishedConsumptionsByUserRx))
 }
 
 @react.component
 let make = (~placeId) => {
   let firestore = Firebase.useFirestore()
-  let placeStatus = Firebase.useFirestoreDocData(.
-    Db.placeDocumentConverted(firestore, placeId),
-    Some(Db.reactFireOptions),
+  let pageDataStatus = Firebase.useObservable(
+    ~observableId="Page_PlacePersonsSetting",
+    ~source=pageDataRx(firestore, placeId),
   )
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
-  switch placeStatus.data {
-  | Some(place) => {
+  switch pageDataStatus.data {
+  | Some((place, unfinishedConsumptionsByUser)) => {
       let personsEntries = place.personsAll->Js.Dict.entries
       personsEntries->Array.sortInPlace(((_, a), (_, b)) => {
         a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
@@ -39,7 +49,12 @@ let make = (~placeId) => {
           />
           <main>
             <SectionWithHeader
-              buttonsSlot={React.null}
+              buttonsSlot={<button
+                className={Styles.buttonClasses.button}
+                type_="button"
+                onClick={_ => sendDialog(ShowAddPerson)}>
+                {React.string("Přidat osobu")}
+              </button>}
               headerId="persons_accounts"
               headerSlot={React.string("Účetnictví osob")}>
               <table
@@ -106,9 +121,19 @@ let make = (~placeId) => {
                   )
                 }
               }
+              let unfinishedConsumptions =
+                unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
               <PersonDetail
                 hasNext
                 hasPrevious
+                onDeleteConsumption={consumption => {
+                  Db.deleteConsumption(
+                    firestore,
+                    placeId,
+                    consumption.kegId,
+                    consumption.consumptionId,
+                  )->ignore
+                }}
                 onDeletePerson={_ => {
                   Db.deletePerson(firestore, placeId, personId)->ignore
                 }}
@@ -118,8 +143,18 @@ let make = (~placeId) => {
                 person
                 personId
                 placeId
+                unfinishedConsumptions={unfinishedConsumptions}
               />
             }
+          | AddPerson =>
+            <PersonAddPersonsSetting
+              existingNames={place.personsAll->Js.Dict.values->Array.map(p => p.name)}
+              onDismiss={hideDialog}
+              onSubmit={async values => {
+                await Db.addPerson(firestore, placeId, values.name)
+                hideDialog()
+              }}
+            />
           }}
         </div>
       </FormattedCurrency.Provider>

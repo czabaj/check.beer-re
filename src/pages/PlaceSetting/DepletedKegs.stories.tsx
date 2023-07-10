@@ -1,13 +1,20 @@
-import * as Belt_MapString from "rescript/lib/es6/belt_MapString.js";
+import { type Meta, type StoryObj } from "@storybook/react";
 import { Timestamp } from "firebase/firestore";
 
-import { make } from "./DepletedKegs.bs.js";
+import { make } from "./DepletedKegs.gen";
 
-const getKegMock = (consumptionLevel) => {
+const meta: Meta<typeof make> = {
+  title: "DepletedKegs",
+  component: make,
+};
+
+export default meta;
+
+const getKegMock = (consumptionLevel: number) => {
   let volume = 30000;
   return {
     beer: "Pilsner Urquell",
-    consumptions: Belt_MapString.fromArray([
+    consumptions: Object.fromEntries([
       [
         "1688362302044",
         {
@@ -98,19 +105,14 @@ const getKegMock = (consumptionLevel) => {
   };
 };
 
-export default {
-  title: "DepletedKegs",
-  component: make,
-};
-
-export const Loading = {
+export const Loading: StoryObj = {
   args: {
     maybeFetchMoreDepletedKegs: undefined,
     maybeDepletedKegs: undefined,
   },
 };
 
-export const Loaded = {
+export const Loaded: StoryObj = {
   args: {
     maybeFetchMoreDepletedKegs: undefined,
     maybeDepletedKegs: [getKegMock(0.9)],
