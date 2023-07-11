@@ -1,7 +1,7 @@
-type boxClassesType = {base: string, variatnError: string}
-@module("./box.module.css") external boxClasses: boxClassesType = "default"
+type boxClasses = {base: string, variatnError: string}
+@module("./box.module.css") external box: boxClasses = "default"
 
-type buttonClassesType = {
+type buttonClasses = {
   button: string,
   iconOnly: string,
   sizeLarge: string,
@@ -11,29 +11,32 @@ type buttonClassesType = {
   variantPrimary: string,
   variantStealth: string,
 }
-@module("./button.module.css") external buttonClasses: buttonClassesType = "default"
+@module("./button.module.css") external button: buttonClasses = "default"
 
-type descriptionListClassesType = {inline: string}
+type descriptionListClasses = {inline: string}
 @module("./descriptionList.module.css")
-external descriptionListClasses: descriptionListClassesType = "default"
+external descriptionList: descriptionListClasses = "default"
 
-type fieldsetClassesType = {grid: string}
-@module("./fieldset.module.css") external fieldsetClasses: fieldsetClassesType = "default"
+type fieldsetClasses = {grid: string}
+@module("./fieldset.module.css") external fieldset: fieldsetClasses = "default"
 
-type linkClassesType = {base: string}
-@module("./link.module.css") external linkClasses: linkClassesType = "default"
+type linkClasses = {base: string}
+@module("./link.module.css") external link: linkClasses = "default"
 
-type listClassesType = {base: string}
-@module("./list.module.css") external listClasses: listClassesType = "default"
+type listClasses = {base: string}
+@module("./list.module.css") external list: listClasses = "default"
 
-type messageBarClassesType = {info: string}
-@module("./messageBar.module.css") external messageBarClasses: messageBarClassesType = "default"
+type messageBarClasses = {info: string}
+@module("./messageBar.module.css") external messageBar: messageBarClasses = "default"
 
-type tableClassesType = {consumptions: string, stretch: string}
-@module("./table.module.css") external tableClasses: tableClassesType = "default"
+type pageClases = {centered: string, narrow: string}
+@module("./page.module.css") external page: pageClases = "default"
 
-type utilityClassesType = {
+type tableClasses = {consumptions: string, stretch: string}
+@module("./table.module.css") external table: tableClasses = "default"
+
+type utilityClasses = {
   breakout: string,
   srOnly: string,
 }
-@module("./utility.module.css") external utilityClasses: utilityClassesType = "default"
+@module("./utility.module.css") external utility: utilityClasses = "default"

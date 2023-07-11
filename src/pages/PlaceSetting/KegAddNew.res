@@ -87,7 +87,7 @@ module FormComponent = {
 
         <Form.Provider value=Some(form)>
           <form id="addKeg" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-            <fieldset className={`reset ${Styles.fieldsetClasses.grid}`}>
+            <fieldset className={`reset ${Styles.fieldset.grid}`}>
               <Form.Field
                 field=Beer
                 render={field => {

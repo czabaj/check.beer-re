@@ -69,7 +69,7 @@ let make = (
 
   <SectionWithHeader
     buttonsSlot={<button
-      className={Styles.buttonClasses.button} onClick={_ => sendDialog(ShowAddTap)} type_="button">
+      className={Styles.button.button} onClick={_ => sendDialog(ShowAddTap)} type_="button">
       {React.string("Přidat pípu")}
     </button>}
     headerId="taps_setting"
@@ -99,28 +99,28 @@ let make = (
             | None =>
               <button
                 disabled={!hasKegsToTap}
-                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                className={`${Styles.button.button} ${Styles.button.variantPrimary}`}
                 onClick={_ => sendDialog(ShowTapKeg(tapName))}
                 type_="button">
                 {React.string("Narazit")}
               </button>
             | Some(keg) =>
               <button
-                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantDanger}`}
+                className={`${Styles.button.button} ${Styles.button.variantDanger}`}
                 onClick={_ => sendDialog(ShowUntapKeg(tapName, keg))}
                 type_="button">
                 {React.string("Odrazit")}
               </button>
             }}
             <button
-              className={Styles.buttonClasses.button}
+              className={Styles.button.button}
               onClick={_ => sendDialog(ShowRenameTap(tapName))}
               type_="button">
               {React.string("Přejmenovat")}
             </button>
             <button
               disabled={tappedKeg != None || tapsCount < 2}
-              className={Styles.buttonClasses.button}
+              className={Styles.button.button}
               onClick={_ => sendDialog(ShowDeleteTap(tapName))}
               type_="button">
               {React.string("Smazat")}

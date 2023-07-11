@@ -52,7 +52,7 @@ let make = (
     onPrevious=onPreviousPerson
     visible={true}>
     <section ariaLabel="Základní údaje">
-      <dl className={`reset ${Styles.descriptionListClasses.inline}`}>
+      <dl className={`reset ${Styles.descriptionList.inline}`}>
         <div>
           <dt> {React.string("již od")} </dt>
           <dd>
@@ -85,7 +85,7 @@ let make = (
             <>
               {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
               <button
-                className={Styles.linkClasses.base}
+                className={Styles.link.base}
                 onClick={_ => sendDialog(ShowConfirmDeletePerson)}
                 type_="button">
                 {React.string("zcela odebrat z aplikace")}
@@ -104,7 +104,7 @@ let make = (
       <header>
         <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
         <button
-          className={Styles.buttonClasses.button}
+          className={Styles.button.button}
           onClick={_ => sendDialog(ShowAddTransaction)}
           type_="button">
           {React.string("Přidat účetní záznam")}

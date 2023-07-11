@@ -10,11 +10,11 @@
   margin-block-start: 0.5rem;
   padding: var(--border-size-2);
 }
-.buttonBack {
+.buttonLeft {
   border-inline-end: var(--border-size-2) solid var(--surface-1);
   grid-area: back;
 }
-.buttonMore {
+.buttonRight {
   grid-area: more;
 }
 .root > h2 {
@@ -29,8 +29,8 @@
   margin: 0;
 }
 
-.buttonBack,
-.buttonMore {
+.buttonLeft,
+.buttonRight {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -38,13 +38,13 @@
   height: 100%;
   padding-inline: 0.5rem;
 }
-:where(.buttonBack, .buttonMore) > span:first-child {
+:where(.buttonLeft, .buttonRight) > span:first-child {
   font-size: 150%;
 }
-:where(.buttonBack, .buttonMore) > span:last-child {
+:where(.buttonLeft, .buttonRight) > span:last-child {
   font-size: 75%;
   font-variant: all-small-caps;
 }
-:where(.buttonBack, .buttonMore):hover {
+:where(.buttonLeft, .buttonRight):hover {
   background-color: var(--surface-3);
 }

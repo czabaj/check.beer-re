@@ -84,7 +84,7 @@ let make = (
         {switch maybeFetchMoreDepletedKegs {
         | None => React.null
         | Some(fetchMore) =>
-          <button className={Styles.buttonClasses.button} onClick={_ => fetchMore()} type_="button">
+          <button className={Styles.button.button} onClick={_ => fetchMore()} type_="button">
             {React.string("Načíst další")}
           </button>
         }}

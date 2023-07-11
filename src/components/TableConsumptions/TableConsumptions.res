@@ -5,7 +5,7 @@ let make = (
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
-  <table ?ariaLabelledby className={Styles.tableClasses.consumptions}>
+  <table ?ariaLabelledby className={Styles.table.consumptions}>
     {switch captionSlot {
     | Some(slot) => <caption> {slot} </caption>
     | None => React.null
@@ -16,7 +16,7 @@ let make = (
         <th scope="col"> {React.string("Objem")} </th>
         <th scope="col"> {React.string("Kdy")} </th>
         <th scope="col">
-          <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+          <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
         </th>
       </tr>
     </thead>
@@ -34,7 +34,7 @@ let make = (
           </td>
           <td>
             <button
-              className={`${Styles.buttonClasses.button}`}
+              className={`${Styles.button.button}`}
               onClick={_ => onDeleteConsumption(consumption)}
               type_="button">
               {React.string("🗑️ Smáznout")}

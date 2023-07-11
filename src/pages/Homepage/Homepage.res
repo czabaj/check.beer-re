@@ -1,15 +1,11 @@
-type classesType = {root: string}
-
-@module("./Homepage.module.css") external classes: classesType = "default"
-
 @react.component
 let make = () => {
-  <div className={classes.root}>
+  <div className={Styles.page.centered}>
     <div>
       <h1 className="text-center"> {React.string("Untap.beer")} </h1>
       <a
         {...RouterUtils.createAnchorProps(`/misto`)}
-        className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}>
+        className={`${Styles.button.button} ${Styles.button.variantPrimary}`}>
         {React.string("Do aplikace")}
       </a>
     </div>

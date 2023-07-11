@@ -82,7 +82,7 @@ let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~on
             ? <p>
                 {React.string("Toto jméno evidujeme u osob v nepřítomnosti, můžete ")}
                 <button
-                  className={Styles.linkClasses.base}
+                  className={Styles.link.base}
                   onClick={_ => onMoveToActive(name)}
                   type_="button">
                   {React.string("přenést tuto osobu do pivního zápisníku")}

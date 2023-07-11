@@ -1,6 +1,11 @@
-.root {
+.centered {
   min-block-size: 100vh;
   min-inline-size: 100vh;
   display: grid;
   place-content: center;
+}
+
+.narrow {
+  max-inline-size: var(--measure);
+  margin-inline: auto;
 }

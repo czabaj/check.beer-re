@@ -1,7 +1,3 @@
-.root {
-  max-inline-size: var(--measure);
-  margin-inline: auto;
-}
 .root main {
   display: flex;
   flex-direction: column;

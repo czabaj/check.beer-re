@@ -14,7 +14,7 @@ module ActiveCheckbox = {
   @react.component
   let make = (~changes: Belt.Map.String.t<bool>, ~initialActive, ~personId, ~setChanges) => {
     let checked = changes->Belt.Map.String.getWithDefault(personId, initialActive)
-    <label className={`${classes.activeCheckbox} ${Styles.utilityClasses.breakout}`}>
+    <label className={`${classes.activeCheckbox} ${Styles.utility.breakout}`}>
       {React.string("Zde")}
       <input
         checked={checked}
@@ -82,7 +82,7 @@ module ActivePersonListItem = {
       | None =>
         <div className={classes.consumption}>
           <button
-            className={Styles.utilityClasses.breakout}
+            className={Styles.utility.breakout}
             onClick={_ => onAddConsumption()}
             title="Detail konzumace"
             type_="button"
@@ -235,21 +235,21 @@ let make = (~placeId) => {
       recentConsumptionsByUser,
     ) =>
     <FormattedCurrency.Provider value={place.currency}>
-      <div className={classes.root}>
+      <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
-          placeName={place.name}
-          createdTimestamp={place.createdAt}
-          slotRightButton={<a
+          buttonRightSlot={<a
             {...RouterUtils.createAnchorProps("./nastaveni")}
-            className={PlaceHeader.classes.buttonMore}>
+            className={Header.classes.buttonRight}>
             <span> {React.string("⚙️")} </span>
             <span> {React.string("Nastavení")} </span>
           </a>}
+          createdTimestamp={place.createdAt}
+          placeName={place.name}
         />
         <main>
           <SectionWithHeader
             buttonsSlot={<button
-              className={Styles.buttonClasses.button}
+              className={Styles.button.button}
               type_="button"
               onClick={_ => sendDialog(ShowAddPerson)}>
               {React.string("Přidat návštěvníka")}
@@ -260,7 +260,7 @@ let make = (~placeId) => {
               ? <p className=classes.listEmpty>
                   {React.string("Nikdo tu není, zkontrolujte nepřítomnost ⤵")}
                 </p>
-              : <ol className={`${Styles.listClasses.base} ${classes.list}`}>
+              : <ol className={`${Styles.list.base} ${classes.list}`}>
                   {activePersonEntries
                   ->Array.map(activePerson => {
                     let (personId, person) = activePerson
@@ -286,7 +286,7 @@ let make = (~placeId) => {
           {switch activePersonsChanges {
           | None =>
             <button
-              className={Styles.buttonClasses.button}
+              className={Styles.button.button}
               onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
               type_="button">
               {React.string("Nepřítomní")}
@@ -294,7 +294,7 @@ let make = (~placeId) => {
           | Some(changes) =>
             <>
               <button
-                className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+                className={`${Styles.button.button} ${Styles.button.variantPrimary}`}
                 onClick={_ => {
                   if changes->Belt.Map.String.size > 0 {
                     let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
@@ -318,10 +318,10 @@ let make = (~placeId) => {
                 type_="button">
                 {React.string("Uložit")}
               </button>
-              <div className={`${Styles.boxClasses.base} ${classes.inactiveUsers}`}>
+              <div className={`${Styles.box.base} ${classes.inactiveUsers}`}>
                 {inactivePersonEntries->Array.length === 0
                   ? <p className=classes.listEmpty> {React.string("Nikdo nechybí 👌")} </p>
-                  : <ol className={`${Styles.listClasses.base} ${classes.list}`}>
+                  : <ol className={`${Styles.list.base} ${classes.list}`}>
                       {inactivePersonEntries
                       ->Array.map(inactivePerson => {
                         let (personId, person) = inactivePerson

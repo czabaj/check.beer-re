@@ -59,7 +59,7 @@ let make = (
     onNext=onNextKeg
     onPrevious=onPreviousKeg
     visible=true>
-    <dl className={`reset ${Styles.descriptionListClasses.inline}`}>
+    <dl className={`reset ${Styles.descriptionList.inline}`}>
       <div>
         <dt> {React.string("objem")} </dt>
         <dd>
@@ -130,7 +130,7 @@ let make = (
     {switch maybeTapName {
     | None => React.null
     | Some(tapName) =>
-      <p className={Styles.messageBarClasses.info}>
+      <p className={Styles.messageBar.info}>
         {React.string(`Sud je naražen na pípu ${tapName}`)}
       </p>
     }}
@@ -144,7 +144,7 @@ let make = (
           <>
             {React.string(" Pokud jste sud přidali omylem můžete ho ")}
             <button
-              className={Styles.linkClasses.base}
+              className={Styles.link.base}
               onClick={_ => sendDialog(ShowConfirmDelete)}
               type_="button">
               {React.string("odebrat z aplikace")}
@@ -155,7 +155,7 @@ let make = (
       </p>
     | _ =>
       <>
-        <table className={Styles.tableClasses.consumptions}>
+        <table className={Styles.table.consumptions}>
           <caption> {React.string("Natočená piva")} </caption>
           <thead>
             <tr>
@@ -163,7 +163,7 @@ let make = (
               <th scope="col"> {React.string("Objem")} </th>
               <th scope="col"> {React.string("Kdy")} </th>
               <th scope="col">
-                <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+                <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
               </th>
             </tr>
           </thead>
@@ -184,7 +184,7 @@ let make = (
                   {keg.depletedAt !== Null.null
                     ? React.null
                     : <button
-                        className={`${Styles.buttonClasses.button}`}
+                        className={`${Styles.button.button}`}
                         onClick={_ => onDeleteConsumption(timestampStr)}
                         type_="button">
                         {React.string("🗑️ Smáznout")}
@@ -198,7 +198,7 @@ let make = (
         {keg.depletedAt !== Null.null
           ? React.null
           : <button
-              className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantDanger}`}
+              className={`${Styles.button.button} ${Styles.button.variantDanger}`}
               onClick={_ => sendDialog(ShowConfirmFinalize)}
               type_="button">
               {React.string("Odepsat ze skladu a rozúčtovat")}

@@ -5,7 +5,7 @@ type classesType = {detailButtonCell: string, emptyTableMessage: string, table: 
 let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) => {
   <SectionWithHeader
     buttonsSlot={<button
-      className={Styles.buttonClasses.button} onClick={_ => onAddNewKeg()} type_="button">
+      className={Styles.button.button} onClick={_ => onAddNewKeg()} type_="button">
       {React.string("Přidat sud")}
     </button>}
     headerId="charged_kegs_setting"
@@ -26,7 +26,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
             <th scope="col"> {React.string("Cena")} </th>
             <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
             <th scope="col">
-              <span className={Styles.utilityClasses.srOnly}> {React.string("Akce")} </span>
+              <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
             </th>
           </tr>
         </thead>

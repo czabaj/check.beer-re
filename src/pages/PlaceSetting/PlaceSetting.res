@@ -1,7 +1,3 @@
-type classesType = {root: string}
-
-@module("./PlaceSettings.module.css") external classes: classesType = "default"
-
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
@@ -50,17 +46,17 @@ let make = (~placeId) => {
     let personsAllEntries = place.personsAll->Js.Dict.entries
 
     <FormattedCurrency.Provider value={place.currency}>
-      <div className={classes.root}>
+      <div className={Styles.page.narrow}>
         <PlaceHeader
-          placeName={place.name}
-          createdTimestamp={place.createdAt}
-          slotRightButton={<button
-            className={PlaceHeader.classes.buttonMore}
+          buttonRightSlot={<button
+            className={Header.classes.buttonRight}
             onClick={_ => sendDialog(ShowBasicInfoEdit)}
             type_="button">
             <span> {React.string("✏️")} </span>
             <span> {React.string("Změnit")} </span>
           </button>}
+          createdTimestamp={place.createdAt}
+          placeName={place.name}
         />
         <main>
           <PlaceStats

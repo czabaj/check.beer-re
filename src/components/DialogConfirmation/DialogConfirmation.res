@@ -11,13 +11,13 @@ let make = (~children, ~className=?, ~heading, ~onConfirm, ~onDismiss, ~visible)
     {children}
     <footer>
       <button
-        className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+        className={`${Styles.button.button} ${Styles.button.variantPrimary}`}
         onClick={_ => onConfirm()}
         type_="submit">
         {React.string("Provést")}
       </button>
       <button
-        className={`${Styles.buttonClasses.button}`} type_="button" onClick={_ => onDismiss()}>
+        className={`${Styles.button.button}`} type_="button" onClick={_ => onDismiss()}>
         {React.string("Zrušit")}
       </button>
     </footer>

@@ -40,7 +40,7 @@ let make = (~onDismiss, ~onSubmit, ~personName) => {
     </p>
     <Form.Provider value=Some(form)>
       <form id="addFinancialTransaction" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-        <fieldset className={`reset ${Styles.fieldsetClasses.grid}`}>
+        <fieldset className={`reset ${Styles.fieldset.grid}`}>
           <Form.Field
             field=Amount
             render={field => {

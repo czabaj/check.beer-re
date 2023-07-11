@@ -1,4 +1,4 @@
-type classesType = {root: string, table: string}
+type classesType = {table: string}
 
 @module("./PlacePersonsSetting.module.css") external classes: classesType = "default"
 
@@ -79,14 +79,14 @@ let make = (~placeId) => {
         a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
       })
       <FormattedCurrency.Provider value={place.currency}>
-        <div className=classes.root>
+        <div className=Styles.page.narrow>
           <PlaceHeader
-            placeName={place.name} createdTimestamp={place.createdAt} slotRightButton={React.null}
+            buttonRightSlot={React.null} createdTimestamp={place.createdAt} placeName={place.name}
           />
           <main>
             <SectionWithHeader
               buttonsSlot={<button
-                className={Styles.buttonClasses.button}
+                className={Styles.button.button}
                 type_="button"
                 onClick={_ => sendDialog(ShowAddPerson)}>
                 {React.string("Přidat osobu")}
@@ -95,7 +95,7 @@ let make = (~placeId) => {
               headerSlot={React.string("Účetnictví")}>
               <table
                 ariaLabelledby="persons_accounts"
-                className={`${Styles.tableClasses.stretch} ${classes.table}`}>
+                className={`${Styles.table.stretch} ${classes.table}`}>
                 <thead>
                   <tr>
                     <th scope="col"> {React.string("Návštěvník")} </th>
@@ -110,7 +110,7 @@ let make = (~placeId) => {
                       <th scope="row">
                         {React.string(person.name)}
                         <button
-                          className={Styles.utilityClasses.breakout}
+                          className={Styles.utility.breakout}
                           onClick={_ => sendDialog(ShowPersonDetail({personId, person}))}
                           title="Detail konzumace"
                           type_="button"

@@ -40,7 +40,7 @@ let make = (~initialValues, ~onDismiss, ~onSubmit) => {
   <DialogForm formId="basicInfo" heading="Základní údaje místa" onDismiss visible=true>
     <Form.Provider value=Some(form)>
       <form id="basicInfo" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-        <fieldset className={`reset ${Styles.fieldsetClasses.grid}`}>
+        <fieldset className={`reset ${Styles.fieldset.grid}`}>
           <Form.Field
             field=Name
             render={field => {

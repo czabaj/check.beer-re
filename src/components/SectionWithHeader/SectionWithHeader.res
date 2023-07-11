@@ -8,6 +8,6 @@ let make = (~children, ~buttonsSlot, ~headerId, ~headerSlot) => {
       <h3 id={headerId}> {headerSlot} </h3>
       {buttonsSlot}
     </header>
-    <div className={Styles.boxClasses.base}> {children} </div>
+    <div className={Styles.box.base}> {children} </div>
   </section>
 }

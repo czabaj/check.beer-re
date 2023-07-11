@@ -7,13 +7,13 @@ let make = (~children, ~className=?, ~formId, ~heading, ~onDismiss, ~visible) =>
     {children}
     <footer>
       <button
-        className={`${Styles.buttonClasses.button} ${Styles.buttonClasses.variantPrimary}`}
+        className={`${Styles.button.button} ${Styles.button.variantPrimary}`}
         form={formId}
         type_="submit">
         {React.string("Uložit")}
       </button>
       <button
-        className={`${Styles.buttonClasses.button}`} type_="button" onClick={_ => onDismiss()}>
+        className={`${Styles.button.button}`} type_="button" onClick={_ => onDismiss()}>
         {React.string("Zrušit")}
       </button>
     </footer>
