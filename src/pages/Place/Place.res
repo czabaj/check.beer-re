@@ -169,7 +169,7 @@ let pageDataRx = (firestore, placeId) => {
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
       )
       consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
-        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+        consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       consumptionsByUser
     }),
@@ -191,7 +191,7 @@ let pageDataRx = (firestore, placeId) => {
       )
       // sort consumptions ty timestamp ascending
       recentConsumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
-        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+        consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       recentConsumptionsByUser
     }),
@@ -199,8 +199,8 @@ let pageDataRx = (firestore, placeId) => {
   let personsSorted = placeRx->Rxjs.pipe(
     Rxjs.map(.(place: Db.placeConverted, _) => {
       let personsAllEntries = place.personsAll->Js.Dict.entries
-      personsAllEntries->Array.sortInPlace(((_, a), (_, b)) => {
-        a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
+      personsAllEntries->Array.sort(((_, a), (_, b)) => {
+        a.name->Js.String2.localeCompare(b.name)
       })
       personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
     }),

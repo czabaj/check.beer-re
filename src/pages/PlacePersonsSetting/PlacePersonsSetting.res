@@ -31,7 +31,7 @@ let pageDataRx = (firestore, placeId) => {
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
       )
       consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
-        consumptions->Array.sortInPlace((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
+        consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       consumptionsByUser
     }),
@@ -75,8 +75,8 @@ let make = (~placeId) => {
   switch pageDataStatus.data {
   | Some((place, unfinishedConsumptionsByUser, pendingTransactionsByUser)) => {
       let personsEntries = place.personsAll->Js.Dict.entries
-      personsEntries->Array.sortInPlace(((_, a), (_, b)) => {
-        a.name->Js.String2.localeCompare(b.name)->Int.fromFloat
+      personsEntries->Array.sort(((_, a), (_, b)) => {
+        a.name->Js.String2.localeCompare(b.name)
       })
       <FormattedCurrency.Provider value={place.currency}>
         <div className=Styles.page.narrow>

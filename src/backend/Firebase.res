@@ -5,7 +5,7 @@ external firebaseConfig: firebaseConfig = "firebaseConfig"
 module FirebaseAppProvider = {
   @react.component @module("reactfire")
   external make: (
-    ~firebaseConfig: firebaseConfig,
+    ~firebaseConfig: firebaseConfig=?,
     ~children: React.element,
     ~suspense: bool=?,
   ) => React.element = "FirebaseAppProvider"
@@ -272,6 +272,36 @@ type appCheckConfig = {provider: reCaptchaV3Provider, isTokenAutoRefreshEnabled:
 @module("firebase/app-check")
 external initializeAppCheck: (FirebaseApp.t, appCheckConfig) => appCheck = "initializeAppCheck"
 
+module FirestoreLocalCache = {
+  type t
+
+  module PersistentTabManager = {
+    type t
+
+    @module("firebase/firestore")
+    external persistentSingleTabManager: (. unit) => t = "persistentLocalCache"
+
+    @module("firebase/firestore")
+    external persistentMultipleTabManager: (. unit) => t = "persistentMultipleTabManager"
+  }
+
+  type persistentCacheSettings = {
+    cacheSizeBytes?: int,
+    tabManager?: PersistentTabManager.t,
+  }
+
+  @module("firebase/firestore")
+  external cacheSizeUnlimited: int = "CACHE_SIZE_UNLIMITED"
+
+  @module("firebase/firestore")
+  external persistentLocalCache: persistentCacheSettings => t = "persistentLocalCache"
+}
+
+type firestoreSettings = {localCache: FirestoreLocalCache.t}
+@module("firebase/firestore")
+external initializeFirestore: (FirebaseApp.t, firestoreSettings) => firestore =
+  "initializeFirestore"
+
 module AppCheckProvider = {
   @react.component @module("reactfire")
   external make: (~sdk: appCheck, ~children: React.element) => React.element = "AppCheckProvider"
@@ -371,3 +401,6 @@ type userCredential = {
 @module("firebase/auth")
 external signInWithPopup: (Auth.t, FederatedAuthProvider.t) => promise<userCredential> =
   "signInWithPopup"
+
+@module("firebase/firestore")
+external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"

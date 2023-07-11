@@ -63,7 +63,7 @@ let make = (
   , [tappedChargedKegs])
   let sortedTapEntries = React.useMemo1(() => {
     let tapsEntries = place.taps->Js.Dict.entries
-    tapsEntries->Array.sortInPlace((a, b) => a->fst->String.localeCompare(b->fst)->Int.fromFloat)
+    tapsEntries->Array.sort((a, b) => a->fst->String.localeCompare(b->fst))
     tapsEntries
   }, [place.taps])
 

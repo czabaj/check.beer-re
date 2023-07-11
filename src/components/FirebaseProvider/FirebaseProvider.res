@@ -1,3 +1,5 @@
+let initializedFirestore: ref<option<Firebase.firestore>> = ref(None)
+
 @react.component
 let make = (~children) => {
   open Firebase
@@ -13,14 +15,24 @@ let make = (~children) => {
   let auth = app->getAuth
 
   let {status, data: firestore} = useInitFirestore(async app => {
-    let firestore = app->getFirestore
-    Js.log("Enabling offline persistence")
-    try {
-      await firestore->enableMultiTabIndexedDbPersistence
-    } catch {
-    | Js.Exn.Error(err) => Js.log(err)
+    switch initializedFirestore.contents {
+    | Some(firestore) => firestore
+    | None => {
+        let firestore = initializeFirestore(
+          app,
+          {
+            localCache: Firebase.FirestoreLocalCache.persistentLocalCache({
+              tabManager: Firebase.FirestoreLocalCache.PersistentTabManager.persistentMultipleTabManager(.),
+            }),
+          },
+        )
+        /* if %raw(`import.meta.env.DEV && window.localStorage.getItem('USE_EMULATOR') === '1'`) {
+          Firebase.connectFirestoreEmulator(. firestore, "localhost", 9090)
+        }*/
+        initializedFirestore := Some(firestore)
+        firestore
+      }
     }
-    firestore
   })
 
   switch status {

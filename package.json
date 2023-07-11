@@ -1,13 +1,13 @@
 {
   "dependencies": {
     "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#b8a694d27037a63c3a321b7ea1e0f16f526dd950",
-    "@rescript/core": "^0.3.1",
+    "@rescript/core": "^0.4.0",
     "@rescript/react": "^0.11.0",
     "@rescriptbr/reform": "^12.1.0",
     "@rescriptbr/reschema": "^3.0.3",
     "@uidotdev/usehooks": "^2.0.1",
     "dialog-polyfill": "^0.5.6",
-    "firebase": "^9.23.0",
+    "firebase": "^10.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-intl": "^6.4.4",

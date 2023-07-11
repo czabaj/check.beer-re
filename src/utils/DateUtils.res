@@ -8,4 +8,4 @@ let fromIsoDateString = isoDateString => {
   }
 }
 
-let compare = (a, b) => (a->Js.Date.getTime -. b->Js.Date.getTime)->Int.fromFloat
+let compare = (a, b) => a->Js.Date.getTime -. b->Js.Date.getTime
