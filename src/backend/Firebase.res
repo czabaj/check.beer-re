@@ -353,6 +353,12 @@ external docDataRx: (
 
 type authProvider
 
+module FederatedAuthProvider = {
+  type t
+  @new @module("firebase/auth")
+  external googleAuthProvider: unit => t = "GoogleAuthProvider"
+}
+
 @module("firebase/auth")
 external googleAuthProvider: authProvider = "GoogleAuthProvider"
 
@@ -363,4 +369,5 @@ type userCredential = {
 }
 
 @module("firebase/auth")
-external signInWithPopup: (Auth.t, authProvider) => promise<userCredential> = "signInWithPopup"
+external signInWithPopup: (Auth.t, FederatedAuthProvider.t) => promise<userCredential> =
+  "signInWithPopup"
