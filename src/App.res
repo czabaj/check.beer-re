@@ -8,7 +8,7 @@ let make = () => {
   | list{} => <Homepage />
   | list{"misto"}
   | list{"misto", ..._} =>
-    <React.Suspense fallback={React.string("Loading ...")}>
+    <React.Suspense fallback={<LoadingFullscreen />}>
       <FirebaseProvider>
         <SignInWrapper>
           {switch List.tail(url.path) {
