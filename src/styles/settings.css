@@ -6,12 +6,14 @@ html {
   --dark: var(--off);
 }
 
+/* TODO: enable once the dark-theme will be ready
 @media (prefers-color-scheme: dark) {
   html:not(.themeLight) {
     --light: var(--off);
     --dark: var(--on);
   }
-}
+} 
+*/
 
 html.themeDark {
   --light: var(--off);
