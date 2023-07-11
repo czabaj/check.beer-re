@@ -13,6 +13,14 @@ export type personName = string;
 export type tapName = string;
 
 // tslint:disable-next-line:interface-over-type-literal
+export type financialTransaction = {
+  readonly amount: number; 
+  readonly createdAt: Firebase_Timestamp_t; 
+  readonly keg: (null | number); 
+  readonly note: (null | string)
+};
+
+// tslint:disable-next-line:interface-over-type-literal
 export type userAccount = {
   readonly email: string; 
   readonly name: string; 
@@ -33,14 +41,6 @@ export type keg = {
   readonly price: number; 
   readonly recentConsumptionAt: (null | Firebase_Timestamp_t); 
   readonly serial: number
-};
-
-// tslint:disable-next-line:interface-over-type-literal
-export type financialTransaction = {
-  readonly amount: number; 
-  readonly createdAt: Firebase_Timestamp_t; 
-  readonly keg: (null | number); 
-  readonly note: (null | string)
 };
 
 // tslint:disable-next-line:interface-over-type-literal

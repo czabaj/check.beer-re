@@ -2,6 +2,13 @@ type personName = string
 type personUID = string
 type tapName = string
 
+type financialTransaction = {
+  amount: int,
+  createdAt: Firebase.Timestamp.t,
+  keg: Js.null<int>,
+  note: Js.null<string>,
+}
+
 @genType
 type userAccount = {
   email: string,
@@ -9,7 +16,6 @@ type userAccount = {
   places: Js.Dict.t<string>,
 }
 
-@genType
 type rec consumption = {
   milliliters: int,
   person: Firebase.documentReference<person>,
@@ -25,13 +31,6 @@ and keg = {
   price: int,
   recentConsumptionAt: Js.null<Firebase.Timestamp.t>,
   serial: int,
-}
-@genType
-and financialTransaction = {
-  amount: int,
-  createdAt: Firebase.Timestamp.t,
-  keg: Js.null<int>,
-  note: Js.null<string>,
 }
 @genType
 and person = {

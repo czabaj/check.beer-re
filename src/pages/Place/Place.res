@@ -130,22 +130,26 @@ let pageDataRx = (firestore, placeId) => {
           }
         )
         ->Js.Dict.fromArray
-      Firebase.collectionDataRx(
-        Firebase.query(
-          Db.placeKegsCollectionConverted(firestore, placeId),
-          [Firebase.where(Firebase.documentId(), #"in", tapsToKegId->Js.Dict.values)],
-        ),
-        Db.reactFireOptions,
-      )->Rxjs.pipe(
-        Rxjs.map(.(kegsOnTap, _) =>
-          tapsToKegId->Js.Dict.map(
-            (. kegId) => {
-              kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegId)->Option.getExn
-            },
-            _,
-          )
-        ),
-      )
+      switch tapsToKegId->Js.Dict.values {
+      | [] => Rxjs.return(Js.Dict.empty())
+      | kegIds =>
+        Firebase.collectionDataRx(
+          Firebase.query(
+            Db.placeKegsCollectionConverted(firestore, placeId),
+            [Firebase.where(Firebase.documentId(), #"in", kegIds)],
+          ),
+          Db.reactFireOptions,
+        )->Rxjs.pipe(
+          Rxjs.map(.(kegsOnTap, _) =>
+            tapsToKegId->Js.Dict.map(
+              (. kegId) => {
+                kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegId)->Option.getExn
+              },
+              _,
+            )
+          ),
+        )
+      }
     }),
   )
   let chargedKegsWithConsumptionRx = Firebase.collectionDataRx(
