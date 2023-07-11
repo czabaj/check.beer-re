@@ -1,6 +1,3 @@
-@module("../../assets/pouring.svg")
-external srcPouring: string = "default"
-
 type classesType = {container: string}
 
 @module("./LoadingFullscreen.module.css") external classes: classesType = "default"
@@ -9,7 +6,7 @@ type classesType = {container: string}
 let make = () => {
   <div className=Styles.page.centered>
     <div className=classes.container>
-      <img src=srcPouring alt="" />
+      <img alt="" src=Assets.pouring />
       <p> {React.string(`Čepuju kilobajty ${HtmlEntities.hellip}`)} </p>
     </div>
   </div>

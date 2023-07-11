@@ -110,7 +110,7 @@ let make = (
                   }
                   <fieldset className={classes.consumptions}>
                     <label>
-                      <SvgComponents.BeerGlassLarge />
+                      <img alt="" src=Assets.beerGlassLarge />
                       <input
                         checked={field.value === 500}
                         name="consumption"
@@ -121,7 +121,7 @@ let make = (
                       <span> {React.string("Velké")} </span>
                     </label>
                     <label>
-                      <SvgComponents.BeerGlassSmall />
+                      <img alt="" src=Assets.beerGlassSmall />
                       <input
                         checked={field.value === 300}
                         name="consumption"

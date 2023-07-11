@@ -34,6 +34,9 @@
   padding-block: 1rem;
   text-align: center;
 }
+.consumptions > label:hover {
+  background-color: var(--surface-warning);
+}
 .consumptions input {
   display: none;
 }

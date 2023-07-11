@@ -1,5 +1,7 @@
 .base {
-  --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
+  --breakout-hover-overlay: hsl(
+    var(--surface-warning-hs) var(--surface-warning-l) / 0.1
+  );
 
   list-style: none;
   padding: 0;
