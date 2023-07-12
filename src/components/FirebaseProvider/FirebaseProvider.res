@@ -28,6 +28,7 @@ let make = (~children) => {
         )
         // if %raw(`import.meta.env.DEV && window.localStorage.getItem('USE_EMULATOR') === '1'`) {
         //   Firebase.connectFirestoreEmulator(. firestore, "127.0.0.1", 9090)
+        //   Firebase.connectAuthEmulator(. auth, "http://localhost:9099")
         // }
         initializedFirestore := Some(firestore)
         firestore

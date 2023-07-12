@@ -138,11 +138,12 @@ let make = (
         onDismiss={hideDialog}
         onSubmit={async values => {
           let newName = values.name
+          let newTaps = ObjectUtils.setInD(place.taps, newName, Js.null)
           await Db.updatePlace(
             firestore,
             placeId,
             {
-              taps: ObjectUtils.setInD(. place.taps, newName, Js.null),
+              taps: newTaps,
             },
           )
           hideDialog()
@@ -151,7 +152,11 @@ let make = (
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          let updateData = ObjectUtils.setIn(. None, `taps.${tapName}`, Firebase.deleteField())
+          let updateData = ObjectUtils.setIn(
+            Object.empty(),
+            `taps.${tapName}`,
+            Firebase.deleteField(),
+          )
           Firebase.updateDoc(Db.placeDocument(firestore, placeId), updateData)
           ->Promise.then(_ => {
             hideDialog()
@@ -171,6 +176,9 @@ let make = (
           let oldName = tapName
           let oldValue = place.taps->Js.Dict.unsafeGet(oldName)
           let newName = values.name
+          let newTaps = place.taps->Dict.copy
+          newTaps->Dict.delete(oldName)
+          newTaps->Dict.set(newName, oldValue)
           await Db.updatePlace(
             firestore,
             placeId,
@@ -189,11 +197,7 @@ let make = (
                 | None => person
                 }
               }, _),
-              taps: ObjectUtils.setInD(.
-                ObjectUtils.omitD(. place.taps, [oldName]),
-                newName,
-                oldValue,
-              ),
+              taps: newTaps,
             },
           )
           hideDialog()
@@ -208,7 +212,7 @@ let make = (
             firestore,
             placeId,
             {
-              taps: ObjectUtils.setInD(. place.taps, tapName, Null.make(kegDoc)),
+              taps: ObjectUtils.setInD(place.taps, tapName, Null.make(kegDoc)),
             },
           )
           hideDialog()
@@ -222,11 +226,12 @@ let make = (
           switch values.untapOption {
           | "finish" => Js.Exn.raiseError("not implemented")
           | "toStocks" => {
+              let newTaps = ObjectUtils.setInD(place.taps, tapName, Null.null)
               await Db.updatePlace(
                 firestore,
                 placeId,
                 {
-                  taps: ObjectUtils.setInD(. place.taps, tapName, Null.null),
+                  taps: newTaps,
                 },
               )
               hideDialog()

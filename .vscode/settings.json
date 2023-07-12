@@ -1,4 +1,9 @@
 {
-  "eslint.packageManager": "yarn",
-  "npm.packageManager": "yarn"
+  "npm.packageManager": "yarn",
+  "testing.automaticallyOpenPeekView": "never",
+  "vitest.enable": true,
+  "vitest.include": [
+    "**/*._test.bs.js",
+    "**/*.{test,spec,_test.bs}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"
+  ]
 }

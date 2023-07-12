@@ -13,7 +13,6 @@ let make = () => {
         <SignInWrapper>
           {switch List.tail(url.path) {
           | Some(list{}) => <MyPlaces />
-          | Some(list{"pridat"}) => <AddPlace />
           | Some(list{placeId}) => <Place placeId />
           | Some(list{placeId, "nastaveni"}) => <PlaceSetting placeId />
           | Some(list{placeId, "nastaveni", "osob"}) => <PlacePersonsSetting placeId />

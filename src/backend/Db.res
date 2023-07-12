@@ -2,6 +2,10 @@ open FirestoreModels
 
 // Resources
 
+let accountDoc = (firestore, userId): Firebase.documentReference<userAccount> => {
+  Firebase.doc(firestore, ~path=`users/${userId}`)
+}
+
 let kegDoc = (firestore, placeId, kegId): Firebase.documentReference<keg> => {
   Firebase.doc(firestore, ~path=`places/${placeId}/kegs/${kegId}`)
 }
@@ -10,6 +14,12 @@ let userAccountsCollection = (firestore): Firebase.collectionReference<userAccou
   Firebase.collection(firestore, ~path="users")
 }
 
+@genType
+let placeCollection = (firestore): Firebase.collectionReference<place> => {
+  Firebase.collection(firestore, ~path="places")
+}
+
+@genType
 let placeDocument = (firestore, placeId): Firebase.documentReference<place> => {
   Firebase.doc(firestore, ~path=`places/${placeId}`)
 }
@@ -298,17 +308,17 @@ let updatePlace = (firestore, placeId, data) => {
 
 let updatePlacePersonsAll = (firestore, placeId, persons: array<(string, personsAllRecord)>) => {
   let updateData = persons->Belt.Array.reduce(Object.empty(), (data, (personId, person)) => {
-    ObjectUtils.setIn(. Some(data), `personsAll.${personId}`, personsAllRecordToTuple(. person))
+    ObjectUtils.setIn(data, `personsAll.${personId}`, personsAllRecordToTuple(. person))
   })
   Firebase.updateDoc(placeDocument(firestore, placeId), updateData)
 }
 
 let addConsumption = (firestore, placeId, kegId, consumption: consumption) => {
   let now = Date.now()
-  let updateData = ObjectUtils.setIn(.
-    Some({
+  let updateData = ObjectUtils.setIn(
+    {
       "recentConsumptionAt": Firebase.serverTimestamp(),
-    }),
+    },
     `consumptions.${now->Js.Float.toString}`,
     consumption,
   )
@@ -329,8 +339,8 @@ let addFinancialTransaction = async (
     ...personsAllRecord,
     balance: personsAllRecord.balance + transaction.amount,
   }
-  let updatePlaceData = ObjectUtils.setIn(.
-    None,
+  let updatePlaceData = ObjectUtils.setIn(
+    Object.empty(),
     `personsAll.${personId}`,
     personsAllRecordToTuple(. newPersonsAllRecord),
   )
@@ -369,8 +379,8 @@ let addPerson = async (firestore, placeId, personName) => {
 
 let deleteConsumption = (firestore, placeId, kegId, consumptionId) => {
   let kegRef = kegDoc(firestore, placeId, kegId)
-  let updateData = ObjectUtils.setIn(.
-    None,
+  let updateData = ObjectUtils.setIn(
+    Object.empty(),
     `consumptions.${consumptionId}`,
     Firebase.deleteField(),
   )
@@ -378,8 +388,8 @@ let deleteConsumption = (firestore, placeId, kegId, consumptionId) => {
 }
 
 let deletePerson = async (firestore, placeId, personId) => {
-  let updatePersonAllData = ObjectUtils.setIn(.
-    None,
+  let updatePersonAllData = ObjectUtils.setIn(
+    Object.empty(),
     `personsAll.${personId}`,
     Firebase.deleteField(),
   )
@@ -402,7 +412,7 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
   let place = (
     await Firebase.getDocFromCache(placeRef->Firebase.withConterterDoc(placeConverter))
   ).data(. {})
-  let placeUpdateObject = ref(Object.empty())
+  let placeUpdateObject = Object.empty()
   // untap keg if on tap
   let kegOnTap =
     place.taps
@@ -414,13 +424,7 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
       ->Option.getWithDefault(false)
     )
   switch kegOnTap {
-  | Some((tapName, _)) =>
-    placeUpdateObject :=
-      ObjectUtils.setIn(.
-        Some(placeUpdateObject.contents),
-        `taps.${tapName}`,
-        Firebase.deleteField(),
-      )
+  | Some((tapName, _)) => placeUpdateObject->Object.set(`taps.${tapName}`, Firebase.deleteField())
   | _ => ()
   }
   // create financial transactions for consumptions
@@ -472,15 +476,13 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
       ...personsAllRecord,
       balance: personsAllRecord.balance + transactiuonsSum,
     }
-    placeUpdateObject :=
-      ObjectUtils.setIn(.
-        Some(placeUpdateObject.contents),
-        `personsAll.${personId}`,
-        personsAllRecordToTuple(. newPersonsAllRecord),
-      )
+    placeUpdateObject->Object.set(
+      `personsAll.${personId}`,
+      personsAllRecordToTuple(. newPersonsAllRecord),
+    )
   })
   await batch
-  ->Firebase.WriteBatch.update(placeRef, placeUpdateObject.contents)
+  ->Firebase.WriteBatch.update(placeRef, placeUpdateObject)
   // mark keg as depleted
   ->Firebase.WriteBatch.update(kegRef, {"depletedAt": nowTimestamp})
   ->Firebase.WriteBatch.commit

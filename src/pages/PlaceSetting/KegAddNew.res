@@ -86,7 +86,7 @@ module FormComponent = {
         )
 
         <Form.Provider value=Some(form)>
-          <form id="addKeg" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+          <form id="add_keg" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
             <fieldset className={`reset ${Styles.fieldset.grid}`}>
               <Form.Field
                 field=Beer
@@ -189,7 +189,7 @@ module FormComponent = {
                           <input
                             onChange={event => {
                               let target = event->ReactEvent.Form.target
-                              let newValue = ObjectUtils.setInD(.
+                              let newValue = ObjectUtils.setInD(
                                 value,
                                 personId,
                                 (target["valueAsNumber"] *. minorUnit)->Int.fromFloat,
@@ -219,7 +219,7 @@ module FormComponent = {
 
 @react.component
 let make = (~onDismiss, ~onSubmit, ~place, ~placeId) => {
-  <DialogForm formId="addKeg" heading="Přidat sud" onDismiss visible=true>
+  <DialogForm formId="add_keg" heading="Přidat sud" onDismiss visible=true>
     <React.Suspense fallback={React.string("Načítám")}>
       <FormComponent onSubmit place placeId />
     </React.Suspense>

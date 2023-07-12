@@ -29,6 +29,7 @@ external useFirebaseApp: unit => FirebaseApp.t = "useFirebaseApp"
 // @module("firebase/analytics")
 // external getAnalytics: firebaseApp => analytics = "getAnalytics"
 
+@genType.import("firebase/firestore") @genType.as("Firestore")
 type firestore
 @module("firebase/firestore")
 external getFirestore: FirebaseApp.t => firestore = "getFirestore"
@@ -69,9 +70,13 @@ type documentReference<'a> = {id: string}
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"
 
+@genType.import("firebase/firestore") @genType.as("CollectionReference")
 type collectionReference<'a>
 @module("firebase/firestore")
 external collection: (firestore, ~path: string) => collectionReference<'a> = "collection"
+
+@module("firebase/firestore")
+external seedDoc: (collectionReference<'a>) => documentReference<'a> = "doc"
 
 type query<'a>
 type queryConstraint
@@ -404,3 +409,6 @@ external signInWithPopup: (Auth.t, FederatedAuthProvider.t) => promise<userCrede
 
 @module("firebase/firestore")
 external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"
+
+@module("firebase/auth")
+external connectAuthEmulator: (. Auth.t, string) => unit = "connectFirestoreEmulator"
