@@ -26,12 +26,11 @@ let make = (
   ~onPreviousKeg,
   ~onNextKeg,
 ) => {
-  let consumptionsByTimestampDesc = React.useMemo1(() =>
-    keg.consumptions
-    ->Js.Dict.entries
-    // The map is sorted by timestamp ascending, we want descending
-    ->Array.reverse
-  , [keg.consumptions])
+  let consumptionsByTimestampDesc = React.useMemo1(() => {
+    let consumptionEntries = keg.consumptions->Js.Dict.entries
+    consumptionEntries->Array.sort((a, b) => fst(b)->String.localeCompare(fst(a)))
+    consumptionEntries
+  }, [keg.consumptions])
   let firstConsumption = Db.kegFirstConsumptionTimestamp(keg)
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
