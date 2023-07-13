@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@csstools/postcss-relative-color-syntax": "^1.0.2",
+    "@firebase/rules-unit-testing": "^3.0.0",
     "@jihchi/vite-plugin-rescript": "^5.3.0",
     "@storybook/addon-essentials": "^7.0.26",
     "@storybook/addon-interactions": "^7.0.26",
@@ -51,6 +52,7 @@
     "serve": "vite preview",
     "start": "vite",
     "test": "vitest",
+    "test:securityRules": "vitest --config vite.config.firestore.rules.mts",
     "storybook": "storybook dev --no-open --port 6006",
     "build-storybook": "storybook build"
   },
