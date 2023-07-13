@@ -28,7 +28,7 @@ let getConstraints = (limit, startAfter) => {
 }
 
 let kegQuerySnapshotToKegs = (kegsSnapshot: Firebase.querySnapshot<Db.kegConverted>) =>
-  kegsSnapshot.docs->Array.map(kegSnapshot => Firebase.snapToData(kegSnapshot, Db.reactFireOptions))
+  kegsSnapshot.docs->Array.map(Rxfire.Firestore.snapToData)
 
 let use = (~limit=20, placeId) => {
   let firestore = Firebase.useFirestore()

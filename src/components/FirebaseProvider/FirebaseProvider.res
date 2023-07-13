@@ -12,7 +12,7 @@ let make = (~children) => {
       isTokenAutoRefreshEnabled: true,
     },
   )
-  let auth = app->getAuth
+  let auth = app->Auth.getAuth
 
   let {status, data: firestore} = useInitFirestore(async app => {
     switch initializedFirestore.contents {
@@ -21,8 +21,8 @@ let make = (~children) => {
         let firestore = initializeFirestore(
           app,
           {
-            localCache: Firebase.FirestoreLocalCache.persistentLocalCache({
-              tabManager: Firebase.FirestoreLocalCache.PersistentTabManager.persistentMultipleTabManager(.),
+            localCache: FirestoreLocalCache.persistentLocalCache({
+              tabManager: FirestoreLocalCache.PersistentTabManager.persistentMultipleTabManager(.),
             }),
           },
         )

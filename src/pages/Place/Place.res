@@ -116,7 +116,7 @@ type userConsumption = {milliliters: int, timestamp: float}
 
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
-  let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
+  let placeRx = Rxfire.Firestore.docData(placeRef)
   let tapsWithKegsRx = placeRx->Rxjs.pipe2(
     Rxjs.distinctUntilChanged((. prev: Db.placeConverted, curr) => prev.taps == curr.taps),
     Rxjs.mergeMap((place: Db.placeConverted) => {
@@ -133,12 +133,11 @@ let pageDataRx = (firestore, placeId) => {
       switch tapsToKegId->Js.Dict.values {
       | [] => Rxjs.return(Js.Dict.empty())
       | kegIds =>
-        Firebase.collectionDataRx(
+        Rxfire.Firestore.collectionData(
           Firebase.query(
             Db.placeKegsCollectionConverted(firestore, placeId),
             [Firebase.where(Firebase.documentId(), #"in", kegIds)],
           ),
-          Db.reactFireOptions,
         )->Rxjs.pipe(
           Rxjs.map(.(kegsOnTap, _) =>
             tapsToKegId->Js.Dict.map(
@@ -152,7 +151,7 @@ let pageDataRx = (firestore, placeId) => {
       }
     }),
   )
-  let chargedKegsWithConsumptionRx = Firebase.collectionDataRx(
+  let chargedKegsWithConsumptionRx = Rxfire.Firestore.collectionData(
     Firebase.query(
       Db.placeKegsCollectionConverted(firestore, placeId),
       [
@@ -160,7 +159,6 @@ let pageDataRx = (firestore, placeId) => {
         Firebase.where("recentConsumptionAt", #"!=", Js.null),
       ],
     ),
-    Db.reactFireOptions,
   )
   let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
     Rxjs.map(.(chargedKegsWithConsumption, _) => {

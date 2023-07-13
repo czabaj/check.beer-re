@@ -1,6 +1,6 @@
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
-  let placeRx = Firebase.docDataRx(placeRef, Db.reactFireOptions)
+  let placeRx = Rxfire.Firestore.docData(placeRef)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   Rxjs.combineLatest2((placeRx, chargedKegsRx))
 }

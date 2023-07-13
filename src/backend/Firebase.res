@@ -76,7 +76,7 @@ type collectionReference<'a>
 external collection: (firestore, ~path: string) => collectionReference<'a> = "collection"
 
 @module("firebase/firestore")
-external seedDoc: (collectionReference<'a>) => documentReference<'a> = "doc"
+external seedDoc: collectionReference<'a> => documentReference<'a> = "doc"
 
 type query<'a>
 type queryConstraint
@@ -207,7 +207,6 @@ external useFirestoreCollectionData: (
 ) => observableStatus<array<'a>> = "useFirestoreCollectionData"
 
 module User = {
-  @deriving(accessors)
   type info = {
     uid: string,
     providerId: string,
@@ -225,7 +224,7 @@ module User = {
 }
 
 module Auth = {
-  type t = {app: FirebaseApp.t}
+  type t = {app: FirebaseApp.t, name: string, currentUser: Js.null<User.t>}
   type update = {displayName?: string, photoURL?: string}
 
   @send
@@ -246,10 +245,43 @@ module Auth = {
   module GoogleAuthProvider = {
     let providerID = "google.com"
   }
-}
 
-@module("firebase/auth")
-external getAuth: FirebaseApp.t => Auth.t = "getAuth"
+  type userCredential = {
+    operationType: @string [#link | #reauthenticate | #signIn],
+    providerId: Js.null<string>,
+    user: User.t,
+  }
+
+  @module("firebase/auth")
+  external signInWithEmailAndPassword: (
+    . t,
+    ~email: string,
+    ~password: string,
+  ) => promise<userCredential> = "signInWithEmailAndPassword"
+
+  @module("firebase/auth")
+  external createUserWithEmailAndPassword: (
+    . t,
+    ~email: string,
+    ~password: string,
+  ) => promise<userCredential> = "createUserWithEmailAndPassword"
+
+  @module("firebase/auth")
+  external getAuth: FirebaseApp.t => t = "getAuth"
+
+  module FederatedAuthProvider = {
+    type t
+    @new @module("firebase/auth")
+    external googleAuthProvider: unit => t = "GoogleAuthProvider"
+  }
+
+  @module("firebase/auth")
+  external signInWithPopup: (. t, FederatedAuthProvider.t) => promise<userCredential> =
+    "signInWithPopup"
+
+  @module("firebase/auth")
+  external connectAuthEmulator: (. t, string) => unit = "connectAuthEmulator"
+}
 
 module AuthProvider = {
   @react.component @module("reactfire")
@@ -358,57 +390,5 @@ external useObservable: (
   ~source: Rxjs.t<Rxjs.foreign, Rxjs.void, 'a>,
 ) => observableStatus<'a> = "useObservable"
 
-@module("rxfire/auth")
-external userRx: Auth.t => Rxjs.t<Rxjs.foreign, Rxjs.void, Js.Nullable.t<User.t>> = "user"
-
-@module("rxfire/firestore")
-external collectionRx: (
-  query<'a>,
-  reactfireOptions<'a>,
-) => Rxjs.t<Rxjs.foreign, Rxjs.void, array<querySnapshot<'a>>> = "collection"
-
-@module("rxfire/firestore")
-external collectionDataRx: (
-  query<'a>,
-  reactfireOptions<'a>,
-) => Rxjs.t<Rxjs.foreign, Rxjs.void, array<'a>> = "collectionData"
-
-@module("rxfire/firestore")
-external docRx: documentReference<'a> => Rxjs.t<Rxjs.foreign, Rxjs.void, documentSnapshot<'a>> =
-  "doc"
-
-@module("rxfire/firestore")
-external snapToData: (documentSnapshot<'a>, reactfireOptions<'a>) => 'a = "snapToData"
-
-@module("rxfire/firestore")
-external docDataRx: (
-  documentReference<'a>,
-  reactfireOptions<'a>,
-) => Rxjs.t<Rxjs.foreign, Rxjs.void, 'a> = "docData"
-
-type authProvider
-
-module FederatedAuthProvider = {
-  type t
-  @new @module("firebase/auth")
-  external googleAuthProvider: unit => t = "GoogleAuthProvider"
-}
-
-@module("firebase/auth")
-external googleAuthProvider: authProvider = "GoogleAuthProvider"
-
-type userCredential = {
-  user: User.t,
-  providerId: Js.Nullable.t<string>,
-  operationType: @string [#link | #reauthenticate | #signIn],
-}
-
-@module("firebase/auth")
-external signInWithPopup: (Auth.t, FederatedAuthProvider.t) => promise<userCredential> =
-  "signInWithPopup"
-
 @module("firebase/firestore")
 external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"
-
-@module("firebase/auth")
-external connectAuthEmulator: (. Auth.t, string) => unit = "connectFirestoreEmulator"
