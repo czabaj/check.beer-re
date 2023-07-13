@@ -47,7 +47,7 @@ let make = (
   ~tappedChargedKegs: array<Db.kegConverted>,
   ~untappedChargedKegs,
 ) => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
   let hasKegsToTap = untappedChargedKegs->Array.length > 0

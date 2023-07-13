@@ -2,9 +2,9 @@ type dialogState = Hidden | AddPlace
 
 @react.component
 let make = () => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let currentUserAccountDoc = Db.useCurrentUserAccountDocData()
-  let auth = Firebase.useAuth()
+  let auth = Reactfire.useAuth()
   let (dialogState, setDialogState) = React.useState(() => Hidden)
   let hideDialog = _ => setDialogState(_ => Hidden)
 

@@ -34,9 +34,9 @@ let make = (
   ~placeId,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let {data: maybePersonDoc} = Db.usePlacePersonDocumentStatus(
-    ~options={suspense: false},
+    ~options={idField: #uid, suspense: false},
     placeId,
     personId,
   )

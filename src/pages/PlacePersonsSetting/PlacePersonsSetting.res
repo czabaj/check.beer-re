@@ -65,8 +65,8 @@ let pageDataRx = (firestore, placeId) => {
 
 @react.component
 let make = (~placeId) => {
-  let firestore = Firebase.useFirestore()
-  let pageDataStatus = Firebase.useObservable(
+  let firestore = Reactfire.useFirestore()
+  let pageDataStatus = Reactfire.useObservable(
     ~observableId="Page_PlacePersonsSetting",
     ~source=pageDataRx(firestore, placeId),
   )

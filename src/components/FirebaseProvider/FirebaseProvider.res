@@ -2,6 +2,7 @@ let initializedFirestore: ref<option<Firebase.firestore>> = ref(None)
 
 @react.component
 let make = (~children) => {
+  open Reactfire
   open Firebase
 
   let app = useFirebaseApp()
@@ -38,6 +39,7 @@ let make = (~children) => {
 
   switch status {
   | #error => <div> {React.string("Some error hapenned")} </div>
+  | #loading => React.null
   | #success =>
     switch firestore {
     | None => React.null

@@ -163,8 +163,6 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 // Queries and helpers
 
-let reactFireOptions: Firebase.reactfireOptions<'a> = {idField: "uid"}
-
 let getUid: 'a => option<string> = %raw("data => data?.uid")
 
 let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
@@ -270,25 +268,25 @@ let allChargedKegsRx = (firestore, placeId) => {
 // Hooks
 
 let useCurrentUserAccountDocData = () => {
-  Firebase.useObservable(
+  Reactfire.useObservable(
     ~observableId="currentUser",
-    ~source=currentUserAccountRx(Firebase.useAuth(), Firebase.useFirestore()),
+    ~source=currentUserAccountRx(Reactfire.useAuth(), Reactfire.useFirestore()),
   )
 }
 
 let usePlacePersonDocumentStatus = (~options=?, placeId, personId) => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let personRef = placePersonDocument(firestore, placeId, personId)
-  Firebase.useFirestoreDocData(. personRef, options)
+  Reactfire.useFirestoreDocDataWithOptions(personRef, ~options)
 }
 
 let useMostRecentKegStatus = placeId => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let query = Firebase.query(
     placeKegsCollection(firestore, placeId),
     [Firebase.orderBy("serial", ~direction=#desc), Firebase.limit(1)],
   )
-  Firebase.useFirestoreCollectionData(. query, reactFireOptions)
+  Reactfire.useFirestoreCollectionData(query)
 }
 
 // Mutations

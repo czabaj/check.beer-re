@@ -1,6 +1,6 @@
 @react.component
 let make = (~children) => {
-  let {data: signInData} = Firebase.useSigninCheck()
+  let {data: signInData} = Reactfire.useSigninCheck()
 
   switch signInData {
   | None => React.null

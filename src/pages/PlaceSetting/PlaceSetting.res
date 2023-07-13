@@ -20,10 +20,10 @@ let dialogReducer = (_, event) => {
 
 @react.component
 let make = (~placeId) => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   // this paginated call do not use suspense, call it above the placePageStatus which _is_ suspended
   let (maybeDepletedKegs, maybeFetchMoreDepletedKegs) = UsePaginatedDepletedKegsData.use(placeId)
-  let pageDataStatus = Firebase.useObservable(
+  let pageDataStatus = Reactfire.useObservable(
     ~observableId="PlaceSettingPage",
     ~source=pageDataRx(firestore, placeId),
   )

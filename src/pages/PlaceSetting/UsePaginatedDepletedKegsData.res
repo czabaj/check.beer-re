@@ -31,7 +31,7 @@ let kegQuerySnapshotToKegs = (kegsSnapshot: Firebase.querySnapshot<Db.kegConvert
   kegsSnapshot.docs->Array.map(Rxfire.Firestore.snapToData)
 
 let use = (~limit=20, placeId) => {
-  let firestore = Firebase.useFirestore()
+  let firestore = Reactfire.useFirestore()
   let kegsCollectionRef = Db.placeKegsCollectionConverted(firestore, placeId)
   let (paginatedDataState, paginatedDataSend) = ReactUpdate.useReducer(initialState, (
     action,

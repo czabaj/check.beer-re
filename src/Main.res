@@ -1,6 +1,4 @@
-
-
-open Firebase
+open Reactfire
 
 ReactDOM.querySelector("#root")
 ->Option.getExn

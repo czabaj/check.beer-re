@@ -1,15 +1,4 @@
-type firebaseConfig
-@module("./firebaseConfig")
-external firebaseConfig: firebaseConfig = "firebaseConfig"
 
-module FirebaseAppProvider = {
-  @react.component @module("reactfire")
-  external make: (
-    ~firebaseConfig: firebaseConfig=?,
-    ~children: React.element,
-    ~suspense: bool=?,
-  ) => React.element = "FirebaseAppProvider"
-}
 
 module FirebaseOptions = {
   type t
@@ -18,9 +7,6 @@ module FirebaseOptions = {
 module FirebaseApp = {
   type t = {options: FirebaseOptions.t}
 }
-
-@module("reactfire")
-external useFirebaseApp: unit => FirebaseApp.t = "useFirebaseApp"
 
 // @module("firebase/app")
 // external initializeApp: firebaseConfig => firebaseApp = "initializeApp"
@@ -36,20 +22,6 @@ external getFirestore: FirebaseApp.t => firestore = "getFirestore"
 
 @module("firebase/firestore")
 external documentId: unit => string = "documentId"
-
-module FirestoreProvider = {
-  @react.component @module("reactfire")
-  external make: (~sdk: firestore, ~children: React.element) => React.element = "FirestoreProvider"
-}
-
-// the #loading is missing because we are using Suspense mode
-type observableStatus<'a> = {status: @string [#error | #success], data: option<'a>}
-@module("reactfire")
-external useInitFirestore: (FirebaseApp.t => promise<firestore>) => observableStatus<_> =
-  "useInitFirestore"
-
-@module("reactfire")
-external useFirestore: unit => firestore = "useFirestore"
 
 @module("firebase/firestore")
 external enableIndexedDbPersistence: firestore => promise<unit> = "enableIndexedDbPersistence"
@@ -188,24 +160,6 @@ module WriteBatch = {
 @module("firebase/firestore")
 external writeBatch: firestore => WriteBatch.t = "writeBatch"
 
-type reactfireOptions<'a> = {
-  idField?: string,
-  initialData?: 'a,
-  suspense?: bool,
-}
-
-@module("reactfire")
-external useFirestoreDocData: (
-  . documentReference<'a>,
-  option<reactfireOptions<'a>>,
-) => observableStatus<'a> = "useFirestoreDocData"
-
-@module("reactfire")
-external useFirestoreCollectionData: (
-  . query<'a>,
-  reactfireOptions<'a>,
-) => observableStatus<array<'a>> = "useFirestoreCollectionData"
-
 module User = {
   type info = {
     uid: string,
@@ -282,19 +236,6 @@ module Auth = {
   @module("firebase/auth")
   external connectAuthEmulator: (. t, string) => unit = "connectAuthEmulator"
 }
-
-module AuthProvider = {
-  @react.component @module("reactfire")
-  external make: (~sdk: Auth.t, ~children: React.element) => React.element = "AuthProvider"
-}
-
-@module("reactfire")
-external useAuth: unit => Auth.t = "useAuth"
-
-// TODO: The domain modeling seems a bit off--what does it mean when signedIn is false and there is a user?
-type signInCheckResult = {signedIn: bool, user: User.t}
-@module("reactfire")
-external useSigninCheck: unit => observableStatus<signInCheckResult> = "useSigninCheck"
 
 type appCheckToken
 @module("./firebaseConfig")
@@ -383,12 +324,6 @@ external getFunctions: (FirebaseApp.t, @as("asia-northeast3") _) => functions = 
 type callResult<'a> = {data: 'a}
 @module("firebase/functions")
 external httpsCallable: (functions, string) => (. 'a) => promise<callResult<'b>> = "httpsCallable"
-
-@module("reactfire")
-external useObservable: (
-  ~observableId: string,
-  ~source: Rxjs.t<Rxjs.foreign, Rxjs.void, 'a>,
-) => observableStatus<'a> = "useObservable"
 
 @module("firebase/firestore")
 external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"
