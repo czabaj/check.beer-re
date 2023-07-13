@@ -173,13 +173,13 @@ let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
 }
 
 let currentUserAccountRx = (auth, firestore) => {
-  Rxfire.Auth.user(auth)->Rxjs.pipe4(
+  Rxfire.user(auth)->Rxjs.pipe4(
     Rxjs.switchMap(user => {
       switch Js.Nullable.toOption(user) {
       | None => Rxjs.fromArray([])
       | Some(user) => {
           let query = currentUserAccountQuery(firestore, user)
-          Rxfire.Firestore.collectionData(query)
+          Rxfire.collectionData(query)
         }
       }
     }),
@@ -209,7 +209,7 @@ let recentlyFinishedKegsRx = (firestore, placeId) => {
         placeKegsCollectionConverted(firestore, placeId),
         [Firebase.where("depletedAt", #">=", firebaseTimestamp)],
       )
-      Rxfire.Firestore.collectionData(query)
+      Rxfire.collectionData(query)
     }),
   )
 }
@@ -262,7 +262,7 @@ let allChargedKegsRx = (firestore, placeId) => {
       Firebase.limit(50),
     ],
   )
-  Rxfire.Firestore.collectionData(chargedKegsQuery)
+  Rxfire.collectionData(chargedKegsQuery)
 }
 
 // Hooks

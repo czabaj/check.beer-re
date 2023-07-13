@@ -22,7 +22,7 @@ let dialogReducer = (_, event) => {
 
 let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
-  let placeRx = Rxfire.Firestore.docData(placeRef)
+  let placeRx = Rxfire.docData(placeRef)
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   let unfinishedConsumptionsByUserRx = allChargedKegsRx->Rxjs.pipe(
     Rxjs.map(.(chargedKegs, _) => {
