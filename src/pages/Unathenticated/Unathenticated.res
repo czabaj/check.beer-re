@@ -2,7 +2,7 @@
 let make = () => {
   let auth = Firebase.useAuth()
   <div className={Styles.page.centered}>
-    <h2> {React.string("Sign in")} </h2>
+    <h2> {React.string("Přihlášení")} </h2>
     <button
       className={Styles.button.button}
       onClick={_ => {
@@ -14,7 +14,7 @@ let make = () => {
         ->ignore
       }}
       type_="button">
-      {React.string("Sign in with Google")}
+      {React.string("Přihlásit se přes Google")}
     </button>
   </div>
 }

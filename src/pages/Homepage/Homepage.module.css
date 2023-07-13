@@ -1,0 +1,5 @@
+.root h1 span {
+  font-family: var(--font-cursive);
+  text-decoration: line-through;
+  font-style: italic;
+}
