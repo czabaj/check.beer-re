@@ -26,11 +26,11 @@ let pageDataRx = (firestore, placeId) => {
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   let unfinishedConsumptionsByUserRx = allChargedKegsRx->Rxjs.pipe(
     Rxjs.map((chargedKegs, _) => {
-      let consumptionsByUser = Belt.MutableMap.String.make()
+      let consumptionsByUser = Map.make()
       chargedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
       )
-      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+      consumptionsByUser->Map.forEach(consumptions => {
         consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       consumptionsByUser
@@ -158,7 +158,7 @@ let make = (~placeId) => {
                 }
               }
               let unfinishedConsumptions =
-                unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
+                unfinishedConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
               <PersonDetail
                 hasNext
                 hasPrevious

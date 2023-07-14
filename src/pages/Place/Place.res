@@ -163,11 +163,11 @@ let pageDataRx = (firestore, placeId) => {
   )
   let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
     map((chargedKegsWithConsumption, _) => {
-      let consumptionsByUser = Belt.MutableMap.String.make()
+      let consumptionsByUser = Map.make()
       chargedKegsWithConsumption->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
       )
-      consumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+      consumptionsByUser->Map.forEach(consumptions => {
         consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       consumptionsByUser
@@ -181,15 +181,15 @@ let pageDataRx = (firestore, placeId) => {
     map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
       let recentConsumptionsByUser =
         unfinishedConsumptionsByUser
-        ->Belt.MutableMap.String.toArray
-        ->Array.map(((userId, consumptions)) => (userId, consumptions->Array.copy))
-        ->Belt.MutableMap.String.fromArray
+        ->Map.entries
+        ->Iterator.toArrayWithMapper(((userId, consumptions)) => (userId, consumptions->Array.copy))
+        ->Map.fromArray
       // TODO: show only past XY hours, filter the older out
       recentlyFinishedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=recentConsumptionsByUser, keg)->ignore
       )
       // sort consumptions ty timestamp ascending
-      recentConsumptionsByUser->Belt.MutableMap.String.forEach((_, consumptions) => {
+      recentConsumptionsByUser->Map.forEach(consumptions => {
         consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
       })
       recentConsumptionsByUser
@@ -264,7 +264,7 @@ let make = (~placeId) => {
                   ->Array.map(activePerson => {
                     let (personId, person) = activePerson
                     let consumptions =
-                      recentConsumptionsByUser->Belt.MutableMap.String.getWithDefault(personId, [])
+                      recentConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
                     <ActivePersonListItem
                       activeCheckbox={activePersonsChanges->Option.map(changes =>
                         <ActiveCheckbox
@@ -393,10 +393,9 @@ let make = (~placeId) => {
             personName={person.name}
             preferredTap={person.preferredTap->Option.getExn}
             tapsWithKegs
-            unfinishedConsumptions={unfinishedConsumptionsByUser->Belt.MutableMap.String.getWithDefault(
-              personId,
-              [],
-            )}
+            unfinishedConsumptions={unfinishedConsumptionsByUser
+            ->Map.get(personId)
+            ->Option.getWithDefault([])}
           />
         | AddPerson =>
           let existingActive = activePersonEntries->Array.map(((_, {name})) => name)

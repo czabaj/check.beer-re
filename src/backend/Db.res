@@ -224,7 +224,7 @@ type userConsumption = {
   createdAt: Js.Date.t,
 }
 
-let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: kegConverted) => {
+let groupKegConsumptionsByUser = (~target=Map.make(), keg: kegConverted) => {
   keg.consumptions
   ->Js.Dict.entries
   ->Array.forEach(((timestampStr, consumption)) => {
@@ -235,9 +235,9 @@ let groupKegConsumptionsByUser = (~target=Belt.MutableMap.String.make(), keg: ke
       milliliters: consumption.milliliters,
       createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
     }
-    switch Belt.MutableMap.String.get(target, consumption.person.id) {
+    switch Map.get(target, consumption.person.id) {
     | Some(consumptions) => consumptions->Array.push(userCons)
-    | None => Belt.MutableMap.String.set(target, consumption.person.id, [userCons])
+    | None => Map.set(target, consumption.person.id, [userCons])
     }
   })
   target
@@ -419,7 +419,7 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
   let kegPricePerMilliliter = keg.price->Float.fromInt /. keg.consumptionsSum->Float.fromInt
   let nowTimestamp = Firebase.Timestamp.now()
   let personsTransactions = Belt.MutableMap.String.make()
-  groupKegConsumptionsByUser(keg)->Belt.MutableMap.String.forEach((personId, consumptions) => {
+  groupKegConsumptionsByUser(keg)->Map.forEachWithKey((consumptions, personId) => {
     let personConsumptionSum =
       consumptions->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
     let priceShare = (personConsumptionSum->Float.fromInt *. kegPricePerMilliliter)->Int.fromFloat
