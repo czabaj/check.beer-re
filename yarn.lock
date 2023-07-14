@@ -2451,9 +2451,9 @@
   resolved "https://registry.yarnpkg.com/@nicolo-ribaudo/semver-v6/-/semver-v6-6.3.3.tgz#ea6d23ade78a325f7a52750aab1526b02b628c29"
   integrity sha512-3Yc1fUTs69MG/uZbJlLSI3JISMn2UV2rg+1D/vROUqZyh3l6iYHCs7GMp+M40ZD7yOdDbYjJcU1oTJhrc+dGKg==
 
-"@nobleai/rescript-rxjs@https://github.com/czabaj/rescript-rxjs#b8a694d27037a63c3a321b7ea1e0f16f526dd950":
+"@nobleai/rescript-rxjs@https://github.com/czabaj/rescript-rxjs#a93dcb9084970e3fee8955d145f1dc0dd9153d7e":
   version "7.5.9"
-  resolved "https://github.com/czabaj/rescript-rxjs#b8a694d27037a63c3a321b7ea1e0f16f526dd950"
+  resolved "https://github.com/czabaj/rescript-rxjs#a93dcb9084970e3fee8955d145f1dc0dd9153d7e"
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

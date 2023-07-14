@@ -118,7 +118,7 @@ let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
   let tapsWithKegsRx = placeRx->Rxjs.pipe2(
-    Rxjs.distinctUntilChanged((. prev: Db.placeConverted, curr) => prev.taps == curr.taps),
+    Rxjs.distinctUntilChanged((prev: Db.placeConverted, curr) => prev.taps == curr.taps),
     Rxjs.mergeMap((place: Db.placeConverted) => {
       let tapsToKegId =
         place.taps
@@ -139,7 +139,7 @@ let pageDataRx = (firestore, placeId) => {
             [Firebase.where(Firebase.documentId(), #"in", kegIds)],
           ),
         )->Rxjs.pipe(
-          Rxjs.map(.(kegsOnTap, _) =>
+          Rxjs.map((kegsOnTap, _) =>
             tapsToKegId->Js.Dict.map(
               (. kegId) => {
                 kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegId)->Option.getExn
@@ -161,7 +161,7 @@ let pageDataRx = (firestore, placeId) => {
     ),
   )
   let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
-    Rxjs.map(.(chargedKegsWithConsumption, _) => {
+    Rxjs.map((chargedKegsWithConsumption, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       chargedKegsWithConsumption->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
@@ -177,7 +177,7 @@ let pageDataRx = (firestore, placeId) => {
     unfinishedConsumptionsByUserRx,
     recentlyFinishedKegsRx,
   ))->Rxjs.pipe(
-    Rxjs.map(.((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
+    Rxjs.map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
       let recentConsumptionsByUser =
         unfinishedConsumptionsByUser
         ->Belt.MutableMap.String.toArray
@@ -195,7 +195,7 @@ let pageDataRx = (firestore, placeId) => {
     }),
   )
   let personsSorted = placeRx->Rxjs.pipe(
-    Rxjs.map(.(place: Db.placeConverted, _) => {
+    Rxjs.map((place: Db.placeConverted, _) => {
       let personsAllEntries = place.personsAll->Js.Dict.entries
       personsAllEntries->Array.sort(((_, a), (_, b)) => {
         a.name->Js.String2.localeCompare(b.name)

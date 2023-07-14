@@ -174,24 +174,19 @@ let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
 
 let currentUserAccountRx = (auth, firestore) => {
   Rxfire.user(auth)->Rxjs.pipe4(
+    Rxjs.keepMap(Js.Nullable.toOption),
+    Rxjs.distinctUntilChanged((a: Firebase.User.t, b) => a.email === b.email),
     Rxjs.switchMap(user => {
-      switch Js.Nullable.toOption(user) {
-      | None => Rxjs.fromArray([])
-      | Some(user) => {
-          let query = currentUserAccountQuery(firestore, user)
-          Rxfire.collectionData(query)
-        }
-      }
+      let query = currentUserAccountQuery(firestore, user)
+      Rxfire.collectionData(query)
     }),
-    Rxjs.map(.(currentUsersDocs, _) => Array.at(currentUsersDocs, 0)),
-    Rxjs.filter(Option.isSome),
-    Rxjs.map(.(surelyCurrentUserData, _) => surelyCurrentUserData->Option.getUnsafe),
+    Rxjs.keepMap(Array.at(_, 0)),
   )
 }
 
 let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
   Rxjs.startWith(0),
-  Rxjs.map(.(_, _) => {
+  Rxjs.map((_, _) => {
     let now = Js.Date.make()
     let monthAgo = Js.Date.setMonth(now, Js.Date.getMonth(now) -. 1.0)
     Firebase.Timestamp.fromMillis(monthAgo)
@@ -201,13 +196,10 @@ let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
 
 let recentlyFinishedKegsRx = (firestore, placeId) => {
   slidingWindowRx->Rxjs.pipe(
-    Rxjs.switchMap(_slidingWindow => {
-      let now = Js.Date.make()
-      let monthAgo = Js.Date.setMonth(now, Js.Date.getMonth(now) -. 1.0)
-      let firebaseTimestamp = Firebase.Timestamp.fromMillis(monthAgo)
+    Rxjs.switchMap(monthAgo => {
       let query = Firebase.query(
         placeKegsCollectionConverted(firestore, placeId),
-        [Firebase.where("depletedAt", #">=", firebaseTimestamp)],
+        [Firebase.where("depletedAt", #">=", monthAgo)],
       )
       Rxfire.collectionData(query)
     }),

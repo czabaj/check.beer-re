@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#b8a694d27037a63c3a321b7ea1e0f16f526dd950",
+    "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#a93dcb9084970e3fee8955d145f1dc0dd9153d7e",
     "@rescript/core": "^0.4.0",
     "@rescript/react": "^0.11.0",
     "@rescriptbr/reform": "^12.1.0",

@@ -25,7 +25,7 @@ let pageDataRx = (firestore, placeId) => {
   let placeRx = Rxfire.docData(placeRef)
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   let unfinishedConsumptionsByUserRx = allChargedKegsRx->Rxjs.pipe(
-    Rxjs.map(.(chargedKegs, _) => {
+    Rxjs.map((chargedKegs, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       chargedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
@@ -37,7 +37,7 @@ let pageDataRx = (firestore, placeId) => {
     }),
   )
   let pendingTransactionsByUserRx = allChargedKegsRx->Rxjs.pipe(
-    Rxjs.map(.(chargedKegs: array<Db.kegConverted>, _) => {
+    Rxjs.map((chargedKegs: array<Db.kegConverted>, _) => {
       let kegByDonor = Belt.MutableMap.String.make()
       chargedKegs->Array.forEach(keg => {
         keg.donors
