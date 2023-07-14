@@ -73,7 +73,7 @@ let make = () => {
             onSubmit={async values => {
               let placeDoc = Firebase.seedDoc(Db.placeCollection(firestore))
               let personDoc = Firebase.seedDoc(Db.placePersonsCollection(firestore, placeDoc.id))
-              let userDoc = Db.accountDoc(firestore, Db.getUid(currentUser)->Option.getExn)
+              let userDoc = Db.accountDoc(firestore, Db.getUid(currentUser))
               let defaultTapName = "Pípa"
               let now = Firebase.Timestamp.now()
               let personTuple = Db.personsAllRecordToTuple(. {

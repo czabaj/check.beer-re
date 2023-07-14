@@ -37,12 +37,8 @@ let make = (~placeId) => {
       ->Belt.Array.keepMap(maybeKegReference =>
         maybeKegReference->Js.Null.toOption->Option.map(ref => ref.id)
       )
-    let (untappedChargedKegs, tappedChargedKegs) = chargedKegs->Belt.Array.partition(keg => {
-      switch Db.getUid(keg) {
-      | Some(kegUid) => !(kegsOnTapUids->Array.includes(kegUid))
-      | None => false
-      }
-    })
+    let (tappedChargedKegs, untappedChargedKegs) =
+      chargedKegs->Belt.Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
     let personsAllEntries = place.personsAll->Js.Dict.entries
 
     <FormattedCurrency.Provider value={place.currency}>
@@ -123,15 +119,14 @@ let make = (~placeId) => {
           }}
         />
       | KegDetail(kegId) => {
-          let currentIdx =
-            chargedKegs->Array.findIndex(keg => Db.getUid(keg)->Option.getExn === kegId)
+          let currentIdx = chargedKegs->Array.findIndex(keg => Db.getUid(keg) === kegId)
           let hasNext = currentIdx !== -1 && currentIdx < Array.length(chargedKegs) - 1
           let hasPrevious = currentIdx > 0
           let handleCycle = increase => {
             let allowed = increase ? hasNext : hasPrevious
             if allowed {
               let nextIdx = currentIdx + (increase ? 1 : -1)
-              let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid->Option.getExn
+              let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid
               sendDialog(ShowKegDetail(nextKegId))
             }
           }

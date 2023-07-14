@@ -7,17 +7,15 @@ type selectOption = {text: React.element, value: string}
 
 @react.component
 let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegConverted>) => {
-  let options = untappedChargedKegs->Belt.Array.keepMap(keg => {
-    Db.getUid(keg)->Option.map(uid => {
-      {
-        text: <>
-          {React.string(`${keg.serialFormatted} ${keg.beer} (`)}
-          <FormattedVolume milliliters=keg.milliliters />
-          {React.string(")")}
-        </>,
-        value: uid,
-      }
-    })
+  let options = untappedChargedKegs->Belt.Array.map(keg => {
+    {
+      text: <>
+        {React.string(`${keg.serialFormatted} ${keg.beer} (`)}
+        <FormattedVolume milliliters=keg.milliliters />
+        {React.string(")")}
+      </>,
+      value: Db.getUid(keg),
+    }
   })
   let form = Form.use(
     ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getWithDefault("")},

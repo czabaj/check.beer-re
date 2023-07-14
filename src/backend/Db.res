@@ -163,7 +163,7 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 // Queries and helpers
 
-let getUid: 'a => option<string> = %raw("data => data?.uid")
+let getUid: 'a => string = %raw("data => data?.uid")
 
 let userAccountsByEmailRx = (firestore, ~email) => {
   let query = Firebase.query(

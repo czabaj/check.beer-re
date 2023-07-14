@@ -51,16 +51,10 @@ let make = (
   let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
   let hideDialog = _ => sendDialog(Hide)
   let hasKegsToTap = untappedChargedKegs->Array.length > 0
-  let tappedKegsById = React.useMemo1(() =>
-    tappedChargedKegs
-    ->Belt.Array.keepMap(keg => {
-      switch Db.getUid(keg) {
-      | Some(uid) => Some((uid, keg))
-      | None => None
-      }
-    })
-    ->Belt.Map.String.fromArray
-  , [tappedChargedKegs])
+  let tappedKegsById = React.useMemo1(
+    () => tappedChargedKegs->Array.map(keg => (Db.getUid(keg), keg))->Dict.fromArray,
+    [tappedChargedKegs],
+  )
   let sortedTapEntries = React.useMemo1(() => {
     let tapsEntries = place.taps->Js.Dict.entries
     tapsEntries->Array.sort((a, b) => a->fst->String.localeCompare(b->fst))
@@ -82,7 +76,7 @@ let make = (
           let tappedKeg =
             maybeKegReference
             ->Js.Null.toOption
-            ->Option.flatMap(kegRef => tappedKegsById->Belt.Map.String.get(kegRef.id))
+            ->Option.flatMap(kegRef => tappedKegsById->Dict.get(kegRef.id))
 
           <li key={tapName}>
             <div>

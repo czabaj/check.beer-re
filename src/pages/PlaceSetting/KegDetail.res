@@ -35,7 +35,7 @@ let make = (
   let priceLargeBeer =
     (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
   let effectivity = keg.consumptionsSum->Int.toFloat /. keg.milliliters->Int.toFloat
-  let kegId = Db.getUid(keg)->Option.getExn
+  let kegId = Db.getUid(keg)
   let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
     place.taps

@@ -143,7 +143,7 @@ let pageDataRx = (firestore, placeId) => {
           map((kegsOnTap, _) =>
             tapsToKegId->Js.Dict.map(
               (. kegId) => {
-                kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegId)->Option.getExn
+                kegsOnTap->Array.find(keg => Db.getUid(keg) === kegId)->Option.getExn
               },
               _,
             )

@@ -33,7 +33,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
         <tbody>
           {kegs
           ->Array.map(keg => {
-            let kegId = Db.getUid(keg)->Option.getExn
+            let kegId = Db.getUid(keg)
             let volume = keg.milliliters
             <tr key={kegId}>
               <th scope="row"> {React.string(keg.serialFormatted)} </th>

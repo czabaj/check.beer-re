@@ -33,7 +33,7 @@ let make = (
             {kegs
             ->Array.map(keg => {
               let volume = keg.milliliters
-              let kegId = Db.getUid(keg)->Option.getExn
+              let kegId = Db.getUid(keg)
               let effectivity = keg.consumptionsSum->Float.fromInt /. volume->Float.fromInt
               let priceLargeBeer =
                 (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
