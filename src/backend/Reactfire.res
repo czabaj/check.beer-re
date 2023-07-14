@@ -23,11 +23,6 @@ type observableStatus<'a> = {status: @string [#error | #loading | #success], dat
 @module("reactfire")
 external useAuth: unit => Auth.t = "useAuth"
 
-// TODO: The domain modeling seems a bit off--what does it mean when signedIn is false and there is a user?
-type signInCheckResult = {signedIn: bool, user: User.t}
-@module("reactfire")
-external useSigninCheck: unit => observableStatus<signInCheckResult> = "useSigninCheck"
-
 @module("reactfire")
 external useFirestoreDocData: (
   documentReference<'a>,

@@ -1,5 +1,3 @@
-
-
 module FirebaseOptions = {
   type t
 }
@@ -167,19 +165,40 @@ module User = {
     displayName: option<string>,
     email: option<string>,
   }
+  type metadata = {
+    // timestamp in a string
+    createdAt: string,
+    // datetime in format e.g. "Fri, 14 Jul 2023 11:48:18 GMT"
+    creationTime: string,
+    // timestamp in a string
+    lastLoginAt: string,
+    // datetime in format e.g. "Fri, 14 Jul 2023 11:48:18 GMT"
+    lastSignInTime: string,
+  }
   type t = {
-    uid: string,
     displayName: option<string>,
     email: option<string>,
     emailVerified: bool,
+    isAnonymous: bool,
+    metadata: metadata,
     photoURL: option<string>,
     providerData: array<info>,
+    uid: string,
   }
 }
 
 module Auth = {
   type t = {app: FirebaseApp.t, name: string, currentUser: Js.null<User.t>}
   type update = {displayName?: string, photoURL?: string}
+
+  @string
+  type operationType = [#link | #reauthenticate | #signIn]
+
+  type userCredential = {
+    operationType: operationType,
+    providerId: Js.null<string>,
+    user: User.t,
+  }
 
   @send
   external onAuthStateChanged: (t, 'user) => 'unsubscribe = "onAuthStateChanged"
@@ -200,18 +219,24 @@ module Auth = {
     let providerID = "google.com"
   }
 
-  type userCredential = {
-    operationType: @string [#link | #reauthenticate | #signIn],
-    providerId: Js.null<string>,
-    user: User.t,
+  type actionCodeSettings = {
+    url: string,
+    handleCodeInApp: bool,
   }
 
   @module("firebase/auth")
-  external signInWithEmailAndPassword: (
+  external sendSignInLinkToEmail: (
     . t,
     ~email: string,
-    ~password: string,
-  ) => promise<userCredential> = "signInWithEmailAndPassword"
+    ~actionCodeSettings: actionCodeSettings,
+  ) => promise<unit> = "sendSignInLinkToEmail"
+
+  @module("firebase/auth")
+  external isSignInWithEmailLink: (. t, ~href: string) => bool = "isSignInWithEmailLink"
+
+  @module("firebase/auth")
+  external signInWithEmailLink: (. t, ~email: string, ~href: string) => promise<userCredential> =
+    "signInWithEmailLink"
 
   @module("firebase/auth")
   external createUserWithEmailAndPassword: (

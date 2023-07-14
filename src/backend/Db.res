@@ -165,21 +165,19 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 let getUid: 'a => option<string> = %raw("data => data?.uid")
 
-let currentUserAccountQuery = (firestore, user: Firebase.User.t) => {
-  Firebase.query(
+let userAccountsByEmailRx = (firestore, ~email) => {
+  let query = Firebase.query(
     userAccountsCollection(firestore),
-    [Firebase.where("email", #"==", user.email), Firebase.limit(1)],
+    [Firebase.where("email", #"==", email), Firebase.limit(1)],
   )
+  Rxfire.collectionData(query)
 }
 
 let currentUserAccountRx = (auth, firestore) => {
   Rxfire.user(auth)->Rxjs.pipe4(
-    Rxjs.keepMap(Js.Nullable.toOption),
+    Rxjs.keepMap(Null.toOption),
     Rxjs.distinctUntilChanged((a: Firebase.User.t, b) => a.email === b.email),
-    Rxjs.switchMap(user => {
-      let query = currentUserAccountQuery(firestore, user)
-      Rxfire.collectionData(query)
-    }),
+    Rxjs.switchMap((user: Firebase.User.t) => userAccountsByEmailRx(firestore, ~email=user.email)),
     Rxjs.keepMap(Array.at(_, 0)),
   )
 }
@@ -476,4 +474,15 @@ let finalizeKeg = async (firestore, placeId, kegId) => {
   // mark keg as depleted
   ->Firebase.WriteBatch.update(kegRef, {"depletedAt": nowTimestamp})
   ->Firebase.WriteBatch.commit
+}
+
+let createUserAccount = (firestore, ~email, ~preferredName) => {
+  Firebase.addDoc(
+    userAccountsCollection(firestore),
+    {
+      email,
+      name: preferredName,
+      places: Js.Dict.empty(),
+    },
+  )
 }

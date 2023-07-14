@@ -1,0 +1,25 @@
+.root {
+  row-gap: 1rem;
+}
+
+section[aria-labelledby="other_methods"] h3 {
+  font-size: var(--font-size-16);
+  overflow: hidden;
+  position: relative;
+  text-align: center;
+}
+section[aria-labelledby="other_methods"] h3::before,
+section[aria-labelledby="other_methods"] h3::after {
+  background-color: var(--text-1);
+  content: "";
+  height: 1px;
+  inset-block-start: 50%;
+  position: absolute;
+  width: 100%;
+}
+section[aria-labelledby="other_methods"] h3::before {
+  transform: translateX(-100%);
+}
+section[aria-labelledby="other_methods"] h3 > span {
+  padding-inline: 0.5rem;
+}

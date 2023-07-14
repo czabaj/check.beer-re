@@ -49,3 +49,9 @@ let createAnchorProps = (~replace=false, pathname: string): JsxDOM.domProps => {
   let resolvedPath = resolveRelativePath(pathname)
   {href: resolvedPath, onClick: createLinkClickHandler(resolvedPath, ~replace)}
 }
+
+let truncateQueryString = (href): string => {
+  let url = Webapi.Url.make(href)
+  url->Webapi.Url.setSearch("")
+  url->Webapi.Url.href
+}

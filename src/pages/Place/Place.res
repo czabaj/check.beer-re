@@ -115,11 +115,12 @@ let dialogReducer = (_, event) => {
 type userConsumption = {milliliters: int, timestamp: float}
 
 let pageDataRx = (firestore, placeId) => {
+  open Rxjs
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
-  let tapsWithKegsRx = placeRx->Rxjs.pipe2(
-    Rxjs.distinctUntilChanged((prev: Db.placeConverted, curr) => prev.taps == curr.taps),
-    Rxjs.mergeMap((place: Db.placeConverted) => {
+  let tapsWithKegsRx = placeRx->pipe2(
+    distinctUntilChanged((prev: Db.placeConverted, curr) => prev.taps == curr.taps),
+    mergeMap((place: Db.placeConverted) => {
       let tapsToKegId =
         place.taps
         ->Js.Dict.entries
@@ -131,15 +132,15 @@ let pageDataRx = (firestore, placeId) => {
         )
         ->Js.Dict.fromArray
       switch tapsToKegId->Js.Dict.values {
-      | [] => Rxjs.return(Js.Dict.empty())
+      | [] => return(Js.Dict.empty())
       | kegIds =>
         Rxfire.collectionData(
           Firebase.query(
             Db.placeKegsCollectionConverted(firestore, placeId),
             [Firebase.where(Firebase.documentId(), #"in", kegIds)],
           ),
-        )->Rxjs.pipe(
-          Rxjs.map((kegsOnTap, _) =>
+        )->pipe(
+          map((kegsOnTap, _) =>
             tapsToKegId->Js.Dict.map(
               (. kegId) => {
                 kegsOnTap->Array.find(keg => Db.getUid(keg)->Option.getExn === kegId)->Option.getExn
@@ -161,7 +162,7 @@ let pageDataRx = (firestore, placeId) => {
     ),
   )
   let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
-    Rxjs.map((chargedKegsWithConsumption, _) => {
+    map((chargedKegsWithConsumption, _) => {
       let consumptionsByUser = Belt.MutableMap.String.make()
       chargedKegsWithConsumption->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
@@ -173,11 +174,11 @@ let pageDataRx = (firestore, placeId) => {
     }),
   )
   let recentlyFinishedKegsRx = Db.recentlyFinishedKegsRx(firestore, placeId)
-  let recentConsumptionsByUserRx = Rxjs.combineLatest2((
+  let recentConsumptionsByUserRx = combineLatest2((
     unfinishedConsumptionsByUserRx,
     recentlyFinishedKegsRx,
-  ))->Rxjs.pipe(
-    Rxjs.map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
+  ))->pipe(
+    map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
       let recentConsumptionsByUser =
         unfinishedConsumptionsByUser
         ->Belt.MutableMap.String.toArray
@@ -194,8 +195,8 @@ let pageDataRx = (firestore, placeId) => {
       recentConsumptionsByUser
     }),
   )
-  let personsSorted = placeRx->Rxjs.pipe(
-    Rxjs.map((place: Db.placeConverted, _) => {
+  let personsSorted = placeRx->pipe(
+    map((place: Db.placeConverted, _) => {
       let personsAllEntries = place.personsAll->Js.Dict.entries
       personsAllEntries->Array.sort(((_, a), (_, b)) => {
         a.name->Js.String2.localeCompare(b.name)
@@ -203,7 +204,7 @@ let pageDataRx = (firestore, placeId) => {
       personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
     }),
   )
-  Rxjs.combineLatest5((
+  combineLatest5((
     placeRx,
     personsSorted,
     tapsWithKegsRx,

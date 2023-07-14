@@ -16,6 +16,7 @@ let apos = "\u0027"
 let lt = "<" // Included for completeness.
 let gt = ">" // Included for completeness.
 let nbsp = "\u00A0"
+let nbhp = "\u2011" // non-breaking hyphen
 let iexcl = "\u00A1"
 let cent = "\u00A2"
 let pound = "\u00A3"

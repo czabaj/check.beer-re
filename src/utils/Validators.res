@@ -4,6 +4,8 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
 
   let custom = Validation.custom
 
+  let email = Validation.email(~error="Neplatný email")
+
   let float = Validation.float
 
   let int = Validation.int

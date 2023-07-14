@@ -1,5 +1,5 @@
 @module("rxfire/auth")
-external user: Firebase.Auth.t => Rxjs.t<Rxjs.foreign, Rxjs.void, Js.Nullable.t<Firebase.User.t>> =
+external user: Firebase.Auth.t => Rxjs.t<Rxjs.foreign, Rxjs.void, Js.Null.t<Firebase.User.t>> =
   "user"
 
 @module("rxfire/firestore")

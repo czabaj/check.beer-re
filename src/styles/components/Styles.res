@@ -17,7 +17,7 @@ type descriptionListClasses = {inline: string}
 @module("./descriptionList.module.css")
 external descriptionList: descriptionListClasses = "default"
 
-type fieldsetClasses = {grid: string}
+type fieldsetClasses = {grid: string, gridSpan: string}
 @module("./fieldset.module.css") external fieldset: fieldsetClasses = "default"
 
 type linkClasses = {base: string}

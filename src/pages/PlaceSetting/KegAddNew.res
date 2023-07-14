@@ -19,8 +19,6 @@ let emptyState: FormFields.state = {
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
-external any: 'a => 'b = "%identity"
-
 let getSelectedOption: {..} => array<
   string,
 > = %raw(`select => Array.from(select.selectedOptions, option => option.value)`)
@@ -167,7 +165,7 @@ module FormComponent = {
                             ->Js.Dict.fromArray
                           field.handleChange(newValue)
                         }}
-                        value={value->Js.Dict.keys->any}>
+                        value={value->Js.Dict.keys->TypeUtils.any}>
                         {place.personsAll
                         ->Js.Dict.entries
                         ->Array.map(((personId, person)) =>

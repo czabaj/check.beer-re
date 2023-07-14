@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: auto 1fr;
   column-gap: 1rem;
+  row-gap: 1rem;
 }
 
 .grid > div:global(.inputWrapper) {
@@ -10,4 +11,8 @@
 
 .grid label {
   text-align: right;
+}
+
+.gridSpan {
+  grid-column: 1 / -1;
 }
