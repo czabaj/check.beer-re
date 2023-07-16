@@ -53,6 +53,7 @@ let removeLastUndefined: FirestoreModels.personsAllItem => FirestoreModels.perso
   "tuple => tuple.at(-1) === undefined ? tuple.slice(0, -1) : tuple"
 )
 
+@genType
 let personsAllRecordToTuple = (. {
   balance,
   name,
@@ -230,7 +231,7 @@ let groupKegConsumptionsByUser = (~target=Map.make(), keg: kegConverted) => {
   ->Array.forEach(((timestampStr, consumption)) => {
     let userCons = {
       consumptionId: timestampStr,
-      kegId: getUid(keg)->Option.getExn,
+      kegId: getUid(keg),
       beer: keg.beer,
       milliliters: consumption.milliliters,
       createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
@@ -390,90 +391,109 @@ let deleteKeg = async (firestore, placeId, kegId) => {
   await Firebase.deleteDoc(kegRef)
 }
 
-let finalizeKeg = async (firestore, placeId, kegId) => {
-  let batch = Firebase.writeBatch(firestore)
-  let kegRef = kegDoc(firestore, placeId, kegId)
-  let keg = (
-    await Firebase.getDocFromCache(kegRef->Firebase.withConterterDoc(kegConverter))
-  ).data(. {})
-  let placeRef = placeDocument(firestore, placeId)
-  let place = (
-    await Firebase.getDocFromCache(placeRef->Firebase.withConterterDoc(placeConverter))
-  ).data(. {})
-  let placeUpdateObject = Object.empty()
-  // untap keg if on tap
-  let kegOnTap =
-    place.taps
+module Keg = {
+  @genType
+  let finalizeGetUpdateObjects = (keg: kegConverted, place: placeConverted) => {
+    let kegId = getUid(keg)
+    let nowTimestamp = Firebase.Timestamp.now()
+    let kegUpdataObject = {"depletedAt": nowTimestamp}
+    let personsUpdateObjects = Map.make()
+    let placeUpdateObject = Object.empty()
+    // untap keg if on tap
+    let kegOnTap =
+      place.taps
+      ->Js.Dict.entries
+      ->Array.find(((_, maybeKegRef)) =>
+        maybeKegRef
+        ->Null.toOption
+        ->Option.map(kegRef => kegRef.id === kegId)
+        ->Option.getWithDefault(false)
+      )
+    switch kegOnTap {
+    | Some((tapName, _)) => placeUpdateObject->Object.set(`taps.${tapName}`, Firebase.deleteField())
+    | _ => ()
+    }
+    // create financial transactions for consumptions
+    let donorsEntries = keg.donors->Js.Dict.entries
+    let kegDonorPrice = donorsEntries->Array.reduce(0, (price, (_, amount)) => price + amount)
+    let kegPricePerMilliliter = kegDonorPrice->Float.fromInt /. keg.consumptionsSum->Float.fromInt
+    let personsTransactions = Map.make()
+    groupKegConsumptionsByUser(keg)->Map.forEachWithKey((consumptions, personId) => {
+      let personConsumptionSum =
+        consumptions->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
+      let priceShare = (personConsumptionSum->Float.fromInt *. kegPricePerMilliliter)->Int.fromFloat
+      let financialTransaction: FirestoreModels.financialTransaction = {
+        amount: -1 * priceShare,
+        createdAt: nowTimestamp,
+        keg: Null.make(keg.serial),
+        note: Null.null,
+      }
+      personsTransactions->Map.set(personId, [financialTransaction])
+    })
+    // create financial transaction for deposit of the keg
+    keg.donors
     ->Js.Dict.entries
-    ->Array.find(((_, maybeKegRef)) =>
-      maybeKegRef
-      ->Null.toOption
-      ->Option.map(kegRef => kegRef.id === kegId)
-      ->Option.getWithDefault(false)
-    )
-  switch kegOnTap {
-  | Some((tapName, _)) => placeUpdateObject->Object.set(`taps.${tapName}`, Firebase.deleteField())
-  | _ => ()
+    ->Array.forEach(((personId, amount)) => {
+      let financialTransaction: FirestoreModels.financialTransaction = {
+        amount,
+        createdAt: nowTimestamp,
+        keg: Null.make(keg.serial),
+        note: Null.null,
+      }
+      switch personsTransactions->Map.get(personId) {
+      | None => personsTransactions->Map.set(personId, [financialTransaction])
+      | Some(transactions) => transactions->Array.push(financialTransaction)
+      }
+    })
+    // write financial transactions to person documents and make personsAll updates
+    personsTransactions->Map.forEachWithKey((transactions, personId) => {
+      personsUpdateObjects->Map.set(
+        personId,
+        {
+          "transactions": Firebase.arrayUnion(transactions),
+        },
+      )
+      let transactiuonsSum =
+        transactions->Array.reduce(0, (sum, transaction) => sum + transaction.amount)
+      let personsAllRecord = place.personsAll->Js.Dict.get(personId)->Option.getExn
+      let newPersonsAllRecord = {
+        ...personsAllRecord,
+        balance: personsAllRecord.balance + transactiuonsSum,
+      }
+      placeUpdateObject->Object.set(
+        `personsAll.${personId}`,
+        personsAllRecordToTuple(. newPersonsAllRecord),
+      )
+    })
+    (kegUpdataObject, personsUpdateObjects, placeUpdateObject)
   }
-  // create financial transactions for consumptions
-  let kegPricePerMilliliter = keg.price->Float.fromInt /. keg.consumptionsSum->Float.fromInt
-  let nowTimestamp = Firebase.Timestamp.now()
-  let personsTransactions = Belt.MutableMap.String.make()
-  groupKegConsumptionsByUser(keg)->Map.forEachWithKey((consumptions, personId) => {
-    let personConsumptionSum =
-      consumptions->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
-    let priceShare = (personConsumptionSum->Float.fromInt *. kegPricePerMilliliter)->Int.fromFloat
-    let financialTransaction: FirestoreModels.financialTransaction = {
-      amount: -1 * priceShare,
-      createdAt: nowTimestamp,
-      keg: Null.make(keg.serial),
-      note: Null.null,
-    }
-    personsTransactions->Belt.MutableMap.String.set(personId, [financialTransaction])
-  })
-  // create financial transaction for deposit of the keg
-  keg.donors
-  ->Js.Dict.entries
-  ->Array.forEach(((personId, amount)) => {
-    let financialTransaction: FirestoreModels.financialTransaction = {
-      amount,
-      createdAt: nowTimestamp,
-      keg: Null.make(keg.serial),
-      note: Null.null,
-    }
-    switch personsTransactions->Belt.MutableMap.String.get(personId) {
-    | None => personsTransactions->Belt.MutableMap.String.set(personId, [financialTransaction])
-    | Some(transactions) => transactions->Array.push(financialTransaction)
-    }
-  })
-  // write financial transactions to person documents and make personsAll updates
-  personsTransactions->Belt.MutableMap.String.forEach((personId, transactions) => {
-    let personRef = placePersonDocument(firestore, placeId, personId)
-    batch
-    ->Firebase.WriteBatch.update(
-      personRef,
-      {
-        "transactions": Firebase.arrayUnion(transactions),
-      },
+  let finalize = async (firestore, placeId, kegId) => {
+    let kegRef = kegDoc(firestore, placeId, kegId)
+    let keg = (
+      await Firebase.getDocFromCache(kegRef->Firebase.withConterterDoc(kegConverter))
+    ).data(. {})
+    let placeRef = placeDocument(firestore, placeId)
+    let place = (
+      await Firebase.getDocFromCache(placeRef->Firebase.withConterterDoc(placeConverter))
+    ).data(. {})
+    let (kegUpdataObject, personsUpdateObjects, placeUpdateObject) = finalizeGetUpdateObjects(
+      keg,
+      place,
     )
-    ->ignore
-    let transactiuonsSum =
-      transactions->Array.reduce(0, (sum, transaction) => sum + transaction.amount)
-    let personsAllRecord = place.personsAll->Js.Dict.get(personId)->Option.getExn
-    let newPersonsAllRecord = {
-      ...personsAllRecord,
-      balance: personsAllRecord.balance + transactiuonsSum,
-    }
-    placeUpdateObject->Object.set(
-      `personsAll.${personId}`,
-      personsAllRecordToTuple(. newPersonsAllRecord),
+    let batch = Firebase.writeBatch(firestore)
+    personsUpdateObjects->Map.forEachWithKey((personUpdateObject, personId) =>
+      batch
+      ->Firebase.WriteBatch.update(
+        placePersonDocument(firestore, placeId, personId),
+        personUpdateObject,
+      )
+      ->ignore
     )
-  })
-  await batch
-  ->Firebase.WriteBatch.update(placeRef, placeUpdateObject)
-  // mark keg as depleted
-  ->Firebase.WriteBatch.update(kegRef, {"depletedAt": nowTimestamp})
-  ->Firebase.WriteBatch.commit
+    await batch
+    ->Firebase.WriteBatch.update(placeRef, placeUpdateObject)
+    ->Firebase.WriteBatch.update(kegRef, kegUpdataObject)
+    ->Firebase.WriteBatch.commit
+  }
 }
 
 let createUserAccount = (firestore, ~email, ~preferredName) => {

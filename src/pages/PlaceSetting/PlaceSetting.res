@@ -144,7 +144,7 @@ let make = (~placeId) => {
             }}
             onDismiss={hideDialog}
             onFinalizeKeg={() => {
-              Db.finalizeKeg(firestore, placeId, kegId)->ignore
+              Db.Keg.finalize(firestore, placeId, kegId)->ignore
               hideDialog()
             }}
             onNextKeg={_ => handleCycle(true)}

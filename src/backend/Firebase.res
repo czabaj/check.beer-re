@@ -28,12 +28,11 @@ external enableIndexedDbPersistence: firestore => promise<unit> = "enableIndexed
 external enableMultiTabIndexedDbPersistence: firestore => promise<unit> =
   "enableMultiTabIndexedDbPersistence"
 
-type updateTag = ArrayUnion | ArrayRemove | Increment
 @module("firebase/firestore") @variadic
-external arrayUnion: array<'a> => updateTag = "arrayUnion"
+external arrayUnion: array<'a> => {..} = "arrayUnion"
 
 @module("firebase/firestore")
-external incrementInt: int => updateTag = "increment"
+external incrementInt: int => {..} = "increment"
 
 @genType.import("firebase/firestore") @genType.as("DocumentReference")
 type documentReference<'a> = {id: string}
@@ -312,9 +311,9 @@ module AppCheckProvider = {
 
 module Timestamp = {
   @genType.import("firebase/firestore") @genType.as("Timestamp")
-  type t
+  type t = {seconds: float, nanoseconds: int}
   @new @module("firebase/firestore")
-  external make: unit => t = "Timestamp"
+  external make: (~seconds: float, ~nanoseconds: float) => t = "Timestamp"
   @send
   external toDate: t => Js.Date.t = "toDate"
   @send

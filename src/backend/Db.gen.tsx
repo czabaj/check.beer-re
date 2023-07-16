@@ -10,6 +10,8 @@ const Curry: any = Curry__Es6Import;
 import * as DbBS__Es6Import from './Db.bs';
 const DbBS: any = DbBS__Es6Import;
 
+import type {Dict_key as Js_Dict_key} from './Js.gen';
+
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 
 import type {collectionReference as Firebase_collectionReference} from './Firebase.gen';
@@ -22,7 +24,11 @@ import type {firestore as Firebase_firestore} from './Firebase.gen';
 
 import type {keg as FirestoreModels_keg} from './FirestoreModels.gen';
 
+import type {personsAllItem as FirestoreModels_personsAllItem} from './FirestoreModels.gen';
+
 import type {place as FirestoreModels_place} from './FirestoreModels.gen';
+
+import type {t as Map_t} from './Map.gen';
 
 // tslint:disable-next-line:interface-over-type-literal
 export type personsAllRecord = {
@@ -60,5 +66,12 @@ export const placeCollection: (firestore:Firebase_firestore) => Firebase_collect
 
 export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Firebase_documentReference<FirestoreModels_place> = function (Arg1: any, Arg2: any) {
   const result = Curry._2(DbBS.placeDocument, Arg1, Arg2);
+  return result
+};
+
+export const personsAllRecordToTuple: (_1:personsAllRecord) => FirestoreModels_personsAllItem = DbBS.personsAllRecordToTuple;
+
+export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:placeConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}] = function (Arg1: any, Arg2: any) {
+  const result = Curry._2(DbBS.Keg.finalizeGetUpdateObjects, Arg1, Arg2);
   return result
 };

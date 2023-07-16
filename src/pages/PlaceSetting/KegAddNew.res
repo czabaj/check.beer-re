@@ -72,7 +72,7 @@ module FormComponent = {
                 let donorsSum = lensState.donors->Js.Dict.values->Array.reduce(0, (a, b) => a + b)
                 let kegPrice = lensState.price
                 if kegPrice > 0 && kegPrice != donorsSum {
-                  Error("Cena sudu se neshoduje s příspěvky věřitelů")
+                  Error("Cena sudu se neshoduje s příspěvky vkladatelů")
                 } else {
                   Valid
                 }
@@ -143,7 +143,7 @@ module FormComponent = {
               />
             </fieldset>
             <fieldset className="reset">
-              <legend> {React.string("Věřitelé sudu")} </legend>
+              <legend> {React.string("Vkladatelé sudu")} </legend>
               <Form.Field
                 field=Donors
                 render={field => {
