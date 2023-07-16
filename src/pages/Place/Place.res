@@ -99,19 +99,6 @@ type dialogState =
   | AddConsumption({personId: string, person: Db.personsAllRecord})
   | AddPerson
 
-type dialogEvent =
-  | Hide
-  | ShowAddConsumption({personId: string, person: Db.personsAllRecord})
-  | ShowAddPerson
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddConsumption({personId, person}) => AddConsumption({personId, person})
-  | ShowAddPerson => AddPerson
-  }
-}
-
 type userConsumption = {milliliters: int, timestamp: float}
 
 let pageDataRx = (firestore, placeId) => {
@@ -220,8 +207,8 @@ let make = (~placeId) => {
     ~observableId="Page_Place",
     ~source=pageDataRx(firestore, placeId),
   )
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   let (activePersonsChanges, setActivePersonsChanges) = React.useState((): option<
     Belt.Map.String.t<bool>,
   > => None)
@@ -250,7 +237,7 @@ let make = (~placeId) => {
             buttonsSlot={<button
               className={Styles.button.button}
               type_="button"
-              onClick={_ => sendDialog(ShowAddPerson)}>
+              onClick={_ => setDialog(_ => AddPerson)}>
               {React.string("Přidat návštěvníka")}
             </button>}
             headerId="active_persons"
@@ -274,7 +261,7 @@ let make = (~placeId) => {
                       consumptions={consumptions}
                       key={personId}
                       onAddConsumption={() => {
-                        sendDialog(ShowAddConsumption({personId, person}))
+                        setDialog(_ => AddConsumption({personId, person}))
                       }}
                       personName={person.name}
                     />
