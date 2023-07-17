@@ -1,4 +1,4 @@
-.button {
+.base {
   align-items: center;
   background-color: var(--_background, var(--surface-2));
   border-radius: var(--radius-2);

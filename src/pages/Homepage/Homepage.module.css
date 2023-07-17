@@ -1,5 +1,13 @@
+.root > div {
+  max-inline-size: 20ch;
+}
+
 .root h1 span {
   font-family: var(--font-cursive);
   text-decoration: line-through;
   font-style: italic;
+}
+
+.root p {
+  font-size: var(--font-size-20);
 }

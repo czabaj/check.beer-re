@@ -183,7 +183,7 @@ let make = (
                   {keg.depletedAt !== Null.null
                     ? React.null
                     : <button
-                        className={`${Styles.button.button}`}
+                        className={`${Styles.button.base}`}
                         onClick={_ => onDeleteConsumption(timestampStr)}
                         type_="button">
                         {React.string("🗑️ Smáznout")}
@@ -197,7 +197,7 @@ let make = (
         {keg.depletedAt !== Null.null
           ? React.null
           : <button
-              className={`${Styles.button.button} ${Styles.button.variantDanger}`}
+              className={`${Styles.button.base} ${Styles.button.variantDanger}`}
               onClick={_ => sendDialog(ShowConfirmFinalize)}
               type_="button">
               {React.string("Odepsat ze skladu a rozúčtovat")}

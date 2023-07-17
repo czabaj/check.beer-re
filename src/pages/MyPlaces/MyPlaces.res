@@ -50,7 +50,7 @@ let make = () => {
         <main>
           <SectionWithHeader
             buttonsSlot={<button
-              className={`${Styles.button.button} `}
+              className={`${Styles.button.base} `}
               onClick={_ => setDialogState(_ => AddPlace)}
               type_="button">
               {React.string("Přidat místo")}

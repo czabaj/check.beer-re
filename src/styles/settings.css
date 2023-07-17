@@ -21,6 +21,8 @@ html.themeDark {
 }
 
 html {
+  --form-control-disabled: hsl(300deg 0% 58%);
+  --form-control-focus: hsl(210deg 100% 96%);
   --surface-1: var(--light, hsl(86deg 3% 93%)) var(--dark, hsl(210deg 14% 7%));
   --surface-2: hsl(210deg 17% 98%);
   --surface-3: hsl(210deg 17% 95%);
@@ -53,7 +55,7 @@ html {
 
 /* Theme-independent settings */
 html {
-  --font-cursive: Bradley Hand, Brush Script MT, Comic Sans MS;
+  --font-cursive: "Indie Flower", Bradley Hand, Brush Script MT, Comic Sans MS;
   --font-mono: Dank Mono, Operator Mono, Inconsolata, Fira Mono, ui-monospace,
     SF Mono, Monaco, Droid Sans Mono, Source Code Pro, monospace;
   --font-sans: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell,

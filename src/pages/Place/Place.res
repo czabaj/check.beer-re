@@ -235,7 +235,7 @@ let make = (~placeId) => {
         <main>
           <SectionWithHeader
             buttonsSlot={<button
-              className={Styles.button.button}
+              className={Styles.button.base}
               type_="button"
               onClick={_ => setDialog(_ => AddPerson)}>
               {React.string("Přidat návštěvníka")}
@@ -272,7 +272,7 @@ let make = (~placeId) => {
           {switch activePersonsChanges {
           | None =>
             <button
-              className={Styles.button.button}
+              className={Styles.button.base}
               onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
               type_="button">
               {React.string("Nepřítomní")}
@@ -280,7 +280,7 @@ let make = (~placeId) => {
           | Some(changes) =>
             <>
               <button
-                className={`${Styles.button.button} ${Styles.button.variantPrimary}`}
+                className={`${Styles.button.base} ${Styles.button.variantPrimary}`}
                 onClick={_ => {
                   if changes->Belt.Map.String.size > 0 {
                     let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)

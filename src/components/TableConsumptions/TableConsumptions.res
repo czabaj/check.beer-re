@@ -34,7 +34,7 @@ let make = (
           </td>
           <td>
             <button
-              className={`${Styles.button.button}`}
+              className={`${Styles.button.base}`}
               onClick={_ => onDeleteConsumption(consumption)}
               type_="button">
               {React.string("🗑️ Smáznout")}

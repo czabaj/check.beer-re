@@ -13,6 +13,19 @@
   text-align: right;
 }
 
+.grid input:where([type="email"], [type="text"], [type="password"]) {
+  width: 100%;
+  font-size: inherit;
+}
+
 .gridSpan {
   grid-column: 1 / -1;
+}
+
+.checkboxLabel {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  grid-column: 1 / -1;
+  justify-content: flex-end;
 }

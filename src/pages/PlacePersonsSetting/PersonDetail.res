@@ -104,7 +104,7 @@ let make = (
       <header>
         <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
         <button
-          className={Styles.button.button}
+          className={Styles.button.base}
           onClick={_ => sendDialog(ShowAddTransaction)}
           type_="button">
           {React.string("Přidat účetní záznam")}

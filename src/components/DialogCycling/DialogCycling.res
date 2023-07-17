@@ -18,14 +18,14 @@ let make = (
     <header>
       <h3> {React.string(header)} </h3>
       <button
-        className={`${Styles.button.button}`}
+        className={`${Styles.button.base}`}
         disabled={!hasPrevious}
         onClick={_ => onPrevious()}
         type_="button">
         {React.string("⬅️ Předchozí")}
       </button>
       <button
-        className={`${Styles.button.button}`}
+        className={`${Styles.button.base}`}
         disabled={!hasNext}
         onClick={_ => onNext()}
         type_="button">
@@ -34,7 +34,7 @@ let make = (
     </header>
     <Dialog.DialogBody> {children} </Dialog.DialogBody>
     <footer>
-      <button className={`${Styles.button.button}`} onClick={_ => onDismiss()}>
+      <button className={`${Styles.button.base}`} onClick={_ => onDismiss()}>
         {React.string("Zavřít")}
       </button>
     </footer>

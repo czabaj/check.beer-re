@@ -6,7 +6,7 @@ let make = (~chargedKegsValue, ~personsCount, ~totalBalance) => {
   <SectionWithHeader
     buttonsSlot={<a
       {...RouterUtils.createAnchorProps("./osob")}
-      className={Styles.button.button}
+      className={Styles.button.base}
       type_="button">
       {React.string("Osobní účty")}
     </a>}

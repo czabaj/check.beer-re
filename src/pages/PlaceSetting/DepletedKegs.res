@@ -10,7 +10,8 @@ let make = (
     buttonsSlot={React.null} headerId="depleted_kegs" headerSlot={React.string("Dopité sudy")}>
     {switch maybeDepletedKegs {
     | None => <LoadingInline />
-    | Some([]) => <p> {React.string("Zde budeme archivovat dopité sudy")} </p>
+    | Some([]) =>
+      <p> {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili.")} </p>
     | Some(kegs) =>
       <>
         <table className={classes.table}>
@@ -84,7 +85,7 @@ let make = (
         {switch maybeFetchMoreDepletedKegs {
         | None => React.null
         | Some(fetchMore) =>
-          <button className={Styles.button.button} onClick={_ => fetchMore()} type_="button">
+          <button className={Styles.button.base} onClick={_ => fetchMore()} type_="button">
             {React.string("Načíst další")}
           </button>
         }}

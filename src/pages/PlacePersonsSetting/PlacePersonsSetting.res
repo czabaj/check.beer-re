@@ -86,7 +86,7 @@ let make = (~placeId) => {
           <main>
             <SectionWithHeader
               buttonsSlot={<button
-                className={Styles.button.button}
+                className={Styles.button.base}
                 type_="button"
                 onClick={_ => sendDialog(ShowAddPerson)}>
                 {React.string("Přidat osobu")}

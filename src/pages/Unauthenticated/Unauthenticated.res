@@ -2,19 +2,6 @@ type classesType = {root: string}
 
 @module("./Unauthenticated.module.css") external classes: classesType = "default"
 
-module UnauthenticatedStorage = {
-  open Dom.Storage2
-
-  let keyRememeberedEmail = "Unauthenticated.email"
-  let keyPendingEmail = "Unauthenticated.email_pending"
-
-  let getPendingEmail = () => localStorage->getItem(keyPendingEmail)
-  let setPendingEmail = email => localStorage->setItem(keyPendingEmail, email)
-  let removePendingEmail = () => localStorage->removeItem(keyPendingEmail)
-  let getRememberEmail = () => localStorage->getItem(keyRememeberedEmail)
-  let setRememberEmail = email => localStorage->setItem(keyRememeberedEmail, email)
-}
-
 module UnauthenticatedQueryString = {
   open Webapi
 
@@ -80,7 +67,7 @@ module Pure = {
             {React.string(`Zkontrolujte schránku `)}
             <b> {React.string(email)} </b>
           </p>
-          <button className={Styles.button.button} onClick={_ => onBackToForm()} type_="button">
+          <button className={Styles.button.base} onClick={_ => onBackToForm()} type_="button">
             {React.string(`Zpět na přihlášení`)}
           </button>
         </>
@@ -107,10 +94,11 @@ module Pure = {
                 <Form.Field
                   field=Remember
                   render={field => {
-                    <label className=Styles.fieldset.gridSpan>
-                      {React.string(`Zapamatovat si e${HtmlEntities.nbhp}mail`)}
+                    <label className=Styles.fieldset.checkboxLabel>
+                      {React.string(`Důvěřovat tomuto zařízení`)}
                       <input
                         checked={field.value}
+                        className={Styles.checkbox.base}
                         onChange={event => {
                           let target = event->ReactEvent.Form.target
                           field.handleChange(target["checked"])
@@ -121,7 +109,7 @@ module Pure = {
                   }}
                 />
                 <button
-                  className={`${Styles.button.button} ${Styles.fieldset.gridSpan}`} type_="submit">
+                  className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`} type_="submit">
                   {React.string(`Přihlásit se e${HtmlEntities.nbhp}mailem`)}
                 </button>
               </fieldset>
@@ -131,7 +119,7 @@ module Pure = {
             <h3 id="other_methods">
               <span> {React.string("nebo")} </span>
             </h3>
-            <button className={Styles.button.button} onClick={_ => onGoogleAuth()} type_="button">
+            <button className={Styles.button.base} onClick={_ => onGoogleAuth()} type_="button">
               {React.string("Přihlásit se přes Google")}
             </button>
           </section>
@@ -149,9 +137,9 @@ let useSignInWithEmailRedirect = auth => {
       let href = Webapi.Dom.location->Webapi.Dom.Location.href
       let remember = ref(false)
       if Firebase.Auth.isSignInWithEmailLink(. auth, ~href) {
-        let email = switch UnauthenticatedStorage.getPendingEmail() {
+        let email = switch AppStorage.getPendingEmail() {
         | Some(email) => {
-            UnauthenticatedStorage.removePendingEmail()
+            AppStorage.removePendingEmail()
             remember := UnauthenticatedQueryString.isRememberOn(href)
             email
           }
@@ -159,9 +147,9 @@ let useSignInWithEmailRedirect = auth => {
         }
         Firebase.Auth.signInWithEmailLink(. auth, ~email, ~href)
         ->Promise.then(_ => {
-          UnauthenticatedStorage.removePendingEmail()
+          AppStorage.removePendingEmail()
           if remember.contents {
-            UnauthenticatedStorage.setRememberEmail(email)
+            AppStorage.setRememberEmail(email)
           }
           let hrefWOParams = RouterUtils.truncateQueryString(href)
           Webapi.Dom.location->Webapi.Dom.Location.setHref(hrefWOParams)
@@ -182,7 +170,7 @@ let make = () => {
   useSignInWithEmailRedirect(auth)
 
   <Pure
-    initialEmail={UnauthenticatedStorage.getRememberEmail()->Option.getWithDefault("")}
+    initialEmail={AppStorage.getRememberEmail()->Option.getWithDefault("")}
     onBackToForm={() => setSignInEmailSent(_ => None)}
     onGoogleAuth={() => {
       signInWithPopup(. auth, FederatedAuthProvider.googleAuthProvider())
@@ -202,7 +190,7 @@ let make = () => {
           handleCodeInApp: true,
         },
       )
-      UnauthenticatedStorage.setPendingEmail(email)
+      AppStorage.setPendingEmail(email)
       setSignInEmailSent(_ => Some(email))
     }}
     ?signInEmailSent

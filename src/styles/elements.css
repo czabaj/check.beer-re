@@ -30,6 +30,19 @@ label {
   cursor: pointer;
 }
 
+p,
+li,
+h1,
+h2,
+h3,
+h4 {
+  /* Help prevent overflow of long words/names/URL */
+  overflow-wrap: break-word;
+
+  /* Optional, not supported for all languages */
+  hyphens: auto;
+}
+
 button:disabled,
 label:has(*:disabled) {
   cursor: not-allowed;

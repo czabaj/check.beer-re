@@ -2,7 +2,7 @@ type boxClasses = {base: string, variatnError: string}
 @module("./box.module.css") external box: boxClasses = "default"
 
 type buttonClasses = {
-  button: string,
+  base: string,
   iconOnly: string,
   sizeLarge: string,
   sizeMedium: string,
@@ -13,11 +13,14 @@ type buttonClasses = {
 }
 @module("./button.module.css") external button: buttonClasses = "default"
 
+type checkboxClasses = {base: string}
+@module("./checkbox.module.css") external checkbox: checkboxClasses = "default"
+
 type descriptionListClasses = {inline: string}
 @module("./descriptionList.module.css")
 external descriptionList: descriptionListClasses = "default"
 
-type fieldsetClasses = {grid: string, gridSpan: string}
+type fieldsetClasses = {checkboxLabel: string, grid: string, gridSpan: string}
 @module("./fieldset.module.css") external fieldset: fieldsetClasses = "default"
 
 type linkClasses = {base: string}

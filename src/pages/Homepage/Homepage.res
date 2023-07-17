@@ -12,9 +12,10 @@ let make = () => {
         {React.string(`beer${HtmlEntities.nbsp}`)}
         <span ariaHidden=true> {React.string(`IIX`)} </span>
       </h1>
+      <p> {React.string("Kamarádské pivní účetnictví 🍻")} </p>
       <a
         {...RouterUtils.createAnchorProps(`/misto`)}
-        className={`${Styles.button.button} ${Styles.button.variantPrimary}`}>
+        className={`${Styles.button.base} ${Styles.button.variantPrimary}`}>
         {React.string("Do aplikace")}
       </a>
     </div>

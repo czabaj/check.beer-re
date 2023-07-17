@@ -57,7 +57,7 @@ module Pure = {
               }}
             />
             <button
-              className={`${Styles.button.button} ${Styles.fieldset.gridSpan}`} type_="submit">
+              className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`} type_="submit">
               {React.string(`Dokončit registraci`)}
             </button>
           </fieldset>

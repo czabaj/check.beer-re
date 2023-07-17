@@ -2,15 +2,21 @@
   row-gap: 1rem;
 }
 
+section[aria-labelledby="other_methods"] {
+  display: flex;
+  flex-direction: column;
+}
+
 section[aria-labelledby="other_methods"] h3 {
   font-size: var(--font-size-16);
+  font-weight: var(--font-weight-medium);
   overflow: hidden;
   position: relative;
   text-align: center;
 }
 section[aria-labelledby="other_methods"] h3::before,
 section[aria-labelledby="other_methods"] h3::after {
-  background-color: var(--text-1);
+  background-color: var(--text-3);
   content: "";
   height: 1px;
   inset-block-start: 50%;
