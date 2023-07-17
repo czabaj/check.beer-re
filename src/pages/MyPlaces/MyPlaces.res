@@ -1,4 +1,4 @@
-type dialogState = Hidden | AddPlace
+type dialogState = Hidden | AddPlace | EditUser
 
 let pageDataRx = (auth, firestore) => {
   open Rxjs
@@ -37,12 +37,13 @@ let make = () => {
             <span> {React.string("🚴‍♂️")} </span>
             <span> {React.string("Odhlásit")} </span>
           </button>}
-          buttonRightSlot={<a
-            {...RouterUtils.createAnchorProps("./nastaveni")}
-            className={Header.classes.buttonRight}>
+          buttonRightSlot={<button
+            className={Header.classes.buttonRight}
+            onClick={_ => setDialogState(_ => EditUser)}
+            type_="button">
             <span> {React.string("⚙️")} </span>
             <span> {React.string("Nastavení")} </span>
-          </a>}
+          </button>}
           headingSlot={React.string(userDisplayName)}
           subheadingSlot={React.null}
         />
@@ -84,43 +85,17 @@ let make = () => {
           <PlaceAdd
             initialPersonName={userDisplayName}
             onDismiss={hideDialog}
+            onSubmit={async ({personName, placeName}) => {
+              await Db.Place.add(firestore, ~personName, ~placeName, ~userId=currentUser.uid)
+              hideDialog()
+            }}
+          />
+        | EditUser =>
+          <EditUser
+            initialName={userDisplayName}
+            onDismiss={hideDialog}
             onSubmit={async values => {
-              let placeDoc = Firebase.seedDoc(Db.placeCollection(firestore))
-              let personDoc = Firebase.seedDoc(Db.placePersonsCollection(firestore, placeDoc.id))
-              let defaultTapName = "Pípa"
-              let now = Firebase.Timestamp.now()
-              let personTuple = Db.personsAllRecordToTuple(. {
-                balance: 0,
-                name: values.personName,
-                preferredTap: Some(defaultTapName),
-                recentActivityAt: now,
-              })
-              await Firebase.writeBatch(firestore)
-              ->Firebase.WriteBatch.set(
-                placeDoc,
-                {
-                  createdAt: now,
-                  currency: "CZK",
-                  name: values.placeName,
-                  personsAll: Dict.fromArray([(personDoc.id, personTuple)]),
-                  taps: Dict.fromArray([(defaultTapName, Null.null)]),
-                  users: Dict.fromArray([
-                    (currentUser.uid, FirestoreModels.roleToJs(FirestoreModels.Owner)),
-                  ]),
-                },
-                {},
-              )
-              ->Firebase.WriteBatch.set(
-                personDoc,
-                {
-                  account: Js.Null.return(currentUser.uid),
-                  createdAt: now,
-                  name: values.personName,
-                  transactions: [],
-                },
-                {},
-              )
-              ->Firebase.WriteBatch.commit
+              let _ = await Firebase.Auth.updateProfile(currentUser, {displayName: values.name})
               hideDialog()
             }}
           />

@@ -472,3 +472,42 @@ module Keg = {
     ->Firebase.WriteBatch.commit
   }
 }
+
+module Place = {
+  let add = async (firestore, ~personName, ~placeName, ~userId) => {
+    let placeDoc = Firebase.seedDoc(placeCollection(firestore))
+    let personDoc = Firebase.seedDoc(placePersonsCollection(firestore, placeDoc.id))
+    let defaultTapName = "Pípa"
+    let now = Firebase.Timestamp.now()
+    let personTuple = personsAllRecordToTuple(. {
+      balance: 0,
+      name: personName,
+      preferredTap: Some(defaultTapName),
+      recentActivityAt: now,
+    })
+    await Firebase.writeBatch(firestore)
+    ->Firebase.WriteBatch.set(
+      placeDoc,
+      {
+        createdAt: now,
+        currency: "CZK",
+        name: placeName,
+        personsAll: Dict.fromArray([(personDoc.id, personTuple)]),
+        taps: Dict.fromArray([(defaultTapName, Null.null)]),
+        users: Dict.fromArray([(userId, FirestoreModels.roleToJs(FirestoreModels.Owner))]),
+      },
+      {},
+    )
+    ->Firebase.WriteBatch.set(
+      personDoc,
+      {
+        account: Js.Null.return(userId),
+        createdAt: now,
+        name: personName,
+        transactions: [],
+      },
+      {},
+    )
+    ->Firebase.WriteBatch.commit
+  }
+}
