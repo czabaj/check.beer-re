@@ -510,4 +510,57 @@ module Place = {
     )
     ->Firebase.WriteBatch.commit
   }
+  let tapAdd = (firestore, ~placeId, ~tapName) => {
+    let placeRef = placeDocument(firestore, placeId)
+    let updateObject = Object.empty()
+    updateObject->Object.set(`taps.${tapName}`, Null.null)
+    Firebase.updateDoc(placeRef, updateObject)
+  }
+  let tapDelete = (firestore, ~placeId, ~tapName) => {
+    let placeRef = placeDocument(firestore, placeId)
+    let updateObject = Object.empty()
+    updateObject->Object.set(`taps.${tapName}`, Firebase.deleteField())
+    Firebase.updateDoc(placeRef, updateObject)
+  }
+  let tapRename = async (firestore, ~placeId, ~currentName, ~newName) => {
+    let placeRef = placeDocumentConverted(firestore, placeId)
+    let place = (await Firebase.getDocFromCache(placeRef)).data(. {})
+    let currentValue = place.taps->Js.Dict.unsafeGet(currentName)
+    let updateObject = Object.empty()
+    let newTaps = place.taps->Dict.copy
+    newTaps->Dict.delete(currentName)
+    newTaps->Dict.set(newName, currentValue)
+    updateObject->Object.set("taps", newTaps)
+    place.personsAll
+    ->Dict.toArray
+    ->Array.forEach(((personId, person)) => {
+      switch person.preferredTap {
+      | None => ()
+      | Some(preferredTap) =>
+        if preferredTap === currentName {
+          updateObject->Object.set(
+            `personsAll.${personId}`,
+            personsAllRecordToTuple(. {
+              ...person,
+              preferredTap: Some(newName),
+            }),
+          )
+        }
+      }
+    })
+    await Firebase.updateDoc(placeRef, updateObject)
+  }
+  let tapKegOff = (firestore, ~placeId, ~tapName) => {
+    let placeRef = placeDocument(firestore, placeId)
+    let updateObject = Object.empty()
+    updateObject->Object.set(`taps.${tapName}`, Null.null)
+    Firebase.updateDoc(placeRef, updateObject)
+  }
+  let tapKegOn = (firestore, ~placeId, ~tapName, ~kegId) => {
+    let placeRef = placeDocument(firestore, placeId)
+    let kegRef = kegDoc(firestore, placeId, kegId)
+    let updateObject = Object.empty()
+    updateObject->Object.set(`taps.${tapName}`, kegRef)
+    Firebase.updateDoc(placeRef, updateObject)
+  }
 }

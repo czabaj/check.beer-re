@@ -19,26 +19,6 @@ type dialogState =
   | RenameTap(string)
   | DeleteTap(string)
   | TapKegOn(string)
-  | UntapKeg(string, Db.kegConverted)
-
-type dialogEvent =
-  | Hide
-  | ShowAddTap
-  | ShowDeleteTap(string)
-  | ShowRenameTap(string)
-  | ShowTapKeg(string)
-  | ShowUntapKeg(string, Db.kegConverted)
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddTap => AddTap
-  | ShowDeleteTap(tapName) => DeleteTap(tapName)
-  | ShowRenameTap(tapName) => RenameTap(tapName)
-  | ShowTapKeg(tapName) => TapKegOn(tapName)
-  | ShowUntapKeg(tapName, keg) => UntapKeg(tapName, keg)
-  }
-}
 
 @react.component
 let make = (
@@ -48,8 +28,8 @@ let make = (
   ~untappedChargedKegs,
 ) => {
   let firestore = Reactfire.useFirestore()
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   let hasKegsToTap = untappedChargedKegs->Array.length > 0
   let tappedKegsById = React.useMemo1(
     () => tappedChargedKegs->Array.map(keg => (Db.getUid(keg), keg))->Dict.fromArray,
@@ -63,7 +43,7 @@ let make = (
 
   <SectionWithHeader
     buttonsSlot={<button
-      className={Styles.button.base} onClick={_ => sendDialog(ShowAddTap)} type_="button">
+      className={Styles.button.base} onClick={_ => setDialog(_ => AddTap)} type_="button">
       {React.string("Přidat pípu")}
     </button>}
     headerId="taps_setting"
@@ -94,28 +74,28 @@ let make = (
               <button
                 disabled={!hasKegsToTap}
                 className={`${Styles.button.base} ${Styles.button.variantPrimary}`}
-                onClick={_ => sendDialog(ShowTapKeg(tapName))}
+                onClick={_ => setDialog(_ => TapKegOn(tapName))}
                 type_="button">
                 {React.string("Narazit")}
               </button>
-            | Some(keg) =>
+            | Some(_) =>
               <button
                 className={`${Styles.button.base} ${Styles.button.variantDanger}`}
-                onClick={_ => sendDialog(ShowUntapKeg(tapName, keg))}
+                onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
                 type_="button">
                 {React.string("Odrazit")}
               </button>
             }}
             <button
               className={Styles.button.base}
-              onClick={_ => sendDialog(ShowRenameTap(tapName))}
+              onClick={_ => setDialog(_ => RenameTap(tapName))}
               type_="button">
               {React.string("Přejmenovat")}
             </button>
             <button
               disabled={tappedKeg != None || tapsCount < 2}
               className={Styles.button.base}
-              onClick={_ => sendDialog(ShowDeleteTap(tapName))}
+              onClick={_ => setDialog(_ => DeleteTap(tapName))}
               type_="button">
               {React.string("Smazat")}
             </button>
@@ -131,32 +111,14 @@ let make = (
         existingNames={place.taps->Js.Dict.keys}
         onDismiss={hideDialog}
         onSubmit={async values => {
-          let newName = values.name
-          let newTaps = ObjectUtils.setInD(place.taps, newName, Js.null)
-          await Db.updatePlace(
-            firestore,
-            placeId,
-            {
-              taps: newTaps,
-            },
-          )
+          Db.Place.tapAdd(firestore, ~placeId, ~tapName=values.name)->ignore
           hideDialog()
         }}
       />
     | DeleteTap(tapName) =>
       <ConfirmDeleteTap
         onConfirm={_ => {
-          let updateData = ObjectUtils.setIn(
-            Object.empty(),
-            `taps.${tapName}`,
-            Firebase.deleteField(),
-          )
-          Firebase.updateDoc(Db.placeDocument(firestore, placeId), updateData)
-          ->Promise.then(_ => {
-            hideDialog()
-            Promise.resolve()
-          })
-          ->ignore
+          Db.Place.tapDelete(firestore, ~placeId, ~tapName)->ignore
         }}
         onDismiss=hideDialog
         tapName
@@ -167,33 +129,12 @@ let make = (
         initialName=tapName
         onDismiss={hideDialog}
         onSubmit={async values => {
-          let oldName = tapName
-          let oldValue = place.taps->Js.Dict.unsafeGet(oldName)
-          let newName = values.name
-          let newTaps = place.taps->Dict.copy
-          newTaps->Dict.delete(oldName)
-          newTaps->Dict.set(newName, oldValue)
-          await Db.updatePlace(
+          Db.Place.tapRename(
             firestore,
-            placeId,
-            {
-              personsAll: place.personsAll->Js.Dict.map((. person: Db.personsAllRecord) => {
-                switch person.preferredTap {
-                | Some(preferredTap) =>
-                  if preferredTap == oldName {
-                    {
-                      ...person,
-                      preferredTap: Some(newName),
-                    }
-                  } else {
-                    person
-                  }
-                | None => person
-                }
-              }, _),
-              taps: newTaps,
-            },
-          )
+            ~placeId,
+            ~currentName=tapName,
+            ~newName=values.name,
+          )->ignore
           hideDialog()
         }}
       />
@@ -201,41 +142,11 @@ let make = (
       <TapKegOn
         onDismiss={hideDialog}
         onSubmit={async values => {
-          let kegDoc = Db.kegDoc(firestore, placeId, values.keg)
-          await Db.updatePlace(
-            firestore,
-            placeId,
-            {
-              taps: ObjectUtils.setInD(place.taps, tapName, Null.make(kegDoc)),
-            },
-          )
+          Db.Place.tapKegOn(firestore, ~placeId, ~tapName, ~kegId=values.keg)->ignore
           hideDialog()
         }}
         tapName
         untappedChargedKegs
-      />
-    | UntapKeg(tapName, keg) =>
-      <TapKegOff
-        onSubmit={async values => {
-          switch values.untapOption {
-          | "finish" => Js.Exn.raiseError("not implemented")
-          | "toStocks" => {
-              let newTaps = ObjectUtils.setInD(place.taps, tapName, Null.null)
-              await Db.updatePlace(
-                firestore,
-                placeId,
-                {
-                  taps: newTaps,
-                },
-              )
-              hideDialog()
-            }
-          | _ => Js.Exn.raiseError("unknown option")
-          }
-        }}
-        onDismiss={hideDialog}
-        keg
-        tapName
       />
     }}
   </SectionWithHeader>

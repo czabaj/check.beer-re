@@ -1,8 +1,14 @@
 .table {
   --_cell-inline-padding: 0.5rem;
+  --breakout-hover-overlay: hsl(
+    var(--surface-warning-hs) var(--surface-warning-l) / 0.1
+  );
 
   border-collapse: collapse;
   width: 100%;
+}
+.table tr {
+  position: relative;
 }
 .table :where(th, td) {
   padding-inline: var(--_cell-inline-padding);
@@ -10,20 +16,6 @@
 }
 .table :where(th, td):where(:nth-child(1), :nth-child(2)) {
   text-align: left;
-}
-
-td.detailButtonCell {
-  padding-inline: 0;
-  position: relative;
-  inline-size: 3rem;
-}
-td.detailButtonCell button {
-  inset: 0;
-  padding-inline: var(--_cell-inline-padding);
-  position: absolute;
-}
-tr:last-child > .detailButtonCell button {
-  border-end-end-radius: var(--radius-2);
 }
 
 .emptyTableMessage {

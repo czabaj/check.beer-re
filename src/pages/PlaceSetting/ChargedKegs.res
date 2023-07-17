@@ -1,11 +1,10 @@
-type classesType = {detailButtonCell: string, emptyTableMessage: string, table: string}
+type classesType = {emptyTableMessage: string, table: string}
 @module("./ChargedKegs.module.css") external classes: classesType = "default"
 
 @react.component
 let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) => {
   <SectionWithHeader
-    buttonsSlot={<button
-      className={Styles.button.base} onClick={_ => onAddNewKeg()} type_="button">
+    buttonsSlot={<button className={Styles.button.base} onClick={_ => onAddNewKeg()} type_="button">
       {React.string("Přidat sud")}
     </button>}
     headerId="charged_kegs_setting"
@@ -50,8 +49,8 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
               <td>
                 <MeterKeg ariaLabelledby="remaining_th" keg />
               </td>
-              <td className={classes.detailButtonCell}>
-                <ButtonDetail onClick={_ => onKegDetail(kegId)} title="Karta sudu" />
+              <td>
+                <button className={Styles.utility.breakout} onClick={_ => onKegDetail(kegId)} title="Karta sudu" type_="button" />
               </td>
             </tr>
           })

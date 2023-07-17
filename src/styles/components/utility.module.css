@@ -7,17 +7,18 @@
   position: absolute;
   z-index: 0;
 }
-
 .breakout:hover::before {
   background-color: var(--breakout-hover-overlay);
 }
+.breakout:focus-visible::before {
+  outline: max(2px, 0.15em) solid -webkit-focus-ring-color;
+  outline: max(2px, 0.15em) solid Highlight;
+}
 
 .srOnly:not(:focus, :active) {
-  /* stylelint-disable-next-line unit-allowed-list */
   block-size: 1px;
   clip-path: inset(50%);
   clip: rect(0 0 0 0);
-  /* stylelint-disable-next-line unit-allowed-list */
   inline-size: 1px;
   overflow: hidden;
   position: absolute;
