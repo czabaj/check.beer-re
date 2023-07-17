@@ -32,8 +32,11 @@ type listClasses = {base: string}
 type messageBarClasses = {info: string}
 @module("./messageBar.module.css") external messageBar: messageBarClasses = "default"
 
-type pageClases = {centered: string, narrow: string}
-@module("./page.module.css") external page: pageClases = "default"
+type pageClasses = {centered: string, narrow: string}
+@module("./page.module.css") external page: pageClasses = "default"
+
+type radioClasses = {base: string}
+@module("./radio.module.css") external radio: radioClasses = "default"
 
 type tableClasses = {consumptions: string, stretch: string}
 @module("./table.module.css") external table: tableClasses = "default"

@@ -1,9 +1,9 @@
 .base {
-  --checkbox-color: var(--surface-brand);
+  --radio-color: var(--surface-brand);
 
   appearance: none;
   background-color: #fff;
-  border-radius: 0.15em;
+  border-radius: 50%;
   border: var(--border-size-1) solid currentColor;
   color: currentColor;
   display: inline-grid;
@@ -11,19 +11,17 @@
   height: 1.15em;
   margin: 0;
   place-content: center;
-  transform: translateY(0.075em);
   width: 1.15em;
 }
 .base::before {
   background-color: CanvasText;
-  box-shadow: inset 1em 1em var(--checkbox-color);
-  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
   content: "";
+  width: 0.65em;
   height: 0.65em;
-  transform-origin: bottom left;
+  border-radius: 50%;
   transform: scale(0);
   transition: 120ms transform ease-in-out;
-  width: 0.65em;
+  box-shadow: inset 1em 1em var(--radio-color);
 }
 .base:checked::before {
   transform: scale(1);
@@ -32,10 +30,5 @@
   outline: max(2px, 0.15em) solid -webkit-focus-ring-color;
   outline: max(2px, 0.15em) solid Highlight;
   outline-offset: max(2px, 0.15em);
-}
-.base:disabled {
-  --checkbox-color: var(--form-control-disabled);
 
-  color: var(--form-control-disabled);
-  cursor: not-allowed;
 }

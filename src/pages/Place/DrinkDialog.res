@@ -86,11 +86,12 @@ let make = (
                     ->Array.map(({text, value}) => {
                       <label key=value>
                         <input
-                          type_="radio"
-                          name="tap"
-                          value={value}
                           checked={field.value === value}
+                          className={Styles.radio.base}
+                          name="tap"
                           onChange={handleChange}
+                          type_="radio"
+                          value={value}
                         />
                         <span> {text} </span>
                       </label>
