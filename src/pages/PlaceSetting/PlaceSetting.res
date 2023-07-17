@@ -7,17 +7,6 @@ let pageDataRx = (firestore, placeId) => {
 
 type dialogState = Hidden | AddKeg | BasicInfoEdit | KegDetail(string)
 
-type dialogEvent = Hide | ShowAddKeg | ShowBasicInfoEdit | ShowKegDetail(string)
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddKeg => AddKeg
-  | ShowBasicInfoEdit => BasicInfoEdit
-  | ShowKegDetail(kegId) => KegDetail(kegId)
-  }
-}
-
 @react.component
 let make = (~placeId) => {
   let firestore = Reactfire.useFirestore()
@@ -27,8 +16,8 @@ let make = (~placeId) => {
     ~observableId="PlaceSettingPage",
     ~source=pageDataRx(firestore, placeId),
   )
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
   | Some((place, chargedKegs)) =>
     let kegsOnTapUids =
@@ -46,7 +35,7 @@ let make = (~placeId) => {
         <PlaceHeader
           buttonRightSlot={<button
             className={Header.classes.buttonRight}
-            onClick={_ => sendDialog(ShowBasicInfoEdit)}
+            onClick={_ => setDialog(_ => BasicInfoEdit)}
             type_="button">
             <span> {React.string("✏️")} </span>
             <span> {React.string("Změnit")} </span>
@@ -65,8 +54,8 @@ let make = (~placeId) => {
           <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
           <ChargedKegs
             chargedKegs
-            onAddNewKeg={_ => sendDialog(ShowAddKeg)}
-            onKegDetail={kegId => sendDialog(ShowKegDetail(kegId))}
+            onAddNewKeg={_ => setDialog(_ => AddKeg)}
+            onKegDetail={kegId => setDialog(_ => KegDetail(kegId))}
           />
           <DepletedKegs maybeFetchMoreDepletedKegs maybeDepletedKegs />
         </main>
@@ -127,7 +116,7 @@ let make = (~placeId) => {
             if allowed {
               let nextIdx = currentIdx + (increase ? 1 : -1)
               let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid
-              sendDialog(ShowKegDetail(nextKegId))
+              setDialog(_ => KegDetail(nextKegId))
             }
           }
           let keg = chargedKegs->Belt.Array.getExn(currentIdx)
