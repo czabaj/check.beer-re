@@ -38,7 +38,7 @@ type pageClasses = {centered: string, narrow: string}
 type radioClasses = {base: string}
 @module("./radio.module.css") external radio: radioClasses = "default"
 
-type tableClasses = {consumptions: string, stretch: string}
+type tableClasses = {inDialog: string, stretch: string}
 @module("./table.module.css") external table: tableClasses = "default"
 
 type utilityClasses = {

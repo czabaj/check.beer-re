@@ -53,6 +53,15 @@ let make = (
     hasNext
     hasPrevious
     className=classes.root
+    footerSlot={keg.depletedAt !== Null.null
+      ? React.null
+      : <button
+          className={`${Styles.button.base} ${Styles.button.variantDanger}`}
+          disabled={consumptionsByTimestampDesc->Array.length === 0}
+          onClick={_ => sendDialog(ShowConfirmFinalize)}
+          type_="button">
+          {React.string("Odepsat ze skladu a rozúčtovat")}
+        </button>}
     header={kegName}
     onDismiss
     onNext=onNextKeg
@@ -130,7 +139,8 @@ let make = (
     | None => React.null
     | Some(tapName) =>
       <p className={Styles.messageBar.info}>
-        {React.string(`Sud je naražen na pípu ${tapName}`)}
+        {React.string(`Sud je naražen na pípu `)}
+        <b> {React.string(tapName)} </b>
       </p>
     }}
     {switch consumptionsByTimestampDesc {
@@ -154,7 +164,7 @@ let make = (
       </p>
     | _ =>
       <>
-        <table className={Styles.table.consumptions}>
+        <table className={Styles.table.inDialog}>
           <caption> {React.string("Natočená piva")} </caption>
           <thead>
             <tr>
@@ -194,14 +204,6 @@ let make = (
             ->React.array}
           </tbody>
         </table>
-        {keg.depletedAt !== Null.null
-          ? React.null
-          : <button
-              className={`${Styles.button.base} ${Styles.button.variantDanger}`}
-              onClick={_ => sendDialog(ShowConfirmFinalize)}
-              type_="button">
-              {React.string("Odepsat ze skladu a rozúčtovat")}
-            </button>}
       </>
     }}
     {switch dialogState {

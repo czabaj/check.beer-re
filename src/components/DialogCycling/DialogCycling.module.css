@@ -8,3 +8,8 @@
 .root > :global(.dialogWindow) > header > button:first-of-type {
   order: -1;
 }
+
+.root > :global(.dialogWindow) > footer {
+  display: flex;
+  justify-content: space-between;
+}

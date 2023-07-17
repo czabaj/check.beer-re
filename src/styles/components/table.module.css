@@ -4,31 +4,31 @@
   border-spacing: 0;
 }
 
-.consumptions {
+.inDialog {
   border-collapse: collapse;
   border-spacing: 0;
   margin-inline: calc(-1 * var(--dialog-padding-inline));
   width: calc(100% + 2 * var(--dialog-padding-inline));
 }
-.consumptions caption {
+.inDialog caption {
   text-align: left;
   font-size: var(--font-size-18);
   font-weight: var(--font-weight-medium);
   padding-inline: var(--dialog-padding-inline);
 }
-.consumptions :where(td, th):first-child {
+.inDialog :where(td, th):first-child {
   padding-inline-start: var(--dialog-padding-inline);
 }
-.consumptions :where(td, th):last-child {
+.inDialog :where(td, th):last-child {
   padding-inline-end: var(--dialog-padding-inline);
 }
-.consumptions :where(td, th) {
+.inDialog :where(td, th) {
   text-align: right;
   padding-inline: 0.5rem;
 }
-.consumptions :where(td, th):where(:nth-child(1)) {
+.inDialog :where(td, th):where(:nth-child(1)) {
   text-align: left;
 }
-.consumptions tbody > tr:nth-child(odd) {
+.inDialog tbody > tr:nth-child(odd) {
   background-color: var(--surface-1);
 }

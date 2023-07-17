@@ -6,6 +6,7 @@ type classesType = {root: string}
 let make = (
   ~children,
   ~className=?,
+  ~footerSlot=?,
   ~hasNext,
   ~hasPrevious,
   ~header,
@@ -37,6 +38,7 @@ let make = (
       <button className={`${Styles.button.base}`} onClick={_ => onDismiss()}>
         {React.string("Zavřít")}
       </button>
+      {footerSlot->Option.getWithDefault(React.null)}
     </footer>
   </Dialog>
 }

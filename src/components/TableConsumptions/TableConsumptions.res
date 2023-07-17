@@ -5,7 +5,7 @@ let make = (
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
-  <table ?ariaLabelledby className={Styles.table.consumptions}>
+  <table ?ariaLabelledby className={Styles.table.inDialog}>
     {switch captionSlot {
     | Some(slot) => <caption> {slot} </caption>
     | None => React.null

@@ -2,3 +2,10 @@
   inline-size: 60ch;
   block-size: min(30rem, 80vh);
 }
+
+.root section[aria-labelledby="financial_transactions"] > header {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}

@@ -6,18 +6,10 @@ type dialogState =
   | ConfirmDeletePerson
   | AddTransaction
 
-type dialogEvent =
-  | Hide
-  | ShowConfirmDeletePerson
-  | ShowAddTransaction
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddTransaction => AddTransaction
-  | ShowConfirmDeletePerson => ConfirmDeletePerson
-  }
-}
+let byCreatedDesc = (
+  a: FirestoreModels.financialTransaction,
+  b: FirestoreModels.financialTransaction,
+) => b.createdAt->Firebase.Timestamp.toMillis -. a.createdAt->Firebase.Timestamp.toMillis
 
 @react.component
 let make = (
@@ -40,8 +32,8 @@ let make = (
     placeId,
     personId,
   )
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   <DialogCycling
     className={classes.root}
     hasNext
@@ -86,7 +78,7 @@ let make = (
               {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
               <button
                 className={Styles.link.base}
-                onClick={_ => sendDialog(ShowConfirmDeletePerson)}
+                onClick={_ => setDialog(_ => ConfirmDeletePerson)}
                 type_="button">
                 {React.string("zcela odebrat z aplikace")}
               </button>
@@ -105,7 +97,7 @@ let make = (
         <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
         <button
           className={Styles.button.base}
-          onClick={_ => sendDialog(ShowAddTransaction)}
+          onClick={_ => setDialog(_ => AddTransaction)}
           type_="button">
           {React.string("Přidat účetní záznam")}
         </button>
@@ -115,7 +107,9 @@ let make = (
       | ([], Some({transactions: []})) =>
         <p> {React.string("Tato osoba zatím nemá účetní záznamy.")} </p>
       | (pending, Some({transactions})) =>
-        <table ariaLabelledby="financial_transactions">
+        pending->Array.sort(byCreatedDesc)
+        transactions->Array.sort(byCreatedDesc)
+        <table ariaLabelledby="financial_transactions" className={Styles.table.inDialog}>
           <thead>
             <tr>
               <th scope="col"> {React.string("Datum")} </th>
@@ -138,9 +132,7 @@ let make = (
                   {switch pendingTransaction.keg->Null.toOption {
                   | None => React.null
                   | Some(kegSerial) =>
-                    React.string(
-                      `Nezaúčtované: věřitelství za sud #${kegSerial->Int.toString}`,
-                    )
+                    React.string(`Nezaúčtované: vklad za sud #${kegSerial->Int.toString}`)
                   }}
                 </td>
               </tr>
