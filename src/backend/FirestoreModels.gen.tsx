@@ -2,6 +2,8 @@
 /* eslint-disable import/first */
 
 
+import type {Role as $$role} from './roles';
+
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 
 import type {documentReference as Firebase_documentReference} from './Firebase.gen';
@@ -18,13 +20,6 @@ export type financialTransaction = {
   readonly createdAt: Firebase_Timestamp_t; 
   readonly keg: (null | number); 
   readonly note: (null | string)
-};
-
-// tslint:disable-next-line:interface-over-type-literal
-export type userAccount = {
-  readonly email: string; 
-  readonly name: string; 
-  readonly places: {[id: string]: string}
 };
 
 // tslint:disable-next-line:interface-over-type-literal
@@ -45,7 +40,7 @@ export type keg = {
 
 // tslint:disable-next-line:interface-over-type-literal
 export type person = {
-  readonly account: (null | Firebase_documentReference<userAccount>); 
+  readonly account: (null | string); 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly name: personName; 
   readonly transactions: financialTransaction[]
@@ -55,10 +50,14 @@ export type person = {
 export type personsAllItem = [personName, Firebase_Timestamp_t, number, (undefined | tapName)];
 
 // tslint:disable-next-line:interface-over-type-literal
+export type role = $$role;
+
+// tslint:disable-next-line:interface-over-type-literal
 export type place = {
   readonly createdAt: Firebase_Timestamp_t; 
   readonly currency: string; 
   readonly name: string; 
   readonly personsAll: {[id: string]: personsAllItem}; 
-  readonly taps: {[id: string]: (null | Firebase_documentReference<keg>)}
+  readonly taps: {[id: string]: (null | Firebase_documentReference<keg>)}; 
+  readonly users: {[id: string]: number}
 };

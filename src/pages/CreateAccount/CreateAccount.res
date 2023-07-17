@@ -52,7 +52,7 @@ module Pure = {
                     type_="text"
                     value={field.value}
                   />}
-                  labelSlot={React.string(`Přezdívka`)}
+                  labelSlot={React.string(`Vaše přezdívka`)}
                 />
               }}
             />
@@ -69,14 +69,9 @@ module Pure = {
 
 @react.component
 let make = (~user: Firebase.User.t) => {
-  let firestore = Reactfire.useFirestore()
-  switch user.email {
-  | None => <div> {React.string("Nemáte přístup k této stránce")} </div>
-  | Some(email) =>
-    <Pure
-      onSubmit={async values => {
-        let _ = await Db.createUserAccount(firestore, ~email, ~preferredName=values.name)
-      }}
-    />
-  }
+  <Pure
+    onSubmit={async values => {
+      let _ = await Firebase.Auth.updateProfile(user, {displayName: values.name})
+    }}
+  />
 }

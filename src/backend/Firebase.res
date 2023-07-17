@@ -188,7 +188,6 @@ module User = {
 
 module Auth = {
   type t = {app: FirebaseApp.t, name: string, currentUser: Js.null<User.t>}
-  type update = {displayName?: string, photoURL?: string}
 
   @string
   type operationType = [#link | #reauthenticate | #signIn]
@@ -205,8 +204,9 @@ module Auth = {
   @module("firebase/auth")
   external signOut: t => promise<unit> = "signOut"
 
+  type updateProfileData = {displayName?: string, photoURL?: string}
   @module("firebase/auth")
-  external updateProfile: (User.t, update) => promise<unit> = "updateProfile"
+  external updateProfile: (User.t, updateProfileData) => promise<unit> = "updateProfile"
 
   module EmailAuthProvider = {
     let providerID = "password"

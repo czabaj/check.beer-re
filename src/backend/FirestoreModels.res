@@ -9,13 +9,6 @@ type financialTransaction = {
   note: Js.null<string>,
 }
 
-@genType
-type userAccount = {
-  email: string,
-  name: string,
-  places: Js.Dict.t<string>,
-}
-
 type rec consumption = {
   milliliters: int,
   person: Firebase.documentReference<person>,
@@ -34,13 +27,20 @@ and keg = {
 }
 @genType
 and person = {
-  account: Js.null<Firebase.documentReference<userAccount>>,
+  account: Js.null<string>,
   createdAt: Firebase.Timestamp.t,
   name: personName,
   transactions: array<financialTransaction>,
 }
 
 type personsAllItem = (personName, Firebase.Timestamp.t, int, option<tapName>)
+
+@genType.import("./roles") @genType.as("Role") @deriving(jsConverter)
+type role =
+  | @as(10) Viewer
+  | @as(50) Staff
+  | @as(80) Admin
+  | @as(100) Owner
 
 @genType
 type place = {
@@ -51,4 +51,5 @@ type place = {
   personsAll: Js.Dict.t<personsAllItem>,
   // null means the tap is not in use, undefined would remove the key
   taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
+  users: Js.Dict.t<int>,
 }

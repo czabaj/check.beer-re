@@ -68,3 +68,7 @@ external useObservable: (
   ~observableId: string,
   ~source: Rxjs.t<Rxjs.foreign, Rxjs.void, 'a>,
 ) => observableStatus<'a> = "useObservable"
+
+type signInCheckResult = {user: Null.t<Firebase.User.t>}
+@module("reactfire")
+external useSigninCheck: unit => observableStatus<signInCheckResult> = "useSigninCheck"

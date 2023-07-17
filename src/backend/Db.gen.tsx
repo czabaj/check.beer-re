@@ -44,7 +44,8 @@ export type placeConverted = {
   readonly currency: string; 
   readonly name: string; 
   readonly personsAll: {[id: string]: personsAllRecord}; 
-  readonly taps: {[id: string]: (null | Firebase_documentReference<FirestoreModels_keg>)}
+  readonly taps: {[id: string]: (null | Firebase_documentReference<FirestoreModels_keg>)}; 
+  readonly users: {[id: string]: number}
 };
 
 // tslint:disable-next-line:interface-over-type-literal

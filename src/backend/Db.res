@@ -2,16 +2,8 @@ open FirestoreModels
 
 // Resources
 
-let accountDoc = (firestore, userId): Firebase.documentReference<userAccount> => {
-  Firebase.doc(firestore, ~path=`users/${userId}`)
-}
-
 let kegDoc = (firestore, placeId, kegId): Firebase.documentReference<keg> => {
   Firebase.doc(firestore, ~path=`places/${placeId}/kegs/${kegId}`)
-}
-
-let userAccountsCollection = (firestore): Firebase.collectionReference<userAccount> => {
-  Firebase.collection(firestore, ~path="users")
 }
 
 @genType
@@ -76,18 +68,19 @@ type placeConverted = {
   // the key is the person's UUID
   personsAll: Js.Dict.t<personsAllRecord>, // covert tuple to record
   taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
+  users: Js.Dict.t<int>,
 }
 
 let placeConverter: Firebase.dataConverter<place, placeConverted> = {
   fromFirestore: (. snapshot, options) => {
-    let {createdAt, currency, name, personsAll, taps} = snapshot.data(. options)
+    let {createdAt, currency, name, personsAll, taps, users} = snapshot.data(. options)
     let personsAllWithRecord = personsAll->Js.Dict.map(personsAllTupleToRecord, _)
-    {createdAt, currency, name, personsAll: personsAllWithRecord, taps}
+    {createdAt, currency, name, personsAll: personsAllWithRecord, taps, users}
   },
   toFirestore: (. place, _) => {
-    let {createdAt, currency, name, personsAll, taps} = place
+    let {createdAt, currency, name, personsAll, taps, users} = place
     let parsonsAllTuple = personsAll->Js.Dict.map(personsAllRecordToTuple, _)
-    {createdAt, currency, name, personsAll: parsonsAllTuple, taps}
+    {createdAt, currency, name, personsAll: parsonsAllTuple, taps, users}
   },
 }
 
@@ -166,21 +159,12 @@ let placeKegsCollectionConverted = (firestore, placeId) => {
 
 let getUid: 'a => string = %raw("data => data?.uid")
 
-let userAccountsByEmailRx = (firestore, ~email) => {
+let placesByUserIdRx = (firestore, userId) => {
   let query = Firebase.query(
-    userAccountsCollection(firestore),
-    [Firebase.where("email", #"==", email), Firebase.limit(1)],
+    placeCollection(firestore),
+    [Firebase.where(`users.${userId}`, #">=", 0)],
   )
   Rxfire.collectionData(query)
-}
-
-let currentUserAccountRx = (auth, firestore) => {
-  Rxfire.user(auth)->Rxjs.pipe4(
-    Rxjs.keepMap(Null.toOption),
-    Rxjs.distinctUntilChanged((a: Firebase.User.t, b) => a.email === b.email),
-    Rxjs.switchMap((user: Firebase.User.t) => userAccountsByEmailRx(firestore, ~email=user.email)),
-    Rxjs.keepMap(Array.at(_, 0)),
-  )
 }
 
 let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
@@ -257,13 +241,6 @@ let allChargedKegsRx = (firestore, placeId) => {
 }
 
 // Hooks
-
-let useCurrentUserAccountDocData = () => {
-  Reactfire.useObservable(
-    ~observableId="currentUser",
-    ~source=currentUserAccountRx(Reactfire.useAuth(), Reactfire.useFirestore()),
-  )
-}
 
 let usePlacePersonDocumentStatus = (~options=?, placeId, personId) => {
   let firestore = Reactfire.useFirestore()
@@ -494,15 +471,4 @@ module Keg = {
     ->Firebase.WriteBatch.update(kegRef, kegUpdataObject)
     ->Firebase.WriteBatch.commit
   }
-}
-
-let createUserAccount = (firestore, ~email, ~preferredName) => {
-  Firebase.addDoc(
-    userAccountsCollection(firestore),
-    {
-      email,
-      name: preferredName,
-      places: Js.Dict.empty(),
-    },
-  )
 }
