@@ -60,7 +60,7 @@ let pageDataRx = (firestore, placeId) => {
       kegByDonor
     }),
   )
-  Rxjs.combineLatest3((placeRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx))
+  Rxjs.combineLatest3(placeRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx)
 }
 
 @react.component

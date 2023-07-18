@@ -7,7 +7,7 @@ let pageDataRx = (auth, firestore) => {
     currentUserRx->pipe(
       switchMap((user: Firebase.User.t) => Db.placesByUserIdRx(firestore, user.uid)),
     )
-  combineLatest2((currentUserRx, userPlacesRx))
+  combineLatest2(currentUserRx, userPlacesRx)
 }
 
 @react.component

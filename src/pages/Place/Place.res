@@ -161,10 +161,10 @@ let pageDataRx = (firestore, placeId) => {
     }),
   )
   let recentlyFinishedKegsRx = Db.recentlyFinishedKegsRx(firestore, placeId)
-  let recentConsumptionsByUserRx = combineLatest2((
+  let recentConsumptionsByUserRx = combineLatest2(
     unfinishedConsumptionsByUserRx,
     recentlyFinishedKegsRx,
-  ))->pipe(
+  )->pipe(
     map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
       let recentConsumptionsByUser =
         unfinishedConsumptionsByUser
@@ -191,13 +191,13 @@ let pageDataRx = (firestore, placeId) => {
       personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
     }),
   )
-  combineLatest5((
+  combineLatest5(
     placeRx,
     personsSorted,
     tapsWithKegsRx,
     unfinishedConsumptionsByUserRx,
     recentConsumptionsByUserRx,
-  ))
+  )
 }
 
 @react.component

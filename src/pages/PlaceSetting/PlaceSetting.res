@@ -2,7 +2,7 @@ let pageDataRx = (firestore, placeId) => {
   let placeRef = Db.placeDocumentConverted(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  Rxjs.combineLatest2((placeRx, chargedKegsRx))
+  Rxjs.combineLatest2(placeRx, chargedKegsRx)
 }
 
 type dialogState = Hidden | AddKeg | BasicInfoEdit | KegDetail(string)
