@@ -509,6 +509,7 @@ module Place = {
       {},
     )
     ->Firebase.WriteBatch.commit
+    placeDoc
   }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)

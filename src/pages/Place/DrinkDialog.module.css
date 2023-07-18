@@ -6,6 +6,13 @@
   margin-block-start: 2rem;
 }
 
+.root header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding-inline: var(--dialog-padding-inline);
+}
+
 .root h3 {
   font-size: 150%;
   text-align: center;

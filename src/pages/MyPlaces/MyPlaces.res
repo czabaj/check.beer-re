@@ -86,8 +86,13 @@ let make = () => {
             initialPersonName={userDisplayName}
             onDismiss={hideDialog}
             onSubmit={async ({personName, placeName}) => {
-              await Db.Place.add(firestore, ~personName, ~placeName, ~userId=currentUser.uid)
-              hideDialog()
+              let placeRef = await Db.Place.add(
+                firestore,
+                ~personName,
+                ~placeName,
+                ~userId=currentUser.uid,
+              )
+              RescriptReactRouter.push(RouterUtils.resolveRelativePath(`./${placeRef.id}`))
             }}
           />
         | EditUser =>

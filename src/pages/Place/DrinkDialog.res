@@ -62,8 +62,7 @@ let make = (
       None
     },
     ~schema={
-      open! Validators
-      schema([required(Tap)])
+      Validators.schema([Validators.required(Tap)])
     },
     ~validationStrategy=OnDemand,
     (),
@@ -71,6 +70,9 @@ let make = (
   <Dialog className={classes.root} onClickOutside={onDismiss} visible={true}>
     <header>
       <h3> {React.string(personName)} </h3>
+      <button className={Styles.button.base} onClick={_ => onDismiss()} type_="button">
+        {React.string("Zavřít")}
+      </button>
     </header>
     {tapsOptions->Array.length === 0
       ? <p> {React.string("Naražte sudy!")} </p>

@@ -7,8 +7,10 @@
 
 .root > :global(.dialogWindow) {
   --dialog-padding-inline: 1rem;
+  
   display: flex;
   flex-flow: column;
+  gap: 1rem;
   max-block-size: calc(100vh - 2rem);
   max-inline-size: min(var(--measure), 100vw);
 }
