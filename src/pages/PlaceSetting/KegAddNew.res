@@ -25,7 +25,8 @@ let getSelectedOption: {..} => array<
 
 module FormComponent = {
   @react.component
-  let make = (~onSubmit, ~place: Db.placeConverted, ~placeId) => {
+  let make = (~onSubmit, ~personsAll: array<(string, Db.personsAllRecord)>, ~placeId) => {
+    let personsAllMap = React.useMemo1(() => personsAll->Js.Dict.fromArray, [personsAll])
     let {minorUnit} = FormattedCurrency.useCurrency()
     let mostRecentKegStatus = Db.useMostRecentKegStatus(placeId)
     switch mostRecentKegStatus.data {
@@ -166,8 +167,7 @@ module FormComponent = {
                           field.handleChange(newValue)
                         }}
                         value={value->Js.Dict.keys->TypeUtils.any}>
-                        {place.personsAll
-                        ->Js.Dict.entries
+                        {personsAll
                         ->Array.map(((personId, person)) =>
                           <option key={personId} value={personId}>
                             {React.string(person.name)}
@@ -181,7 +181,7 @@ module FormComponent = {
                       {value
                       ->Js.Dict.entries
                       ->Array.map(((personId, amount)) => {
-                        let person = place.personsAll->Js.Dict.get(personId)->Option.getExn
+                        let person = personsAllMap->Js.Dict.unsafeGet(personId)
                         <li key=personId>
                           {React.string(person.name)}
                           <input
@@ -216,10 +216,10 @@ module FormComponent = {
 }
 
 @react.component
-let make = (~onDismiss, ~onSubmit, ~place, ~placeId) => {
+let make = (~onDismiss, ~onSubmit, ~personsAll, ~placeId) => {
   <DialogForm formId="add_keg" heading="Přidat sud" onDismiss visible=true>
     <React.Suspense fallback={React.string("Načítám")}>
-      <FormComponent onSubmit place placeId />
+      <FormComponent onSubmit personsAll placeId />
     </React.Suspense>
   </DialogForm>
 }

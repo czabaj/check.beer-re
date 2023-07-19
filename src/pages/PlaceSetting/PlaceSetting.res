@@ -1,8 +1,10 @@
 let pageDataRx = (firestore, placeId) => {
-  let placeRef = Db.placeDocumentConverted(firestore, placeId)
+  open Rxjs
+  let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
+  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  Rxjs.combineLatest2(placeRx, chargedKegsRx)
+  combineLatest3(placeRx, personsAllRx, chargedKegsRx)
 }
 
 type dialogState = Hidden | AddKeg | BasicInfoEdit | KegDetail(string)
@@ -19,7 +21,7 @@ let make = (~placeId) => {
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
-  | Some((place, chargedKegs)) =>
+  | Some((place, personsAll, chargedKegs)) =>
     let kegsOnTapUids =
       place.taps
       ->Js.Dict.values
@@ -28,7 +30,6 @@ let make = (~placeId) => {
       )
     let (tappedChargedKegs, untappedChargedKegs) =
       chargedKegs->Belt.Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
-    let personsAllEntries = place.personsAll->Js.Dict.entries
 
     <FormattedCurrency.Provider value={place.currency}>
       <div className={Styles.page.narrow}>
@@ -46,10 +47,8 @@ let make = (~placeId) => {
         <main>
           <PlaceStats
             chargedKegsValue={chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)}
-            personsCount={personsAllEntries->Array.length}
-            totalBalance={personsAllEntries->Array.reduce(0, (sum, (_, person)) =>
-              sum + person.balance
-            )}
+            personsCount={personsAll->Array.length}
+            totalBalance={personsAll->Array.reduce(0, (sum, (_, person)) => sum + person.balance)}
           />
           <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
           <ChargedKegs
@@ -82,7 +81,7 @@ let make = (~placeId) => {
             )
             hideDialog()
           }}
-          place
+          personsAll
           placeId
         />
       | BasicInfoEdit =>
@@ -93,16 +92,11 @@ let make = (~placeId) => {
           }}
           onDismiss={hideDialog}
           onSubmit={async values => {
-            let placeDoc = Db.placeDocumentConverted(firestore, placeId)
-            await Firebase.setDoc(
-              placeDoc,
-              {
-                ...place,
-                createdAt: values.createdAt
-                ->DateUtils.fromIsoDateString
-                ->Firebase.Timestamp.fromDate,
-                name: values.name,
-              },
+            await Db.Place.update(
+              firestore,
+              ~placeId,
+              ~createdAt=values.createdAt->DateUtils.fromIsoDateString->Firebase.Timestamp.fromDate,
+              ~name=values.name,
             )
             hideDialog()
           }}
@@ -125,10 +119,10 @@ let make = (~placeId) => {
             hasPrevious
             keg
             onDeleteConsumption={consumptionId => {
-              Db.deleteConsumption(firestore, placeId, kegId, consumptionId)->ignore
+              Db.Keg.deleteConsumption(firestore, ~placeId, ~kegId, ~consumptionId)->ignore
             }}
             onDeleteKeg={_ => {
-              Db.deleteKeg(firestore, placeId, kegId)->ignore
+              Db.Keg.delete(firestore, ~placeId, ~kegId)->ignore
               hideDialog()
             }}
             onDismiss={hideDialog}
@@ -138,6 +132,7 @@ let make = (~placeId) => {
             }}
             onNextKeg={_ => handleCycle(true)}
             onPreviousKeg={_ => handleCycle(false)}
+            personsAllById={personsAll->Js.Dict.fromArray}
             place
           />
         }

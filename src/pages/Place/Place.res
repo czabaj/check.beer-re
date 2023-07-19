@@ -103,11 +103,11 @@ type userConsumption = {milliliters: int, timestamp: float}
 
 let pageDataRx = (firestore, placeId) => {
   open Rxjs
-  let placeRef = Db.placeDocumentConverted(firestore, placeId)
+  let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
   let tapsWithKegsRx = placeRx->pipe2(
-    distinctUntilChanged((prev: Db.placeConverted, curr) => prev.taps == curr.taps),
-    mergeMap((place: Db.placeConverted) => {
+    distinctUntilChanged((prev: FirestoreModels.place, curr) => prev.taps == curr.taps),
+    mergeMap((place: FirestoreModels.place) => {
       let tapsToKegId =
         place.taps
         ->Js.Dict.entries
@@ -145,10 +145,11 @@ let pageDataRx = (firestore, placeId) => {
       [
         Firebase.where("depletedAt", #"==", Js.null),
         Firebase.where("recentConsumptionAt", #"!=", Js.null),
+        Firebase.limit(30),
       ],
     ),
   )
-  let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->Rxjs.pipe(
+  let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->pipe(
     map((chargedKegsWithConsumption, _) => {
       let consumptionsByUser = Map.make()
       chargedKegsWithConsumption->Array.forEach(keg =>
@@ -182,18 +183,17 @@ let pageDataRx = (firestore, placeId) => {
       recentConsumptionsByUser
     }),
   )
-  let personsSorted = placeRx->pipe(
-    map((place: Db.placeConverted, _) => {
-      let personsAllEntries = place.personsAll->Js.Dict.entries
-      personsAllEntries->Array.sort(((_, a), (_, b)) => {
-        a.name->Js.String2.localeCompare(b.name)
-      })
-      personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
+  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)->pipe(
+    map((personsAllEntries: array<(string, Db.personsAllRecord)>, _) => {
+      let (active, inactive) =
+        personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
+      let all = Map.fromArray(personsAllEntries)
+      (all, active, inactive)
     }),
   )
   combineLatest5(
     placeRx,
-    personsSorted,
+    personsAllRx,
     tapsWithKegsRx,
     unfinishedConsumptionsByUserRx,
     recentConsumptionsByUserRx,
@@ -215,7 +215,7 @@ let make = (~placeId) => {
   switch pageDataStatus.data {
   | Some(
       place,
-      (activePersonEntries, inactivePersonEntries),
+      (allActivePersonsMap, activePersonEntries, inactivePersonEntries),
       tapsWithKegs,
       unfinishedConsumptionsByUser,
       recentConsumptionsByUser,
@@ -284,20 +284,18 @@ let make = (~placeId) => {
                 onClick={_ => {
                   if changes->Belt.Map.String.size > 0 {
                     let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
-                    Db.updatePlacePersonsAll(
-                      firestore,
-                      placeId,
+                    let personsChanges =
                       changes
                       ->Belt.Map.String.mapWithKey((personId, newActive) => {
-                        let person = place.personsAll->Js.Dict.unsafeGet(personId)
+                        let person = allActivePersonsMap->Map.get(personId)->Option.getExn
                         let newPerson = {
                           ...person,
                           preferredTap: newActive ? Some(firstTap) : None,
                         }
                         newPerson
                       })
-                      ->Belt.Map.String.toArray,
-                    )->ignore
+                      ->Belt.Map.String.toArray
+                    Db.PersonsIndex.update(firestore, ~placeId, ~personsChanges)->ignore
                   }
                   setActivePersonsChanges(_ => None)
                 }}
@@ -336,46 +334,26 @@ let make = (~placeId) => {
         | AddConsumption({personId, person}) =>
           <DrinkDialog
             onDeleteConsumption={consumption => {
-              Db.deleteConsumption(
+              Db.Keg.deleteConsumption(
                 firestore,
-                placeId,
-                consumption.kegId,
-                consumption.consumptionId,
+                ~placeId,
+                ~kegId=consumption.kegId,
+                ~consumptionId=consumption.consumptionId,
               )->ignore
             }}
             onDismiss={hideDialog}
             onSubmit={async values => {
-              let kegRef =
-                place.taps->Js.Dict.unsafeGet(values.tap)->Js.Null.toOption->Option.getExn
-              let addConsumptionPromise = Db.addConsumption(
+              let kegRef = place.taps->Js.Dict.unsafeGet(values.tap)->Null.getExn
+              Db.Keg.addConsumption(
                 firestore,
-                placeId,
-                kegRef.id,
-                {
+                ~consumption={
                   milliliters: values.consumption,
                   person: Db.placePersonDocument(firestore, placeId, personId),
                 },
-              )
-              let updatePlacePersonPromise = Db.updatePlacePersonsAll(
-                firestore,
-                placeId,
-                [
-                  (
-                    personId,
-                    {
-                      ...person,
-                      preferredTap: Some(values.tap),
-                      recentActivityAt: Firebase.Timestamp.now(),
-                    },
-                  ),
-                ],
-              )
-              try {
-                let _ = await Js.Promise2.all([addConsumptionPromise, updatePlacePersonPromise])
-                hideDialog()
-              } catch {
-              | e => Js.log2("Error while adding consumption", e)
-              }
+                ~kegId=kegRef.id,
+                ~personId,
+                ~placeId,
+              )->ignore
             }}
             personName={person.name}
             preferredTap={person.preferredTap->Option.getExn}
@@ -397,15 +375,15 @@ let make = (~placeId) => {
                 ->Array.find(((_, {name})) => name === personName)
                 ->Option.getExn
               let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
-              Db.updatePlacePersonsAll(
+              Db.PersonsIndex.update(
                 firestore,
-                placeId,
-                [(personId, {...person, preferredTap: Some(firstTap)})],
+                ~placeId,
+                ~personsChanges=[(personId, {...person, preferredTap: Some(firstTap)})],
               )->ignore
               hideDialog()
             }}
             onSubmit={async values => {
-              await Db.addPerson(firestore, placeId, values.name)
+              await Db.Person.add(firestore, ~placeId, ~personName=values.name)
               hideDialog()
             }}
           />

@@ -7,25 +7,13 @@ type dialogState =
   | AddPerson
   | PersonDetail({personId: string, person: Db.personsAllRecord})
 
-type dialogEvent =
-  | Hide
-  | ShowAddPerson
-  | ShowPersonDetail({personId: string, person: Db.personsAllRecord})
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowAddPerson => AddPerson
-  | ShowPersonDetail({personId, person}) => PersonDetail({personId, person})
-  }
-}
-
 let pageDataRx = (firestore, placeId) => {
-  let placeRef = Db.placeDocumentConverted(firestore, placeId)
+  open Rxjs
+  let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  let unfinishedConsumptionsByUserRx = allChargedKegsRx->Rxjs.pipe(
-    Rxjs.map((chargedKegs, _) => {
+  let unfinishedConsumptionsByUserRx = allChargedKegsRx->pipe(
+    map((chargedKegs, _) => {
       let consumptionsByUser = Map.make()
       chargedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
@@ -36,9 +24,9 @@ let pageDataRx = (firestore, placeId) => {
       consumptionsByUser
     }),
   )
-  let pendingTransactionsByUserRx = allChargedKegsRx->Rxjs.pipe(
-    Rxjs.map((chargedKegs: array<Db.kegConverted>, _) => {
-      let kegByDonor = Belt.MutableMap.String.make()
+  let pendingTransactionsByUserRx = allChargedKegsRx->pipe(
+    map((chargedKegs: array<Db.kegConverted>, _) => {
+      let kegByDonor = Map.make()
       chargedKegs->Array.forEach(keg => {
         keg.donors
         ->Js.Dict.entries
@@ -50,9 +38,9 @@ let pageDataRx = (firestore, placeId) => {
               keg: Null.make(keg.serial),
               note: Null.null,
             }
-            switch kegByDonor->Belt.MutableMap.String.get(personId) {
+            switch kegByDonor->Map.get(personId) {
             | Some(kegs) => kegs->Array.push(transaction)
-            | None => kegByDonor->Belt.MutableMap.String.set(personId, [transaction])
+            | None => kegByDonor->Map.set(personId, [transaction])
             }
           },
         )
@@ -60,7 +48,8 @@ let pageDataRx = (firestore, placeId) => {
       kegByDonor
     }),
   )
-  Rxjs.combineLatest3(placeRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx)
+  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
+  combineLatest4(placeRx, personsAllRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx)
 }
 
 @react.component
@@ -70,134 +59,127 @@ let make = (~placeId) => {
     ~observableId="Page_PlacePersonsSetting",
     ~source=pageDataRx(firestore, placeId),
   )
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
-  | Some((place, unfinishedConsumptionsByUser, pendingTransactionsByUser)) => {
-      let personsEntries = place.personsAll->Js.Dict.entries
-      personsEntries->Array.sort(((_, a), (_, b)) => {
-        a.name->Js.String2.localeCompare(b.name)
-      })
-      <FormattedCurrency.Provider value={place.currency}>
-        <div className=Styles.page.narrow>
-          <PlaceHeader
-            buttonRightSlot={React.null} createdTimestamp={place.createdAt} placeName={place.name}
-          />
-          <main>
-            <SectionWithHeader
-              buttonsSlot={<button
-                className={Styles.button.base}
-                type_="button"
-                onClick={_ => sendDialog(ShowAddPerson)}>
-                {React.string("Přidat osobu")}
-              </button>}
-              headerId="persons_accounts"
-              headerSlot={React.string("Účetnictví")}>
-              <table
-                ariaLabelledby="persons_accounts"
-                className={`${Styles.table.stretch} ${classes.table}`}>
-                <thead>
-                  <tr>
-                    <th scope="col"> {React.string("Návštěvník")} </th>
-                    <th scope="col"> {React.string("Poslední aktivita")} </th>
-                    <th scope="col"> {React.string("Bilance")} </th>
+  | Some((place, personsAll, unfinishedConsumptionsByUser, pendingTransactionsByUser)) =>
+    <FormattedCurrency.Provider value={place.currency}>
+      <div className=Styles.page.narrow>
+        <PlaceHeader
+          buttonRightSlot={React.null} createdTimestamp={place.createdAt} placeName={place.name}
+        />
+        <main>
+          <SectionWithHeader
+            buttonsSlot={<button
+              className={Styles.button.base}
+              type_="button"
+              onClick={_ => setDialog(_ => AddPerson)}>
+              {React.string("Přidat osobu")}
+            </button>}
+            headerId="persons_accounts"
+            headerSlot={React.string("Účetnictví")}>
+            <table
+              ariaLabelledby="persons_accounts"
+              className={`${Styles.table.stretch} ${classes.table}`}>
+              <thead>
+                <tr>
+                  <th scope="col"> {React.string("Návštěvník")} </th>
+                  <th scope="col"> {React.string("Poslední aktivita")} </th>
+                  <th scope="col"> {React.string("Bilance")} </th>
+                </tr>
+              </thead>
+              <tbody>
+                {personsAll
+                ->Array.map(((personId, person)) => {
+                  <tr key=personId>
+                    <th scope="row">
+                      {React.string(person.name)}
+                      <button
+                        className={Styles.utility.breakout}
+                        onClick={_ => setDialog(_ => PersonDetail({personId, person}))}
+                        title="Detail konzumace"
+                        type_="button"
+                      />
+                    </th>
+                    <td>
+                      <FormattedRelativeTime
+                        dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
+                      />
+                    </td>
+                    <td>
+                      <FormattedCurrency
+                        format={FormattedCurrency.formatAccounting} value=person.balance
+                      />
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {personsEntries
-                  ->Array.map(((personId, person)) => {
-                    <tr key=personId>
-                      <th scope="row">
-                        {React.string(person.name)}
-                        <button
-                          className={Styles.utility.breakout}
-                          onClick={_ => sendDialog(ShowPersonDetail({personId, person}))}
-                          title="Detail konzumace"
-                          type_="button"
-                        />
-                      </th>
-                      <td>
-                        <FormattedRelativeTime
-                          dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
-                        />
-                      </td>
-                      <td>
-                        <FormattedCurrency
-                          format={FormattedCurrency.formatAccounting} value=person.balance
-                        />
-                      </td>
-                    </tr>
-                  })
-                  ->React.array}
-                </tbody>
-              </table>
-            </SectionWithHeader>
-          </main>
-          {switch dialogState {
-          | Hidden => React.null
-          | PersonDetail({personId, person}) =>
-            let currentIdx = personsEntries->Array.findIndex(((id, _)) => id === personId)
-            if currentIdx === -1 {
-              // Possibly, the person was deleted on the backend best to close the dialog
-              hideDialog()
-              React.null
-            } else {
-              let hasNext = currentIdx < Array.length(personsEntries) - 1
-              let hasPrevious = currentIdx > 0
-              let handleCycle = increase => {
-                let allowed = increase ? hasNext : hasPrevious
-                if allowed {
-                  let nextIdx = currentIdx + (increase ? 1 : -1)
-                  let (nextPersonId, nextPerson) = personsEntries->Belt.Array.getExn(nextIdx)
-                  sendDialog(
-                    ShowPersonDetail({
-                      person: nextPerson,
-                      personId: nextPersonId,
-                    }),
-                  )
-                }
+                })
+                ->React.array}
+              </tbody>
+            </table>
+          </SectionWithHeader>
+        </main>
+        {switch dialogState {
+        | Hidden => React.null
+        | PersonDetail({personId, person}) =>
+          let currentIdx = personsAll->Array.findIndex(((id, _)) => id === personId)
+          if currentIdx === -1 {
+            // Possibly, the person was deleted on the backend best to close the dialog
+            hideDialog()
+            React.null
+          } else {
+            let hasNext = currentIdx < Array.length(personsAll) - 1
+            let hasPrevious = currentIdx > 0
+            let handleCycle = increase => {
+              let allowed = increase ? hasNext : hasPrevious
+              if allowed {
+                let nextIdx = currentIdx + (increase ? 1 : -1)
+                let (nextPersonId, nextPerson) = personsAll->Belt.Array.getExn(nextIdx)
+                setDialog(_ => PersonDetail({
+                  person: nextPerson,
+                  personId: nextPersonId,
+                }))
               }
-              let unfinishedConsumptions =
-                unfinishedConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
-              <PersonDetail
-                hasNext
-                hasPrevious
-                onDeleteConsumption={consumption => {
-                  Db.deleteConsumption(
-                    firestore,
-                    placeId,
-                    consumption.kegId,
-                    consumption.consumptionId,
-                  )->ignore
-                }}
-                onDeletePerson={_ => {
-                  Db.deletePerson(firestore, placeId, personId)->ignore
-                }}
-                onDismiss={hideDialog}
-                onNextPerson={_ => handleCycle(true)}
-                onPreviousPerson={_ => handleCycle(false)}
-                pendingTransactions={pendingTransactionsByUser
-                ->Belt.MutableMap.String.get(personId)
-                ->Belt.Option.getWithDefault([])}
-                person
-                personId
-                placeId
-                unfinishedConsumptions={unfinishedConsumptions}
-              />
             }
-          | AddPerson =>
-            <PersonAddPersonsSetting
-              existingNames={place.personsAll->Js.Dict.values->Array.map(p => p.name)}
-              onDismiss={hideDialog}
-              onSubmit={async values => {
-                await Db.addPerson(firestore, placeId, values.name)
-                hideDialog()
+            let unfinishedConsumptions =
+              unfinishedConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
+            <PersonDetail
+              hasNext
+              hasPrevious
+              onDeleteConsumption={consumption => {
+                Db.Keg.deleteConsumption(
+                  firestore,
+                  ~placeId,
+                  ~kegId=consumption.kegId,
+                  ~consumptionId=consumption.consumptionId,
+                )->ignore
               }}
+              onDeletePerson={_ => {
+                Db.Person.delete(firestore, ~placeId, ~personId)->ignore
+              }}
+              onDismiss={hideDialog}
+              onNextPerson={_ => handleCycle(true)}
+              onPreviousPerson={_ => handleCycle(false)}
+              pendingTransactions={pendingTransactionsByUser
+              ->Map.get(personId)
+              ->Option.getWithDefault([])}
+              person
+              personId
+              placeId
+              unfinishedConsumptions={unfinishedConsumptions}
             />
-          }}
-        </div>
-      </FormattedCurrency.Provider>
-    }
+          }
+        | AddPerson =>
+          <PersonAddPersonsSetting
+            existingNames={personsAll->Array.map(((_, person)) => person.name)}
+            onDismiss={hideDialog}
+            onSubmit={async values => {
+              await Db.Person.add(firestore, ~placeId, ~personName=values.name)
+              hideDialog()
+            }}
+          />
+        }}
+      </div>
+    </FormattedCurrency.Provider>
   | None => React.null
   }
 }

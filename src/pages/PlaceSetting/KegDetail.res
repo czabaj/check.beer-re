@@ -3,22 +3,13 @@ type classesType = {root: string}
 
 type dialogState = Hidden | ConfirmDelete | ConfirmFinalize
 
-type dialogEvent = Hide | ShowConfirmDelete | ShowConfirmFinalize
-
-let dialogReducer = (_, event) => {
-  switch event {
-  | Hide => Hidden
-  | ShowConfirmDelete => ConfirmDelete
-  | ShowConfirmFinalize => ConfirmFinalize
-  }
-}
-
 @react.component
 let make = (
   ~hasNext,
   ~hasPrevious,
   ~keg: Db.kegConverted,
-  ~place: Db.placeConverted,
+  ~place: FirestoreModels.place,
+  ~personsAllById: Js.Dict.t<Db.personsAllRecord>,
   ~onDeleteConsumption,
   ~onDeleteKeg,
   ~onDismiss,
@@ -47,8 +38,8 @@ let make = (
       ->Option.getWithDefault(false)
     )
     ->Option.map(((tapName, _)) => tapName)
-  let (dialogState, sendDialog) = React.useReducer(dialogReducer, Hidden)
-  let hideDialog = _ => sendDialog(Hide)
+  let (dialogState, setDialog) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialog(_ => Hidden)
   <DialogCycling
     hasNext
     hasPrevious
@@ -58,7 +49,7 @@ let make = (
       : <button
           className={`${Styles.button.base} ${Styles.button.variantDanger}`}
           disabled={consumptionsByTimestampDesc->Array.length === 0}
-          onClick={_ => sendDialog(ShowConfirmFinalize)}
+          onClick={_ => setDialog(_ => ConfirmFinalize)}
           type_="button">
           {React.string("Odepsat ze skladu a rozúčtovat")}
         </button>}
@@ -154,7 +145,7 @@ let make = (
             {React.string(" Pokud jste sud přidali omylem můžete ho ")}
             <button
               className={Styles.link.base}
-              onClick={_ => sendDialog(ShowConfirmDelete)}
+              onClick={_ => setDialog(_ => ConfirmDelete)}
               type_="button">
               {React.string("odebrat z aplikace")}
             </button>
@@ -179,7 +170,7 @@ let make = (
           <tbody>
             {consumptionsByTimestampDesc
             ->Array.map(((timestampStr, consumption)) => {
-              let person = place.personsAll->Js.Dict.unsafeGet(consumption.person.id)
+              let person = personsAllById->Js.Dict.unsafeGet(consumption.person.id)
               let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
               <tr key={timestampStr}>
                 <td> {React.string(person.name)} </td>

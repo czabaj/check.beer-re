@@ -31,8 +31,8 @@
   ],
   "fieldOverrides": [
     {
-      "collectionGroup": "places",
-      "fieldPath": "personsAll",
+      "collectionGroup": "personsIndex",
+      "fieldPath": "all",
       "indexes": []
     }
   ]

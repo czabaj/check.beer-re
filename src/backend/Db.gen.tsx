@@ -22,8 +22,6 @@ import type {documentReference as Firebase_documentReference} from './Firebase.g
 
 import type {firestore as Firebase_firestore} from './Firebase.gen';
 
-import type {keg as FirestoreModels_keg} from './FirestoreModels.gen';
-
 import type {personsAllItem as FirestoreModels_personsAllItem} from './FirestoreModels.gen';
 
 import type {place as FirestoreModels_place} from './FirestoreModels.gen';
@@ -35,18 +33,12 @@ export type personsAllRecord = {
   readonly balance: number; 
   readonly name: string; 
   readonly preferredTap: (undefined | string); 
-  readonly recentActivityAt: Firebase_Timestamp_t
+  readonly recentActivityAt: Firebase_Timestamp_t; 
+  readonly userId: (null | string)
 };
 
 // tslint:disable-next-line:interface-over-type-literal
-export type placeConverted = {
-  readonly createdAt: Firebase_Timestamp_t; 
-  readonly currency: string; 
-  readonly name: string; 
-  readonly personsAll: {[id: string]: personsAllRecord}; 
-  readonly taps: {[id: string]: (null | Firebase_documentReference<FirestoreModels_keg>)}; 
-  readonly users: {[id: string]: number}
-};
+export type personsIndexConverted = { readonly all: {[id: string]: personsAllRecord} };
 
 // tslint:disable-next-line:interface-over-type-literal
 export type kegConverted = {
@@ -72,7 +64,7 @@ export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Fi
 
 export const personsAllRecordToTuple: (_1:personsAllRecord) => FirestoreModels_personsAllItem = DbBS.personsAllRecordToTuple;
 
-export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:placeConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}] = function (Arg1: any, Arg2: any) {
-  const result = Curry._2(DbBS.Keg.finalizeGetUpdateObjects, Arg1, Arg2);
+export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] = function (Arg1: any, Arg2: any, Arg3: any) {
+  const result = Curry._3(DbBS.Keg.finalizeGetUpdateObjects, Arg1, Arg2, Arg3);
   return result
 };

@@ -33,8 +33,6 @@ and person = {
   transactions: array<financialTransaction>,
 }
 
-type personsAllItem = (personName, Firebase.Timestamp.t, int, option<tapName>)
-
 @genType.import("./roles") @genType.as("Role") @deriving(jsConverter)
 type role =
   | @as(10) Viewer
@@ -47,9 +45,17 @@ type place = {
   createdAt: Firebase.Timestamp.t,
   currency: string,
   name: string,
-  // the key is the person's UUID
-  personsAll: Js.Dict.t<personsAllItem>,
   // null means the tap is not in use, undefined would remove the key
   taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
   users: Js.Dict.t<int>,
+}
+
+// use tuple to reducec byte size (hello gRPC) this is converted to records on
+// the client through converter
+type personsAllItem = (personName, Firebase.Timestamp.t, int, Js.null<string>, option<tapName>)
+
+@genType
+type personsIndex = {
+  // the key is the person's UUID
+  all: Js.Dict.t<personsAllItem>,
 }

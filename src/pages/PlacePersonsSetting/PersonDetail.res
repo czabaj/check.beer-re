@@ -177,11 +177,11 @@ let make = (
       <AddFinancialTransactions
         onDismiss={hideDialog}
         onSubmit={async values => {
-          await Db.addFinancialTransaction(
+          await Db.Person.addFinancialTransaction(
             firestore,
-            placeId,
-            personId,
-            {
+            ~placeId,
+            ~personId,
+            ~transaction={
               amount: values.amount,
               createdAt: Firebase.Timestamp.now(),
               keg: Null.null,

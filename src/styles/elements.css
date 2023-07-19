@@ -51,3 +51,8 @@ label:has(*:disabled) {
 select {
   font-size: inherit;
 }
+
+input,
+textarea {
+  font-size: min(16px, 1em);
+}

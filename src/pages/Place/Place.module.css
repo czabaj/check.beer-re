@@ -12,7 +12,6 @@
 }
 
 .listEmpty {
-  font-family: var(--font-cursive);
   padding-block: 0.5rem;
   padding-inline: 0.5rem;
 }

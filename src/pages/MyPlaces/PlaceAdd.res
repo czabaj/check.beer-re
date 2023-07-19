@@ -41,7 +41,7 @@ let make = (~initialPersonName, ~onDismiss, ~onSubmit) => {
 
   <DialogForm formId="add_place" heading="Nové místo" onDismiss visible=true>
     <Form.Provider value={Some(form)}>
-      <form id="add_place" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+      <form autoComplete="off" id="add_place" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className={`reset ${Styles.fieldset.grid}`}>
           <Form.Field
             field=PlaceName

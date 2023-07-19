@@ -47,9 +47,6 @@ export type person = {
 };
 
 // tslint:disable-next-line:interface-over-type-literal
-export type personsAllItem = [personName, Firebase_Timestamp_t, number, (undefined | tapName)];
-
-// tslint:disable-next-line:interface-over-type-literal
 export type role = $$role;
 
 // tslint:disable-next-line:interface-over-type-literal
@@ -57,7 +54,12 @@ export type place = {
   readonly createdAt: Firebase_Timestamp_t; 
   readonly currency: string; 
   readonly name: string; 
-  readonly personsAll: {[id: string]: personsAllItem}; 
   readonly taps: {[id: string]: (null | Firebase_documentReference<keg>)}; 
   readonly users: {[id: string]: number}
 };
+
+// tslint:disable-next-line:interface-over-type-literal
+export type personsAllItem = [personName, Firebase_Timestamp_t, number, (null | string), (undefined | tapName)];
+
+// tslint:disable-next-line:interface-over-type-literal
+export type personsIndex = { readonly all: {[id: string]: personsAllItem} };

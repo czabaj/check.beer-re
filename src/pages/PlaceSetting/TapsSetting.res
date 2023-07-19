@@ -22,7 +22,7 @@ type dialogState =
 
 @react.component
 let make = (
-  ~place: Db.placeConverted,
+  ~place: FirestoreModels.place,
   ~placeId,
   ~tappedChargedKegs: array<Db.kegConverted>,
   ~untappedChargedKegs,

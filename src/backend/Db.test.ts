@@ -5,13 +5,13 @@ import {
   Keg_finalizeGetUpdateObjects,
   kegConverted,
   personsAllRecordToTuple,
-  placeConverted,
 } from "./Db.gen";
 
 describe(`Keg`, () => {
   it(`should compute keg`, () => {
     let now = Timestamp.now();
     let kegId = "testKeg";
+    let tapName = "testTap";
     let keg: kegConverted = {
       beer: "testBeer",
       consumptions: {
@@ -31,35 +31,45 @@ describe(`Keg`, () => {
       serial: 1,
       serialFormatted: "1",
     };
+    (keg as any).uid = kegId;
     let personA = {
       balance: 0,
       name: "person A",
       preferredTap: undefined,
       recentActivityAt: now,
+      userId: null,
     };
     let personB = {
       balance: 100,
       name: "person B",
       preferredTap: undefined,
       recentActivityAt: now,
+      userId: null,
     };
-    let place: placeConverted = {
+    let place = {
       createdAt: now,
       currency: "EUR",
       name: "testPlace",
-      personsAll: {
+      taps: { [tapName]: { id: kegId } as any },
+      users: {},
+    };
+    let personsIndex = {
+      all: {
         A: personA,
         B: personB,
       },
-      taps: { testTap: { id: kegId } as any },
     };
     let [
       actualKegUpdataObject,
       actualPersonsUpdateObjects,
       actualPlaceUpdateObject,
-    ] = Keg_finalizeGetUpdateObjects(keg, place);
+      actualPersonsIndexUpdateObject,
+    ] = Keg_finalizeGetUpdateObjects(keg, place, personsIndex);
     expect(actualKegUpdataObject).toEqual({
       depletedAt: expect.any(Timestamp),
+    });
+    expect(actualPlaceUpdateObject).toEqual({
+      [`taps.${tapName}`]: null,
     });
     let actualPersonsUpdateObjectsObject = Object.fromEntries(
       actualPersonsUpdateObjects.entries()
@@ -75,9 +85,9 @@ describe(`Keg`, () => {
         transactions: arrayUnion(expect.objectContaining({ amount: 500 })),
       },
     });
-    expect(actualPlaceUpdateObject).toEqual({
-      "personsAll.A": personsAllRecordToTuple({ ...personA, balance: -500 }),
-      "personsAll.B": personsAllRecordToTuple({ ...personB, balance: 600 }),
+    expect(actualPersonsIndexUpdateObject).toEqual({
+      "all.A": personsAllRecordToTuple({ ...personA, balance: -500 }),
+      "all.B": personsAllRecordToTuple({ ...personB, balance: 600 }),
     });
   });
 });
