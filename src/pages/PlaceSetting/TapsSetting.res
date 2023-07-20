@@ -86,19 +86,22 @@ let make = (
                 {React.string("Odrazit")}
               </button>
             }}
-            <button
-              className={Styles.button.base}
-              onClick={_ => setDialog(_ => RenameTap(tapName))}
-              type_="button">
-              {React.string("Přejmenovat")}
-            </button>
-            <button
-              disabled={tappedKeg != None || tapsCount < 2}
-              className={Styles.button.base}
-              onClick={_ => setDialog(_ => DeleteTap(tapName))}
-              type_="button">
-              {React.string("Smazat")}
-            </button>
+            <ButtonMenu
+              className={`${Styles.button.base} ${Styles.button.iconOnly}`}
+              title="další akce"
+              menuItems={[
+                {
+                  label: "Přejmenovat",
+                  onClick: _ => setDialog(_ => RenameTap(tapName)),
+                },
+                {
+                  disabled: tappedKeg != None || tapsCount < 2,
+                  label: "Smazat",
+                  onClick: _ => setDialog(_ => DeleteTap(tapName)),
+                },
+              ]}>
+              {React.string("⋯")}
+            </ButtonMenu>
           </li>
         })
         ->React.array

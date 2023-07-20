@@ -3,6 +3,8 @@ import React from "react";
 import { IntlProvider } from "react-intl";
 
 import "../src/styles/index.css";
+import "@oddbird/popover-polyfill";
+import "@oddbird/popover-polyfill/dist/popover.css";
 
 const preview: Preview = {
   decorators: [

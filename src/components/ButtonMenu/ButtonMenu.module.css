@@ -1,0 +1,26 @@
+.popover.popover.popover {
+  background-color: var(--surface-2);
+  border: var(--border-size-1) solid var(--surface-4);
+  top: anchor(bottom);
+  right: anchor(right);
+  padding: 0;
+}
+.popover ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.popover li > :where(a, button) {
+  color: var(--text-1);
+  padding: 0.5rem;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+}
+.popover li > :where(a, button):hover {
+  background-color: var(--surface-highlighted);
+}
+.popover li > :where(a, button):disabled {
+  background-color: var(--surface-3);
+  color: var(--text-3);
+}

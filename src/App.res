@@ -1,4 +1,6 @@
 %%raw(`import './styles/index.css'`)
+%%raw(`import '@oddbird/popover-polyfill'`)
+%%raw(`import '@oddbird/popover-polyfill/dist/popover.css'`)
 
 @react.component
 let make = () => {
