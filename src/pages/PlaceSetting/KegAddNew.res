@@ -11,7 +11,7 @@ module FormFields = %lenses(
 let emptyState: FormFields.state = {
   beer: "",
   donors: Js.Dict.empty(),
-  milliliters: 30,
+  milliliters: 0,
   price: 0,
   serial: 1,
 }
@@ -34,8 +34,8 @@ module FormComponent = {
     | Some(mostResentKegs) => {
         let recentKegState =
           mostResentKegs
-          ->Belt.Array.get(0)
-          ->Belt.Option.mapWithDefault(emptyState, keg => {
+          ->Array.at(0)
+          ->Option.mapWithDefault(emptyState, keg => {
             let {beer, donors, milliliters, price, serial} = keg
             {
               beer,
