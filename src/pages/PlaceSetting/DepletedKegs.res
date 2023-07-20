@@ -9,9 +9,14 @@ let make = (
   <SectionWithHeader
     buttonsSlot={React.null} headerId="depleted_kegs" headerSlot={React.string("Dopité sudy")}>
     {switch maybeDepletedKegs {
-    | None => <LoadingInline />
+    | None =>
+      <p className=classes.emptyTableMessage>
+        <LoadingInline />
+      </p>
     | Some([]) =>
-      <p> {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili.")} </p>
+      <p className=classes.emptyTableMessage>
+        {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili.")}
+      </p>
     | Some(kegs) =>
       <>
         <table className={classes.table}>

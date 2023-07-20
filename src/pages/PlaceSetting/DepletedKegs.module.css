@@ -58,8 +58,5 @@
 }
 
 .emptyTableMessage {
-  font-family: var(--font-cursive);
-  text-align: end;
-  padding-inline-end: 4rem;
-  padding-block: 1rem;
+  padding-inline: 0.5rem;
 }
