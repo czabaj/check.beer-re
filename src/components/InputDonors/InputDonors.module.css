@@ -1,0 +1,12 @@
+.root table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+.root table :where(td, th) {
+  text-align: left;
+}
+.root table :where(td, th):nth-child(2) {
+  text-align: right;
+}

@@ -1,6 +1,13 @@
 type classesType = {errorMessage: string, hasError: string, root: string}
 @module("./InputWrapper.module.css") external classes: classesType = "default"
 
+module ErrorMessage = {
+  @react.component
+  let make = (~id=?, ~message) => {
+    <p className=classes.errorMessage ?id role="alert"> {React.string(message)} </p>
+  }
+}
+
 @react.component
 let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot) => {
   let hasError = inputError != None
@@ -19,8 +26,7 @@ let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot) => 
       )}
       {switch inputError {
       | None => React.null
-      | Some(errorMessage) =>
-        <p className=classes.errorMessage id=errorId role="alert"> {React.string(errorMessage)} </p>
+      | Some(errorMessage) => <ErrorMessage id={errorId} message={errorMessage} />
       }}
     </div>
   </div>

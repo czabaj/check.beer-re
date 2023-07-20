@@ -15,7 +15,7 @@ let make = (
       </p>
     | Some([]) =>
       <p className=classes.emptyTableMessage>
-        {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili.")}
+        {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili 🤷‍♂️")}
       </p>
     | Some(kegs) =>
       <>

@@ -7,6 +7,7 @@
   border: var(--border-size-1) solid currentColor;
   color: currentColor;
   display: inline-grid;
+  flex: 0 0 auto;
   font: inherit;
   height: 1.15em;
   margin: 0;
@@ -30,5 +31,4 @@
   outline: max(2px, 0.15em) solid -webkit-focus-ring-color;
   outline: max(2px, 0.15em) solid Highlight;
   outline-offset: max(2px, 0.15em);
-
 }

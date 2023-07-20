@@ -354,6 +354,7 @@ let make = (~placeId) => {
                 ~personId,
                 ~placeId,
               )->ignore
+              hideDialog()
             }}
             personName={person.name}
             preferredTap={person.preferredTap->Option.getExn}

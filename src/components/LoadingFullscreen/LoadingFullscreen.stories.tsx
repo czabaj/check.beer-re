@@ -3,7 +3,7 @@ import { type Meta, type StoryObj } from "@storybook/react";
 import { make } from "./LoadingFullscreen.gen";
 
 const meta: Meta<typeof make> = {
-  title: "LoadingFullscreen",
+  title: "Components/LoadingFullscreen",
   component: make,
   parameters: {
     layout: "fullscreen",

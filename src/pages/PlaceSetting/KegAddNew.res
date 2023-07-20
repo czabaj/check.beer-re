@@ -26,6 +26,10 @@ let getSelectedOption: {..} => array<
 module FormComponent = {
   @react.component
   let make = (~onSubmit, ~personsAll: array<(string, Db.personsAllRecord)>, ~placeId) => {
+    let personsAllNames = React.useMemo1(
+      () => personsAll->Array.map(((_, {name})) => name),
+      [personsAll],
+    )
     let personsAllMap = React.useMemo1(() => personsAll->Js.Dict.fromArray, [personsAll])
     let {minorUnit} = FormattedCurrency.useCurrency()
     let mostRecentKegStatus = Db.useMostRecentKegStatus(placeId)
@@ -143,71 +147,18 @@ module FormComponent = {
                 }}
               />
             </fieldset>
-            <fieldset className="reset">
-              <legend> {React.string("Vkladatelé sudu")} </legend>
-              <Form.Field
-                field=Donors
-                render={field => {
-                  let value = field.value
-                  <>
-                    <InputWrapper
-                      inputError=?field.error
-                      inputName="donors_select"
-                      inputSlot={<select
-                        multiple=true
-                        onChange={event => {
-                          let target = event->ReactEvent.Form.target
-                          let newValue =
-                            getSelectedOption(target)
-                            ->Array.map(personId => (
-                              personId,
-                              value->Js.Dict.get(personId)->Option.getWithDefault(0),
-                            ))
-                            ->Js.Dict.fromArray
-                          field.handleChange(newValue)
-                        }}
-                        value={value->Js.Dict.keys->TypeUtils.any}>
-                        {personsAll
-                        ->Array.map(((personId, person)) =>
-                          <option key={personId} value={personId}>
-                            {React.string(person.name)}
-                          </option>
-                        )
-                        ->React.array}
-                      </select>}
-                      labelSlot={React.null}
-                    />
-                    <ul className="reset">
-                      {value
-                      ->Js.Dict.entries
-                      ->Array.map(((personId, amount)) => {
-                        let person = personsAllMap->Js.Dict.unsafeGet(personId)
-                        <li key=personId>
-                          {React.string(person.name)}
-                          <input
-                            onChange={event => {
-                              let target = event->ReactEvent.Form.target
-                              let newValue = ObjectUtils.setInD(
-                                value,
-                                personId,
-                                (target["valueAsNumber"] *. minorUnit)->Int.fromFloat,
-                              )
-                              field.handleChange(newValue)
-                            }}
-                            min="0"
-                            step=1.0
-                            max={(form.values.price->Float.fromInt /. minorUnit)->Float.toString}
-                            type_="number"
-                            value={(amount->Float.fromInt /. minorUnit)->Float.toString}
-                          />
-                        </li>
-                      })
-                      ->React.array}
-                    </ul>
-                  </>
-                }}
-              />
-            </fieldset>
+            <Form.Field
+              field=Donors
+              render={field => {
+                <InputDonors
+                  errorMessage=?field.error
+                  legendSlot={React.string("Vkladatelé sudu")}
+                  onChange={field.handleChange}
+                  persons=personsAllNames
+                  value={field.value}
+                />
+              }}
+            />
           </form>
         </Form.Provider>
       }
