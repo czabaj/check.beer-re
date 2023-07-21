@@ -6,6 +6,7 @@
     "@rescript/react": "^0.11.0",
     "@rescriptbr/reform": "^12.1.0",
     "@rescriptbr/reschema": "^3.0.3",
+    "@sentry/react": "^7.59.3",
     "@uidotdev/usehooks": "^2.0.1",
     "dialog-polyfill": "^0.5.6",
     "firebase": "^10.0.0",
