@@ -1,28 +1,21 @@
-# Vite React ReScript Starter
+# check.beer
 
-- [Vite](https://vitejs.dev): Next Generation Frontend Tooling
-- [React](https://reactjs.org): A JavaScript library for building user interfaces
-- [ReScript](https://rescript-lang.org): The JavaScript-like language you have been waiting for. (previously known as BuckleScript and Reason)
-    - [@jihchi/vite-plugin-rescript](https://github.com/jihchi/vite-plugin-rescript): Integrate ReScript with Vite seamlessly
-- [vitest](https://vitest.dev/): A blazing fast unit-test framework, powered by [Vite](https://vitejs.dev) ⚡️
-    - [rescript-vitest](https://github.com/cometkim/rescript-vitest): ReScript bindings to Vitest
-    - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/): Helps you test UI components in a user-centric way.
+A web application for "home pub" operation. It solves the following problems:
 
-## Getting Started
+- what beer is on which tap,
+- how much beer is left in the kegs,
+- how many kegs there are in the storage,
+- who paid for which keg,
+- who drank from which keg,
+- how much beer was really taped from the keg until it was marked as depleted and count the depleted kegs among its consumers,
+- settle accounts between keg owners and consumers (consumers owe for consumptions, but they can also pre-pay).
 
-```sh
-npx degit jihchi/vitejs-template-react-rescript my-vitejs-react-rescript
-cd my-vitejs-react-rescript
-npm i
-npm start
-```
+## History
 
-## Contributors
+This concept originates from an Android application BeerBook, which I developed years ago and never released publicly. It serves well for its users, although it has a few drawbacks, namely no cloud backup of the data and tricky release management, requiring me to backup data and deploy the app over a wire.
 
-Many thanks for your help!
+## Developer philosophy
 
-<a href="https://github.com/jihchi/vitejs-template-react-rescript/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=jihchi/vitejs-template-react-rescript" />
-</a>
+This project is my playground for experiments. It uses no UI library, the styles are hand-crafted using modern CSS (e.g. there is no single media query), dialogs and menus utilizes HTML `<dialog>` and Popover API which is experimental, but will soon be supported in all major browsers and it helped me avoid libraries for this, although I'm loading polyfills.
 
-The image of contributors is made with [contrib.rocks](https://contrib.rocks).
+The app is written in ReScript, which is a flavor of OCaml tailored to web development. The app is capable of running offline and when running online it features real-time data synchronization, this is achieved by using Firebase Firestore backend and SDK. The app uses React with Suspense for data-fetching and data are loaded and prepared through RxJS which enables fine-grained memoization.
