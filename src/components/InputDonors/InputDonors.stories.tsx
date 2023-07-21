@@ -27,7 +27,8 @@ const Wrapper = (args: any) => {
 
 export const Base: StoryObj = {
   args: {
-    value: {},
+    legendSlot: "Vkladatelé sudu",
+    value: { Petr: 10000 },
     persons: ["Petr", "Jana", "Karel"],
   },
   render: Wrapper,

@@ -184,7 +184,7 @@ let make = (
                   {keg.depletedAt !== Null.null
                     ? React.null
                     : <button
-                        className={`${Styles.button.base}`}
+                        className={`${Styles.button.base} ${Styles.button.sizeExtraSmall}`}
                         onClick={_ => onDeleteConsumption(timestampStr)}
                         type_="button">
                         {React.string("🗑️ Smáznout")}

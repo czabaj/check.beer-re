@@ -7,6 +7,7 @@ type buttonClasses = {
   sizeLarge: string,
   sizeMedium: string,
   sizeSmall: string,
+  sizeExtraSmall: string,
   variantDanger: string,
   variantPrimary: string,
   variantStealth: string,

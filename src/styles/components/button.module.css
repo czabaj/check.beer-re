@@ -116,8 +116,9 @@
 
 .sizeExtraSmall {
   --_padding-inline: 0.5rem;
-  --_block-size: 1.25rem;
+  --_block-size: 1rem;
   --_font-weight: var(--font-weight-1);
+  font-size: var(--font-size-14);
 }
 
 .flat {

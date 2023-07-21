@@ -50,7 +50,7 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
             </td>
             <td>
               <button
-                className={`${Styles.button.base} ${Styles.button.iconOnly}`}
+                className={`${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.sizeExtraSmall}`}
                 onClick={_ => {
                   let newValue = value->Dict.copy
                   newValue->Dict.delete(name)
@@ -65,32 +65,37 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
         })
         ->React.array}
       </tbody>
+      <tbody>
+        <tr>
+          <td>
+            <select
+              disabled={availableNames->Array.length === 0}
+              onChange={event => {
+                let person = ReactEvent.Form.target(event)["value"]
+                if person !== "" {
+                  let newValue = value->Dict.copy
+                  newValue->Dict.set(person, 0)
+                  onChange(newValue)
+                }
+              }}
+              value="">
+              <option disabled={true} value=""> {React.string("Přidat vkladatele")} </option>
+              {availableNames
+              ->Array.map(name => <option key={name} value={name}> {React.string(name)} </option>)
+              ->React.array}
+            </select>
+          </td>
+        </tr>
+      </tbody>
       <tfoot>
         <tr>
           <th scope="row"> {React.string("Celkem")} </th>
-          <td>
+          <td colSpan=2>
             <FormattedCurrency value={amountsSum} />
           </td>
-          <td />
         </tr>
       </tfoot>
     </table>
-    <select
-      disabled={availableNames->Array.length === 0}
-      onChange={event => {
-        let person = ReactEvent.Form.target(event)["value"]
-        if person !== "" {
-          let newValue = value->Dict.copy
-          newValue->Dict.set(person, 0)
-          onChange(newValue)
-        }
-      }}
-      value="">
-      <option disabled={true} value=""> {React.string("Přidat vkladatele")} </option>
-      {availableNames
-      ->Array.map(name => <option key={name} value={name}> {React.string(name)} </option>)
-      ->React.array}
-    </select>
     {switch errorMessage {
     | None => React.null
     | Some(errorMessage) => <InputWrapper.ErrorMessage message={errorMessage} />

@@ -4,6 +4,7 @@
   top: anchor(bottom);
   right: anchor(right);
   padding: 0;
+  padding-block: 0.5rem;
 }
 .popover ul {
   list-style: none;

@@ -3,10 +3,17 @@
   border-collapse: collapse;
   border-spacing: 0;
 }
-
 .root table :where(td, th) {
   text-align: left;
 }
-.root table :where(td, th):nth-child(2) {
-  text-align: right;
+.root table input[type="number"] {
+  inline-size: 8ch;
+}
+.root tbody th {
+  font-weight: var(--font-weight-regular);
+}
+
+.root legend {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-18);
 }
