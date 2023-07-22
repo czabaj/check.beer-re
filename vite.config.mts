@@ -13,6 +13,9 @@ export default defineConfig(({ mode }) => ({
     mode !== `test` && createReScriptPlugin(),
     mode === `production` && VitePWA(),
   ].filter(Boolean),
+  server: {
+    host: `0.0.0.0`,
+  },
   test: {
     include: [
       //"tests/**/*_test.bs.js",
