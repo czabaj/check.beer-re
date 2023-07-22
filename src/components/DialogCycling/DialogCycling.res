@@ -6,7 +6,6 @@ type classesType = {root: string}
 let make = (
   ~children,
   ~className=?,
-  ~footerSlot=?,
   ~hasNext,
   ~hasPrevious,
   ~header,
@@ -18,6 +17,15 @@ let make = (
   <Dialog className={`${classes.root} ${className->Option.getWithDefault("")}`} visible>
     <header>
       <h3> {React.string(header)} </h3>
+      <button
+        className={`${Styles.button.base} ${Styles.button.iconOnly}`}
+        onClick={_ => onDismiss()}
+        title="Zavřít dialog">
+        {React.string("✖️")}
+      </button>
+    </header>
+    <Dialog.DialogBody> {children} </Dialog.DialogBody>
+    <footer>
       <button
         className={`${Styles.button.base}`}
         disabled={!hasPrevious}
@@ -32,13 +40,6 @@ let make = (
         type_="button">
         {React.string("Následující ➡️")}
       </button>
-    </header>
-    <Dialog.DialogBody> {children} </Dialog.DialogBody>
-    <footer>
-      <button className={`${Styles.button.base}`} onClick={_ => onDismiss()}>
-        {React.string("Zavřít")}
-      </button>
-      {footerSlot->Option.getWithDefault(React.null)}
     </footer>
   </Dialog>
 }

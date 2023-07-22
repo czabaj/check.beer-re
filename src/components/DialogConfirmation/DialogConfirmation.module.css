@@ -1,4 +1,4 @@
-.deleteConfirmation > :global(.dialogWindow) {
+.deleteConfirmation {
   inline-size: 40ch;
 }
 .deleteConfirmation header ~ p {

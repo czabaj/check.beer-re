@@ -1,4 +1,4 @@
-.root > :global(.dialogWindow) {
+.root {
   --dialog-padding-inline: clamp(1rem, 4vw, 3rem);
   inline-size: 60ch;
 }

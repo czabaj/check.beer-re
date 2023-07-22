@@ -1,4 +1,4 @@
-.root > :global(.dialogWindow) {
+.root {
   inline-size: 60ch;
   block-size: min(30rem, 80vh);
 }

@@ -1,15 +1,13 @@
-.root > :global(.dialogWindow) > header {
+.root > header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-block: 1rem;
   border-bottom: 1px solid var(--surface-1);
 }
-.root > :global(.dialogWindow) > header > button:first-of-type {
-  order: -1;
-}
 
-.root > :global(.dialogWindow) > footer {
+.root > footer {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
 }

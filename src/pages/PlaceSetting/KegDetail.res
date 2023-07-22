@@ -44,15 +44,6 @@ let make = (
     hasNext
     hasPrevious
     className=classes.root
-    footerSlot={keg.depletedAt !== Null.null
-      ? React.null
-      : <button
-          className={`${Styles.button.base} ${Styles.button.variantDanger}`}
-          disabled={consumptionsByTimestampDesc->Array.length === 0}
-          onClick={_ => setDialog(_ => ConfirmFinalize)}
-          type_="button">
-          {React.string("Odepsat ze skladu a rozúčtovat")}
-        </button>}
     header={kegName}
     onDismiss
     onNext=onNextKeg
@@ -195,6 +186,15 @@ let make = (
             ->React.array}
           </tbody>
         </table>
+        {keg.depletedAt !== Null.null
+          ? React.null
+          : <button
+              className={`${Styles.button.base} ${Styles.button.variantDanger}`}
+              disabled={consumptionsByTimestampDesc->Array.length === 0}
+              onClick={_ => setDialog(_ => ConfirmFinalize)}
+              type_="button">
+              {React.string("Odepsat ze skladu a rozúčtovat")}
+            </button>}
       </>
     }}
     {switch dialogState {
