@@ -28,8 +28,12 @@ const Wrapper = (args: any) => {
 export const Base: StoryObj = {
   args: {
     legendSlot: "Vkladatelé sudu",
-    value: { Petr: 10000 },
-    persons: ["Petr", "Jana", "Karel"],
+    value: { PetrId: 10000 },
+    persons: new Map([
+      ["PetrId", "Petr"],
+      ["JanaId", "Jana"],
+      ["KarelId", "Karel"],
+    ]),
   },
   render: Wrapper,
 };
@@ -38,7 +42,11 @@ export const Error: StoryObj = {
   args: {
     errorMessage: "Error message",
     value: {},
-    persons: ["Petr", "Jana", "Karel"],
+    persons: new Map([
+      ["PetrId", "Petr"],
+      ["JanaId", "Jana"],
+      ["KarelId", "Karel"],
+    ]),
   },
   render: Wrapper,
 };

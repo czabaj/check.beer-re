@@ -6,14 +6,22 @@
 .root table :where(td, th) {
   text-align: left;
 }
+.root table :where(td, th):last-child {
+  inline-size: 4ch;
+}
 .root table input[type="number"] {
-  inline-size: 8ch;
+  inline-size: 10ch;
 }
 .root tbody th {
   font-weight: var(--font-weight-regular);
 }
 
+.root tbody select {
+  width: 100%;
+}
+
 .root legend {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-regular);
   font-size: var(--font-size-18);
+  margin-block-end: 0.5rem;
 }

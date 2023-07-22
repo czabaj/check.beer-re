@@ -2,15 +2,17 @@ type classesType = {root: string}
 @module("./InputDonors.module.css") external classes: classesType = "default"
 
 @gentype @react.component
-let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
+let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~value, ~onChange) => {
   let {minorUnit} = FormattedCurrency.useCurrency()
-  let (valueEntries, availableNames, amountsSum) = React.useMemo1(() => {
+  let (valueEntries, unusedPersons, amountsSum) = React.useMemo1(() => {
     let entries = value->Dict.toArray
-    let names = entries->Array.map(((name, _)) => name)
-    let usedNames = Set.fromArray(names)
-    let unusedNames = persons->Array.filter(name => !(usedNames->Set.has(name)))
+    let unused =
+      persons
+      ->Map.entries
+      ->Iterator.toArray
+      ->Array.filter(((personId, _)) => value->Dict.get(personId) === None)
     let sum = entries->Array.reduce(0, (acc, (_, amount)) => acc + amount)
-    (entries, unusedNames, sum)
+    (entries, unused, sum)
   }, [value])
   <fieldset className={`reset ${classes.root}`}>
     {switch legendSlot {
@@ -29,9 +31,9 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
       </thead>
       <tbody>
         {valueEntries
-        ->Array.map(((name, amount)) => {
-          <tr key={name}>
-            <th scope="row"> {React.string(name)} </th>
+        ->Array.map(((personId, amount)) => {
+          <tr key={personId}>
+            <th scope="row"> {React.string(persons->Map.get(personId)->Option.getExn)} </th>
             <td>
               <input
                 min="0"
@@ -40,7 +42,7 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
                   let newAmount = target["valueAsNumber"]
                   let newAmountInt = (newAmount *. minorUnit)->Int.fromFloat
                   let newValue = value->Dict.copy
-                  newValue->Dict.set(name, newAmountInt)
+                  newValue->Dict.set(personId, newAmountInt)
                   onChange(newValue)
                 }}
                 step=1.
@@ -53,10 +55,10 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
                 className={`${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.sizeExtraSmall}`}
                 onClick={_ => {
                   let newValue = value->Dict.copy
-                  newValue->Dict.delete(name)
+                  newValue->Dict.delete(personId)
                   onChange(newValue)
                 }}
-                title="Odebrat donátora"
+                title="Odebrat vkladatele"
                 type_="button">
                 {React.string("❌")}
               </button>
@@ -67,9 +69,9 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
       </tbody>
       <tbody>
         <tr>
-          <td>
+          <td colSpan=2>
             <select
-              disabled={availableNames->Array.length === 0}
+              disabled={unusedPersons->Array.length === 0}
               onChange={event => {
                 let person = ReactEvent.Form.target(event)["value"]
                 if person !== "" {
@@ -80,8 +82,10 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons, ~value, ~onChange) => {
               }}
               value="">
               <option disabled={true} value=""> {React.string("Přidat vkladatele")} </option>
-              {availableNames
-              ->Array.map(name => <option key={name} value={name}> {React.string(name)} </option>)
+              {unusedPersons
+              ->Array.map(((personId, name)) =>
+                <option key={personId} value={personId}> {React.string(name)} </option>
+              )
               ->React.array}
             </select>
           </td>

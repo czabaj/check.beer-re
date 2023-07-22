@@ -1,8 +1,12 @@
+type classesType = {form: string}
+@module("./KegAddNew.module.css") external classes: classesType = "default"
+
 module FormFields = %lenses(
   type state = {
     beer: string,
     donors: Js.Dict.t<int>,
     milliliters: int,
+    ownerIsDonor: bool,
     price: int,
     serial: int,
   }
@@ -12,6 +16,7 @@ let emptyState: FormFields.state = {
   beer: "",
   donors: Js.Dict.empty(),
   milliliters: 0,
+  ownerIsDonor: true,
   price: 0,
   serial: 1,
 }
@@ -26,12 +31,11 @@ let getSelectedOption: {..} => array<
 module FormComponent = {
   @react.component
   let make = (~onSubmit, ~personsAll: array<(string, Db.personsAllRecord)>, ~placeId) => {
-    let personsAllNames = React.useMemo1(
-      () => personsAll->Array.map(((_, {name})) => name),
+    let personsAllMap = React.useMemo1(
+      () => personsAll->Array.map(((personId, {name})) => (personId, name))->Map.fromArray,
       [personsAll],
     )
-    let personsAllMap = React.useMemo1(() => personsAll->Js.Dict.fromArray, [personsAll])
-    let {minorUnit} = FormattedCurrency.useCurrency()
+    let {currency, minorUnit} = FormattedCurrency.useCurrency()
     let mostRecentKegStatus = Db.useMostRecentKegStatus(placeId)
     switch mostRecentKegStatus.data {
     | None => React.null
@@ -45,6 +49,7 @@ module FormComponent = {
               beer,
               donors,
               milliliters,
+              ownerIsDonor: true,
               price,
               serial: serial + 1,
             }
@@ -74,12 +79,16 @@ module FormComponent = {
               Validators.int(~min=1, ~minError="Sud nemůže být nulový", Milliliters),
               Validators.int(~min=0, ~minError="Cena nemůže být záporná", Price),
               Validators.custom(lensState => {
-                let donorsSum = lensState.donors->Js.Dict.values->Array.reduce(0, (a, b) => a + b)
-                let kegPrice = lensState.price
-                if kegPrice > 0 && kegPrice != donorsSum {
-                  Error("Cena sudu se neshoduje s příspěvky vkladatelů")
-                } else {
+                if lensState.ownerIsDonor {
                   Valid
+                } else {
+                  let donorsSum = lensState.donors->Js.Dict.values->Array.reduce(0, (a, b) => a + b)
+                  let kegPrice = lensState.price
+                  if kegPrice > 0 && kegPrice != donorsSum {
+                    Error("Cena sudu se neshoduje s příspěvky vkladatelů")
+                  } else {
+                    Valid
+                  }
                 }
               }, Donors),
             ])
@@ -89,7 +98,10 @@ module FormComponent = {
         )
 
         <Form.Provider value=Some(form)>
-          <form id="add_keg" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+          <form
+            className={classes.form}
+            id="add_keg"
+            onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
             <fieldset className={`reset ${Styles.fieldset.grid}`}>
               <Form.Field
                 field=Beer
@@ -109,9 +121,10 @@ module FormComponent = {
               <Form.Field
                 field=Milliliters
                 render={field => {
+                  let liters = field.value->Float.fromInt /. 1000.0
                   <InputWrapper
                     inputError=?field.error
-                    inputName="liters"
+                    inputName="milliliters"
                     inputSlot={<input
                       max="200"
                       min="1"
@@ -119,9 +132,15 @@ module FormComponent = {
                         field.handleChange(ReactEvent.Form.target(event)["valueAsNumber"] * 1000)}
                       step=1.0
                       type_="number"
-                      value={(field.value->Float.fromInt /. 1000.0)->Float.toString}
+                      value={liters->Float.toString}
                     />}
                     labelSlot={React.string("Objem sudu")}
+                    unitSlot={<ReactIntl.FormattedPlural
+                      one={React.string("Litr")}
+                      few={React.string("Litry")}
+                      other={React.string("Litrů")}
+                      value={liters->Float.toInt}
+                    />}
                   />
                 }}
               />
@@ -143,20 +162,48 @@ module FormComponent = {
                       value={(field.value->Float.fromInt /. minorUnit)->Float.toString}
                     />}
                     labelSlot={React.string("Cena sudu")}
+                    unitSlot={<ReactIntl.FormattedNumberParts currency style=#currency value={0.}>
+                      {(~formattedNumberParts) =>
+                        formattedNumberParts
+                        ->Array.find(p => p.type_ === `currency`)
+                        ->Option.map(p => React.string(p.value))
+                        ->Option.getWithDefault(React.null)}
+                    </ReactIntl.FormattedNumberParts>}
                   />
                 }}
               />
             </fieldset>
             <Form.Field
-              field=Donors
+              field=OwnerIsDonor
               render={field => {
-                <InputDonors
-                  errorMessage=?field.error
-                  legendSlot={React.string("Vkladatelé sudu")}
-                  onChange={field.handleChange}
-                  persons=personsAllNames
-                  value={field.value}
-                />
+                let ownerIsDonor = field.value
+                <>
+                  <InputWrapper
+                    inputName="owner_is_donor"
+                    inputSlot={<InputToggle
+                      checked={ownerIsDonor}
+                      onChange={event => {
+                        let target = event->ReactEvent.Form.target
+                        field.handleChange(target["checked"])
+                      }}
+                    />}
+                    labelSlot={React.string("Vkládá vlastník místa")}
+                  />
+                  {ownerIsDonor
+                    ? React.null
+                    : <Form.Field
+                        field=Donors
+                        render={field => {
+                          <InputDonors
+                            errorMessage=?field.error
+                            legendSlot={React.string("Vkladatelé sudu")}
+                            onChange={field.handleChange}
+                            persons=personsAllMap
+                            value={field.value}
+                          />
+                        }}
+                      />}
+                </>
               }}
             />
           </form>

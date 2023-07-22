@@ -145,4 +145,12 @@ html {
     hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
   --inner-shadow-4: inset 0 2px 14px 0
     hsl(var(--shadow-color) / calc(var(--shadow-strength) + 9%));
+
+  --transition-fast: 200ms;
+}
+
+@media (prefers-reduced-motion: reduced) {
+  html {
+    --transition-fast: 0ms;
+  }
 }

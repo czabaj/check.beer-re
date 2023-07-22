@@ -1,4 +1,4 @@
-type classesType = {errorMessage: string, hasError: string, root: string}
+type classesType = {description: string, errorMessage: string, hasError: string, root: string}
 @module("./InputWrapper.module.css") external classes: classesType = "default"
 
 module ErrorMessage = {
@@ -9,21 +9,28 @@ module ErrorMessage = {
 }
 
 @react.component
-let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot) => {
+let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot, ~unitSlot=?) => {
+  let unitId = unitSlot !== None ? `${inputName}_unit` : ""
   let hasError = inputError != None
-  let errorId = `${inputName}-error`
+  let errorId = hasError ? `${inputName}_error` : ""
   <div className={`inputWrapper ${className->Option.getWithDefault("")}`}>
     <label htmlFor=inputName> {labelSlot} </label>
     <div>
-      {React.cloneElement(
-        inputSlot,
-        {
-          "aria-invalid": hasError ? "true" : "",
-          "aria-describedby": hasError ? errorId : "",
-          "id": inputName,
-          "name": className,
-        },
-      )}
+      <div>
+        {React.cloneElement(
+          inputSlot,
+          {
+            "aria-describedby": `${errorId} ${unitId}`,
+            "aria-invalid": hasError ? "true" : "false",
+            "id": inputName,
+            "name": className,
+          },
+        )}
+        {switch unitSlot {
+        | None => React.null
+        | Some(description) => <p className={classes.description} id={unitId}> {description} </p>
+        }}
+      </div>
       {switch inputError {
       | None => React.null
       | Some(errorMessage) => <ErrorMessage id={errorId} message={errorMessage} />

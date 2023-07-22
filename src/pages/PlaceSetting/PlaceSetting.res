@@ -64,14 +64,36 @@ let make = (~placeId) => {
       | AddKeg =>
         <KegAddNew
           onDismiss={hideDialog}
-          onSubmit={async ({beer, donors, milliliters, price, serial}) => {
+          onSubmit={async ({beer, donors, milliliters, ownerIsDonor, price, serial}) => {
+            let resolvedDonors = if !ownerIsDonor {
+              donors
+            } else {
+              let userRole = FirestoreModels.roleToJs(FirestoreModels.Owner)
+              let placeOwnerUid =
+                place.users
+                ->Dict.toArray
+                ->Array.find(((_, role)) => role === userRole)
+                ->Option.getExn
+                ->fst
+              let placeOwnerPersonId =
+                personsAll
+                ->Array.find(((_, person)) =>
+                  switch person.userId->Null.toOption {
+                  | Some(userId) => userId === placeOwnerUid
+                  | _ => false
+                  }
+                )
+                ->Option.getExn
+                ->fst
+              Js.Dict.fromArray([(placeOwnerPersonId, price)])
+            }
             let _ = await Firebase.addDoc(
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
                 consumptions: Js.Dict.empty(),
                 createdAt: Firebase.Timestamp.now(),
-                donors,
+                donors: resolvedDonors,
                 depletedAt: Null.null,
                 milliliters,
                 price,

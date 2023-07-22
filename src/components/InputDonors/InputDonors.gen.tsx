@@ -10,6 +10,8 @@ import type {element as Jsx_element} from './Jsx.gen';
 
 import type {t as Dict_t} from './Dict.gen';
 
+import type {t as Map_t} from './Map.gen';
+
 // tslint:disable-next-line:interface-over-type-literal
 export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly errorMessage?: errorMessage; 
@@ -19,4 +21,4 @@ export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly onChange: onChange
 };
 
-export const make: (_1:props<string,JSX.Element,string[],Dict_t<number>,((_1:Dict_t<number>) => void)>) => Jsx_element = InputDonorsBS.make;
+export const make: (_1:props<string,JSX.Element,Map_t<string,string>,Dict_t<number>,((_1:Dict_t<number>) => void)>) => Jsx_element = InputDonorsBS.make;

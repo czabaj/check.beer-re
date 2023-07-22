@@ -1,0 +1,9 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form > fieldset:first-child input[type="number"] {
+  width: 10ch;
+}

@@ -3,16 +3,20 @@
   gap: 1rem;
 }
 
-:global(.inputWrapper) :where(input, select) {
-  border: var(--border-size-1) solid var(--surface-1);
+:global(.inputWrapper) :where(p) {
+  margin: 0;
 }
 
 :global(.inputWrapper) :where(input, select)[aria-invalid="true"] {
   border-color: var(--surface-danger);
 }
 
+:global(.inputWrapper) > div > div:first-child {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .errorMessage {
   font-size: 75%;
-  margin: 0;
   color: var(--text-danger);
 }
