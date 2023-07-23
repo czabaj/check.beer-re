@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     createReactPlugin(),
     mode !== `test` && createReScriptPlugin(),
-    mode === `production` && VitePWA(),
+    VitePWA({ registerType: `autoUpdate` }),
   ].filter(Boolean),
   server: {
     host: `0.0.0.0`,
