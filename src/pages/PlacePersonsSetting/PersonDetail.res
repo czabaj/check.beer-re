@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {root: string, unclosed: string}
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
 type dialogState =
@@ -35,6 +35,7 @@ let make = (
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
+  let personsAllDict = React.useMemo1(() => personsAll->Dict.fromArray, [personsAll])
   <DialogCycling
     className={classes.root}
     hasNext
@@ -127,7 +128,7 @@ let make = (
             {pending
             ->Array.map(pendingTransaction => {
               let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
-              <tr key={createdDate->Js.Date.getTime->Float.toString}>
+              <tr className={classes.unclosed} key={createdDate->Js.Date.getTime->Float.toString}>
                 <td>
                   <FormattedDateTime value={createdDate} />
                 </td>
@@ -138,7 +139,7 @@ let make = (
                   {switch pendingTransaction.keg->Null.toOption {
                   | None => React.null
                   | Some(kegSerial) =>
-                    React.string(`Nezaúčtované: vklad za sud #${kegSerial->Int.toString}`)
+                    React.string(`Nezaúčtované: vklad za sud ${kegSerial->Db.formatKegSerial}`)
                   }}
                 </td>
               </tr>
@@ -156,17 +157,24 @@ let make = (
                 </td>
                 <td>
                   {switch (
-                    finalTransaction.note->Null.toOption,
                     finalTransaction.keg->Null.toOption,
+                    finalTransaction.note->Null.toOption,
+                    finalTransaction.person->Null.toOption,
                     finalTransaction.amount > 0,
                   ) {
-                  | (Some(note), _, _) => React.string(note)
-                  | (_, Some(kegSerial), false) =>
-                    React.string(`Konzumace ze sudu #${kegSerial->Int.toString}`)
-                  | (_, Some(kegSerial), true) =>
-                    React.string(`Věřitelství za sud #${kegSerial->Int.toString}`)
-                  | (_, None, false) => React.string("Mimořádná srážka")
-                  | (_, None, true) => React.string("Nabití kreditu")
+                  | (_, Some(note), _, _) => React.string(note)
+                  | (Some(kegSerial), _, _, false) =>
+                    React.string(`Konzumace ze sudu ${kegSerial->Db.formatKegSerial}`)
+                  | (Some(kegSerial), _, _, true) =>
+                    React.string(`Vklad sudu ${kegSerial->Db.formatKegSerial}`)
+                  | (_, _, Some(counterparty), false) =>
+                    React.string(
+                      `Převod od ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                    )
+                  | (_, _, Some(counterparty), true) =>
+                    React.string(
+                      `Převod pro ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                    )
                   | _ => React.null
                   }}
                 </td>

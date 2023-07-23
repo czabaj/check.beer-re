@@ -102,6 +102,8 @@ type kegConverted = {
   serialFormatted: string, // added by converter
 }
 
+let formatKegSerial = (serial: int) => "#" ++ serial->Int.toString->String.padStart(3, "0")
+
 let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
   fromFirestore: (. snapshot, options) => {
     let keg = snapshot.data(. options)
@@ -109,7 +111,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       keg.consumptions
       ->Js.Dict.values
       ->Array.reduce(0, (sum, consumption) => sum + consumption.milliliters)
-    let serialFormatted = "#" ++ keg.serial->Int.toString->String.padStart(3, "0")
+    let serialFormatted = formatKegSerial(keg.serial)
     {
       beer: keg.beer,
       consumptions: keg.consumptions,

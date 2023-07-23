@@ -14,6 +14,7 @@
   min-inline-size: 10ch;
   user-select: none;
   padding-inline: var(--_padding-inline, 1rem);
+  white-space: nowrap;
 
   &:focus-visible {
     outline-style: solid;

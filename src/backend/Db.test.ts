@@ -11,6 +11,7 @@ describe(`Keg`, () => {
   it(`should compute keg`, () => {
     let now = Timestamp.now();
     let kegId = "testKeg";
+    let kegSerial = 1;
     let tapName = "testTap";
     let keg: kegConverted = {
       beer: "testBeer",
@@ -28,7 +29,7 @@ describe(`Keg`, () => {
       milliliters: 1000,
       price: 1000,
       recentConsumptionAt: null,
-      serial: 1,
+      serial: kegSerial,
       serialFormatted: "1",
     };
     (keg as any).uid = kegId;
@@ -77,8 +78,8 @@ describe(`Keg`, () => {
     expect(actualPersonsUpdateObjectsObject).toEqual({
       A: {
         transactions: arrayUnion(
-          expect.objectContaining({ amount: -1000 }),
-          expect.objectContaining({ amount: 500 })
+          expect.objectContaining({ amount: -1000, keg: kegSerial }),
+          expect.objectContaining({ amount: 500, keg: kegSerial })
         ),
       },
       B: {
