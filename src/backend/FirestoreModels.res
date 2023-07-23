@@ -37,6 +37,7 @@ and person = {
 @genType.import("./roles") @genType.as("Role") @deriving(jsConverter)
 type role =
   | @as(10) Viewer
+  | @as(20) SelfService
   | @as(50) Staff
   | @as(80) Admin
   | @as(100) Owner

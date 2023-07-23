@@ -85,6 +85,7 @@ let make = (~placeId) => {
               <thead>
                 <tr>
                   <th scope="col"> {React.string("Návštěvník")} </th>
+                  <th scope="col"> {React.string("Role")} </th>
                   <th scope="col"> {React.string("Poslední aktivita")} </th>
                   <th scope="col"> {React.string("Bilance")} </th>
                 </tr>
@@ -102,6 +103,26 @@ let make = (~placeId) => {
                         type_="button"
                       />
                     </th>
+                    <td>
+                      {
+                        open FirestoreModels
+                        let personRole =
+                          person.userId
+                          ->Null.toOption
+                          ->Option.flatMap(userId => place.users->Dict.get(userId))
+                          ->Option.flatMap(roleFromJs)
+                        {
+                          switch personRole {
+                          | Some(Owner) => React.string("Vlastník")
+                          | Some(Admin) => React.string("Správce")
+                          | Some(Staff) => React.string("Výčepní")
+                          | Some(SelfService) => React.string("Samoobsluha")
+                          | Some(Viewer) => React.string("Nahlížeč")
+                          | None => React.null
+                          }
+                        }
+                      }
+                    </td>
                     <td>
                       <FormattedRelativeTime
                         dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
