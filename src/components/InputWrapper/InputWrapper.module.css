@@ -7,7 +7,12 @@
   margin: 0;
 }
 
-:global(.inputWrapper) :where(input, select)[aria-invalid="true"] {
+:global(.inputWrapper) :where(input, select) {
+  width: 100%;
+}
+
+:global(.inputWrapper)
+  :where(input, select):where(:invalid, [aria-invalid="true"]) {
   border-color: var(--surface-danger);
 }
 

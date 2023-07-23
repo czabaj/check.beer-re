@@ -18,6 +18,14 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
       }
     }, field)
 
+  let isNumeric = (~error="Musí být číslo", field) => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      switch value->Float.fromString {
+      | Some(_) => Valid
+      | _ => Error(error)
+      }
+    }, field)
+
   let notIn = (~haystack, ~error, field) => Validation.custom(lensState => {
       let value = Lenses.get(lensState, field)
       switch haystack->Array.includes(value) {

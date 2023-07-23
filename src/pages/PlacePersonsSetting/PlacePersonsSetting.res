@@ -37,6 +37,7 @@ let pageDataRx = (firestore, placeId) => {
               createdAt: keg.createdAt,
               keg: Null.make(keg.serial),
               note: Null.null,
+              person: Null.null,
             }
             switch kegByDonor->Map.get(personId) {
             | Some(kegs) => kegs->Array.push(transaction)
@@ -164,6 +165,7 @@ let make = (~placeId) => {
               ->Option.getWithDefault([])}
               person
               personId
+              personsAll
               placeId
               unfinishedConsumptions={unfinishedConsumptions}
             />

@@ -344,6 +344,7 @@ module Keg = {
         createdAt: nowTimestamp,
         keg: Null.make(keg.serial),
         note: Null.null,
+        person: Null.null,
       }
       personsTransactions->Map.set(personId, [financialTransaction])
     })
@@ -356,6 +357,7 @@ module Keg = {
         createdAt: nowTimestamp,
         keg: Null.make(keg.serial),
         note: Null.null,
+        person: Null.null,
       }
       switch personsTransactions->Map.get(personId) {
       | None => personsTransactions->Map.set(personId, [financialTransaction])
@@ -563,6 +565,7 @@ module Person = {
     firestore,
     ~placeId,
     ~personId,
+    ~counterPartyId,
     ~transaction: FirestoreModels.financialTransaction,
   ) => {
     let personsIndexRef = personsIndexDocument(firestore, placeId)
@@ -573,16 +576,38 @@ module Person = {
       ...personsAllRecord,
       balance: personsAllRecord.balance + transaction.amount,
     }
-    let updatePersonsIndexData = ObjectUtils.setIn(
-      Object.empty(),
+    let updatePersonsIndexData = Object.empty()
+    updatePersonsIndexData->Object.set(
       `all.${personId}`,
       personsAllRecordToTuple(. newPersonsAllRecord),
     )
+    let counterPartyTuple = personsIndex.all->Js.Dict.get(counterPartyId)->Option.getExn
+    let counterPartyRecord = personsAllTupleToRecord(. counterPartyTuple)
+    let newCounterPartyRecord = {
+      ...counterPartyRecord,
+      balance: counterPartyRecord.balance - transaction.amount,
+    }
+    updatePersonsIndexData->Object.set(
+      `all.${counterPartyId}`,
+      personsAllRecordToTuple(. newCounterPartyRecord),
+    )
+    let counterPartyTransaction: FirestoreModels.financialTransaction = {
+      ...transaction,
+      amount: -1 * transaction.amount,
+      keg: Null.null,
+      person: Null.make(personId),
+    }
     await Firebase.writeBatch(firestore)
     ->Firebase.WriteBatch.update(
       placePersonDocument(firestore, placeId, personId),
       {
         "transactions": Firebase.arrayUnion([transaction]),
+      },
+    )
+    ->Firebase.WriteBatch.update(
+      placePersonDocument(firestore, placeId, counterPartyId),
+      {
+        "transactions": Firebase.arrayUnion([counterPartyTransaction]),
       },
     )
     ->Firebase.WriteBatch.update(personsIndexRef, updatePersonsIndexData)

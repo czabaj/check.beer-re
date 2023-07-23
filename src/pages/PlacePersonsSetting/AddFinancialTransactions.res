@@ -1,15 +1,30 @@
-module FormFields = %lenses(type state = {amount: int, note: string})
+type submitValues = {amount: int, note: string, person: string}
+
+module FormFields = %lenses(type state = {amount: string, note: string, person: string})
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
-let make = (~onDismiss, ~onSubmit, ~personName) => {
+let make = (
+  ~initialCounterParty,
+  ~onDismiss,
+  ~onSubmit,
+  ~personId,
+  ~personName,
+  ~personsAll: array<(string, Db.personsAllRecord)>,
+) => {
   let {minorUnit} = FormattedCurrency.useCurrency()
   let form = Form.use(
-    ~initialState={amount: 0, note: ""},
+    ~initialState={amount: "", note: "", person: initialCounterParty},
     ~onSubmit=({state, raiseSubmitFailed}) => {
-      onSubmit(state.values)
+      let amountFloat = state.values.amount->Float.fromString->Option.getExn
+      let amountMinor = amountFloat *. minorUnit
+      onSubmit({
+        amount: amountMinor->Int.fromFloat,
+        note: state.values.note,
+        person: state.values.person,
+      })
       ->Promise.catch(error => {
         let errorMessage = switch error {
         | Js.Exn.Error(e) =>
@@ -26,21 +41,46 @@ let make = (~onDismiss, ~onSubmit, ~personName) => {
       None
     },
     ~schema={
-      Validators.schema([Validators.intNonZero(~error="Částka nemůže být nulová", Amount)])
+      Validators.schema([
+        Validators.required(Amount),
+        Validators.isNumeric(Amount),
+        Validators.required(Person),
+      ])
     },
     ~validationStrategy=OnDemand,
     (),
   )
 
   <DialogForm
-    formId="addFinancialTransaction" heading="Nový účetní záznam" onDismiss visible=true>
+    formId="addFinancialTransaction" heading="Peněžní transakce" onDismiss visible=true>
     <p>
       <b> {React.string(personName)} </b>
-      {React.string(` obdrží nový účetní záznam.`)}
+      {React.string(` předává peníze.`)}
     </p>
     <Form.Provider value=Some(form)>
       <form id="addFinancialTransaction" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className={`reset ${Styles.fieldset.grid}`}>
+          <Form.Field
+            field=Person
+            render={field => {
+              <InputWrapper
+                inputError=?field.error
+                inputName="amount"
+                inputSlot={<select
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
+                  <option disabled={true} value=""> {React.string("Příjemce platby")} </option>
+                  {personsAll
+                  ->Belt.Array.keepMap(((pId, p)) =>
+                    pId === personId
+                      ? None
+                      : Some(<option key=pId value=pId> {React.string(p.name)} </option>)
+                  )
+                  ->React.array}
+                </select>}
+                labelSlot={React.string("Komu")}
+              />
+            }}
+          />
           <Form.Field
             field=Amount
             render={field => {
@@ -48,13 +88,10 @@ let make = (~onDismiss, ~onSubmit, ~personName) => {
                 inputError=?field.error
                 inputName="amount"
                 inputSlot={<input
-                  onChange={event =>
-                    field.handleChange(
-                      (ReactEvent.Form.target(event)["valueAsNumber"] *. minorUnit)->Int.fromFloat,
-                    )}
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   step=1.0
                   type_="number"
-                  value={(field.value->Float.fromInt /. minorUnit)->Float.toString}
+                  value={field.value}
                 />}
                 labelSlot={React.string("Částka")}
               />

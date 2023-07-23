@@ -19,7 +19,8 @@ export type financialTransaction = {
   readonly amount: number; 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly keg: (null | number); 
-  readonly note: (null | string)
+  readonly note: (null | string); 
+  readonly person: (null | string)
 };
 
 // tslint:disable-next-line:interface-over-type-literal

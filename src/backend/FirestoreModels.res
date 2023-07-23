@@ -7,6 +7,7 @@ type financialTransaction = {
   createdAt: Firebase.Timestamp.t,
   keg: Js.null<int>,
   note: Js.null<string>,
+  person: Js.null<string>,
 }
 
 type rec consumption = {

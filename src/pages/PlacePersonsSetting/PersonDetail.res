@@ -22,6 +22,7 @@ let make = (
   ~onPreviousPerson,
   ~pendingTransactions: array<FirestoreModels.financialTransaction>,
   ~person: Db.personsAllRecord,
+  ~personsAll: array<(string, Db.personsAllRecord)>,
   ~personId,
   ~placeId,
   ~unfinishedConsumptions: array<Db.userConsumption>,
@@ -95,12 +96,17 @@ let make = (
     <section ariaLabelledby="financial_transactions">
       <header>
         <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
-        <button
-          className={Styles.button.base}
-          onClick={_ => setDialog(_ => AddTransaction)}
-          type_="button">
-          {React.string("Přidat účetní záznam")}
-        </button>
+        {React.cloneElement(
+          <button
+            className={Styles.button.base}
+            onClick={_ => setDialog(_ => AddTransaction)}
+            type_="button">
+            {React.string("Zaznamenat transakci")}
+          </button>,
+          personsAll->Array.length < 2
+            ? {"disabled": true, "title": "Přidejte další osoby"}
+            : Object.empty(),
+        )}
       </header>
       {switch (pendingTransactions, maybePersonDoc) {
       | (_, None) => <LoadingInline />
@@ -173,25 +179,47 @@ let make = (
     </section>
     {switch dialogState {
     | Hidden => React.null
-    | AddTransaction =>
-      <AddFinancialTransactions
-        onDismiss={hideDialog}
-        onSubmit={async values => {
-          await Db.Person.addFinancialTransaction(
-            firestore,
-            ~placeId,
-            ~personId,
-            ~transaction={
-              amount: values.amount,
-              createdAt: Firebase.Timestamp.now(),
-              keg: Null.null,
-              note: Null.make(values.note),
-            },
-          )
-          hideDialog()
-        }}
-        personName={person.name}
-      />
+    | AddTransaction => {
+        let highestBalanceNonCurrentPerson = personsAll->Array.reduce(None, (
+          acc: option<(string, Db.personsAllRecord)>,
+          item: (string, Db.personsAllRecord),
+        ) => {
+          switch acc {
+          | None => Some(item)
+          | Some((id, {balance})) =>
+            if id === personId || balance >= snd(item).balance {
+              acc
+            } else {
+              Some(item)
+            }
+          }
+        })
+        <AddFinancialTransactions
+          initialCounterParty={highestBalanceNonCurrentPerson
+          ->Option.map(fst)
+          ->Option.getWithDefault("")}
+          onDismiss={hideDialog}
+          onSubmit={async values => {
+            await Db.Person.addFinancialTransaction(
+              firestore,
+              ~counterPartyId=values.person,
+              ~placeId,
+              ~personId,
+              ~transaction={
+                amount: values.amount,
+                createdAt: Firebase.Timestamp.now(),
+                keg: Null.null,
+                note: values.note === "" ? Null.null : Null.make(values.note),
+                person: Null.make(values.person),
+              },
+            )
+            hideDialog()
+          }}
+          personId
+          personName={person.name}
+          personsAll
+        />
+      }
     | ConfirmDeletePerson =>
       <DialogConfirmation
         className={DialogConfirmation.classes.deleteConfirmation}
@@ -205,7 +233,7 @@ let make = (
         <p>
           {React.string(`Chystáte se odstranit osobu `)}
           <b> {React.string(person.name)} </b>
-          {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetních transakcí. Chcete pokračovat?`)}
+          {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetní transakci. Chcete pokračovat?`)}
         </p>
       </DialogConfirmation>
     }}
