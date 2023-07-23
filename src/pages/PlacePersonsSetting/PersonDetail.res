@@ -180,17 +180,20 @@ let make = (
     {switch dialogState {
     | Hidden => React.null
     | AddTransaction => {
-        let highestBalanceNonCurrentPerson = personsAll->Array.reduce(None, (
-          acc: option<(string, Db.personsAllRecord)>,
-          item: (string, Db.personsAllRecord),
-        ) => {
-          switch acc {
-          | None => Some(item)
-          | Some((id, {balance})) =>
-            if id === personId || balance >= snd(item).balance {
-              acc
-            } else {
-              Some(item)
+        let highestBalanceNonCurrentPerson = personsAll->Array.reduce(None, (acc, item) => {
+          let (itemId, {Db.balance: itemBalance}) = item
+          if itemId === personId {
+            // skip current person, it cannot be a counterparty
+            acc
+          } else {
+            switch acc {
+            | None => Some(item)
+            | Some((_, {Db.balance: accBalance})) =>
+              if accBalance >= itemBalance {
+                acc
+              } else {
+                Some(item)
+              }
             }
           }
         })
