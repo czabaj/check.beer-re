@@ -204,7 +204,7 @@ let pageDataRx = (firestore, placeId) => {
 let make = (~placeId) => {
   let firestore = Reactfire.useFirestore()
   let pageDataStatus = Reactfire.useObservable(
-    ~observableId="Page_Place",
+    ~observableId=`Page_Place_${placeId}`,
     ~source=pageDataRx(firestore, placeId),
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)

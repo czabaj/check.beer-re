@@ -15,7 +15,7 @@ let make = (~placeId) => {
   // this paginated call do not use suspense, call it above the placePageStatus which _is_ suspended
   let (maybeDepletedKegs, maybeFetchMoreDepletedKegs) = UsePaginatedDepletedKegsData.use(placeId)
   let pageDataStatus = Reactfire.useObservable(
-    ~observableId="PlaceSettingPage",
+    ~observableId=`Page_PlaceSetting_${placeId}`,
     ~source=pageDataRx(firestore, placeId),
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
