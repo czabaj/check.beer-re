@@ -64,3 +64,11 @@ export type personsAllItem = [personName, Firebase_Timestamp_t, number, (null | 
 
 // tslint:disable-next-line:interface-over-type-literal
 export type personsIndex = { readonly all: {[id: string]: personsAllItem} };
+
+// tslint:disable-next-line:interface-over-type-literal
+export type shareLink = {
+  readonly createdAt: Firebase_Timestamp_t; 
+  readonly person: string; 
+  readonly place: string; 
+  readonly role: number
+};

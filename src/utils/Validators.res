@@ -26,6 +26,14 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
       }
     }, field)
 
+  let oneOf = (~haystack, ~error, field) => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      switch haystack->Array.includes(value) {
+      | true => Valid
+      | false => Error(error)
+      }
+    }, field)
+
   let notIn = (~haystack, ~error, field) => Validation.custom(lensState => {
       let value = Lenses.get(lensState, field)
       switch haystack->Array.includes(value) {

@@ -55,3 +55,9 @@ let truncateQueryString = (href): string => {
   url->Webapi.Url.setSearch("")
   url->Webapi.Url.href
 }
+
+let createShareLink = shareLinkId => {
+  open Webapi
+  let origin = Dom.location->Dom.Location.origin
+  `${origin}/s/${shareLinkId}`
+}

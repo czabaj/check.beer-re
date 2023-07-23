@@ -104,24 +104,12 @@ let make = (~placeId) => {
                       />
                     </th>
                     <td>
-                      {
-                        open FirestoreModels
-                        let personRole =
-                          person.userId
-                          ->Null.toOption
-                          ->Option.flatMap(userId => place.users->Dict.get(userId))
-                          ->Option.flatMap(roleFromJs)
-                        {
-                          switch personRole {
-                          | Some(Owner) => React.string("Vlastník")
-                          | Some(Admin) => React.string("Správce")
-                          | Some(Staff) => React.string("Výčepní")
-                          | Some(SelfService) => React.string("Samoobsluha")
-                          | Some(Viewer) => React.string("Nahlížeč")
-                          | None => React.null
-                          }
-                        }
-                      }
+                      {person.userId
+                      ->Null.toOption
+                      ->Option.flatMap(userId => place.users->Dict.get(userId))
+                      ->Option.flatMap(FirestoreModels.roleFromJs)
+                      ->Option.map(FirestoreModels.roleI18n)
+                      ->Option.mapWithDefault(React.null, React.string)}
                     </td>
                     <td>
                       <FormattedRelativeTime
@@ -187,6 +175,7 @@ let make = (~placeId) => {
               person
               personId
               personsAll
+              place
               placeId
               unfinishedConsumptions={unfinishedConsumptions}
             />

@@ -1,7 +1,3 @@
-type classesType = {root: string}
-
-@module("./CreateAccount.module.css") external classes: classesType = "default"
-
 module FormFields = %lenses(type state = {name: string})
 
 module Form = ReForm.Make(FormFields)
@@ -35,7 +31,7 @@ module Pure = {
       ~validationStrategy=OnDemand,
       (),
     )
-    <div className={`${Styles.page.centered} ${classes.root}`}>
+    <div className={Styles.page.centered}>
       <h1 className=Styles.utility.srOnly> {React.string("Check.beer")} </h1>
       <h2> {React.string("Dokončení registrace")} </h2>
       <Form.Provider value=Some(form)>
@@ -56,8 +52,7 @@ module Pure = {
                 />
               }}
             />
-            <button
-              className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`} type_="submit">
+            <button className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`} type_="submit">
               {React.string(`Dokončit registraci`)}
             </button>
           </fieldset>

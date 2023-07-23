@@ -117,23 +117,28 @@ let pageDataRx = (firestore, placeId) => {
           | None => None
           }
         )
-        ->Js.Dict.fromArray
-      switch tapsToKegId->Js.Dict.values {
+      switch tapsToKegId {
       | [] => return(Js.Dict.empty())
-      | kegIds =>
+      | entries =>
+        let kegIds = entries->Array.map(snd)
         Rxfire.collectionData(
           Firebase.query(
             Db.placeKegsCollectionConverted(firestore, placeId),
-            [Firebase.where(Firebase.documentId(), #"in", kegIds)],
+            [
+              Firebase.where(Firebase.documentId(), #"in", kegIds),
+              Firebase.where("depletedAt", #"==", Js.null),
+            ],
           ),
         )->pipe(
           map((kegsOnTap, _) =>
-            tapsToKegId->Js.Dict.map(
-              (. kegId) => {
-                kegsOnTap->Array.find(keg => Db.getUid(keg) === kegId)->Option.getExn
-              },
-              _,
+            tapsToKegId
+            ->Array.filterMap(
+              ((tapName, kegId)) =>
+                kegsOnTap
+                ->Array.find(keg => Db.getUid(keg) === kegId)
+                ->Option.map(keg => (tapName, keg)),
             )
+            ->Js.Dict.fromArray
           ),
         )
       }

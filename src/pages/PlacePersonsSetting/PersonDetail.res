@@ -3,8 +3,9 @@ type classesType = {root: string, unclosed: string}
 
 type dialogState =
   | Hidden
-  | ConfirmDeletePerson
   | AddTransaction
+  | ConfirmDeletePerson
+  | SendInvitation
 
 let byCreatedDesc = (
   a: FirestoreModels.financialTransaction,
@@ -24,6 +25,7 @@ let make = (
   ~person: Db.personsAllRecord,
   ~personsAll: array<(string, Db.personsAllRecord)>,
   ~personId,
+  ~place: FirestoreModels.place,
   ~placeId,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
@@ -94,6 +96,30 @@ let make = (
           onDeleteConsumption
           unfinishedConsumptions
         />}
+    {
+      let personRole =
+        person.userId
+        ->Null.toOption
+        ->Option.flatMap(userId => place.users->Dict.get(userId))
+        ->Option.flatMap(FirestoreModels.roleFromJs)
+        ->Option.map(FirestoreModels.roleI18n)
+      switch personRole {
+      | None =>
+        <p className={Styles.messageBar.info}>
+          {React.string(`Osoba nemá propojený účet. `)}
+          <button
+            className={Styles.link.base}
+            onClick={_ => setDialog(_ => SendInvitation)}
+            type_="button">
+            {React.string(`Poslat pozvánku`)}
+          </button>
+        </p>
+      | Some(role) =>
+        <p className={Styles.messageBar.info}>
+          {React.string(`Osoba má přiřazenou roli ${role}`)}
+        </p>
+      }
+    }
     <section ariaLabelledby="financial_transactions">
       <header>
         <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
@@ -102,7 +128,7 @@ let make = (
             className={Styles.button.base}
             onClick={_ => setDialog(_ => AddTransaction)}
             type_="button">
-            {React.string("Zaznamenat transakci")}
+            {React.string("Zaznamenat platbu")}
           </button>,
           personsAll->Array.length < 2
             ? {"disabled": true, "title": "Přidejte další osoby"}
@@ -247,6 +273,25 @@ let make = (
           {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetní transakci. Chcete pokračovat?`)}
         </p>
       </DialogConfirmation>
+    | SendInvitation =>
+      <SendInvitation
+        onDismiss={hideDialog}
+        onSubmit={async values => {
+          open DomUtils
+          let linkId = await Db.ShareLink.upsert(firestore, ~personId, ~placeId, ~role=values.role)
+          let url = RouterUtils.createShareLink(linkId)
+          let handler = await share({
+            text: `Zvu tě do aplikace check.beer, kde uvidíš svůj pivní lístek.`,
+            title: `Pozvánka do aplikace check.beer`,
+            url,
+          })
+          switch handler {
+          | Clipboard =>
+            Webapi.Dom.window->Webapi.Dom.Window.alert("Pozvánka byla zkopírována do schránky.")
+          | _ => ()
+          }
+        }}
+      />
     }}
   </DialogCycling>
 }

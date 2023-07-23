@@ -23,6 +23,14 @@ let make = () => {
         </SignInWrapper>
       </FirebaseProvider>
     </React.Suspense>
+  | list{"s", linkId} =>
+    <React.Suspense fallback={<LoadingFullscreen />}>
+      <FirebaseProvider>
+        <SignInWrapper>
+          <ShareLinkResolver linkId />
+        </SignInWrapper>
+      </FirebaseProvider>
+    </React.Suspense>
   | _ => <PageNotFound />
   }
 }

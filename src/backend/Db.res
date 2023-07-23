@@ -649,3 +649,76 @@ module PersonsIndex = {
     Firebase.updateDoc(personsIndexRef, updateObject)
   }
 }
+
+module ShareLink = {
+  let collection = (firestore): Firebase.collectionReference<shareLink> =>
+    Firebase.collection(firestore, ~path="shareLinks")
+
+  let document = (firestore, linkId): Firebase.documentReference<shareLink> => {
+    Firebase.doc(firestore, ~path=`shareLinks/${linkId}`)
+  }
+
+  let upsert = async (firestore, ~placeId, ~personId, ~role) => {
+    if role === FirestoreModels.Owner {
+      Exn.raiseError("Changing owner is currently not supported")
+    }
+    let shareLinkCollection = collection(firestore)
+    open Firebase
+    let shareLinkQuery = query(
+      shareLinkCollection,
+      [where("person", #"==", personId), where("place", #"==", placeId), limit(1)],
+    )
+    let shareLinks = await getDocs(shareLinkQuery)
+    switch shareLinks.docs {
+    | [shareLinkSnapshot] => {
+        await updateDoc(
+          shareLinkSnapshot.ref,
+          {"createdAt": Timestamp.now(), "role": role->roleToJs},
+        )
+        shareLinkSnapshot.id
+      }
+    | _ =>
+      let newDoc = await addDoc(
+        shareLinkCollection,
+        {createdAt: Timestamp.now(), person: personId, place: placeId, role: role->roleToJs},
+      )
+      newDoc.id
+    }
+  }
+
+  let acceptInvitation = (firestore, ~linkId, ~userId) => {
+    let shareLinkDocument = document(firestore, linkId)
+    open Firebase
+    runTransaction(.firestore, async transaction => {
+      let shareLinkSnapshot = await transaction->Transaction.get(shareLinkDocument)
+      if !shareLinkSnapshot.exists(.) {
+        Exn.raiseError("Share link does not exist")
+      }
+      let {place, person, role} = shareLinkSnapshot.data(. {})
+      let placeIndexDocument = personsIndexDocument(firestore, place)
+      let placeIndex = (await transaction->Transaction.get(placeIndexDocument)).data(. {})
+      let personTuple = placeIndex.all->Js.Dict.get(person)->Option.getExn
+      let personRecord = personsAllTupleToRecord(. personTuple)
+      if personRecord.userId !== Null.null {
+        Exn.raiseError("Person already has a connected user account")
+      }
+      // update personsIndex - add userId to person tuple
+      let newPersonRecord = {
+        ...personRecord,
+        userId: Null.make(userId),
+      }
+      let personsIndexUpdateData = Object.empty()
+      personsIndexUpdateData->Object.set(
+        `all.${person}`,
+        personsAllRecordToTuple(. newPersonRecord),
+      )
+      // update place - add userId to users dict
+      let placeUpdateData = Object.empty()
+      placeUpdateData->Object.set(`users.${userId}`, role)
+
+      transaction->Transaction.update(placeDocument(firestore, place), placeUpdateData)
+      transaction->Transaction.update(placeIndexDocument, personsIndexUpdateData)
+      transaction->Transaction.delete(shareLinkDocument)
+    })
+  }
+}

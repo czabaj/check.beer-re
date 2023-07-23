@@ -18,7 +18,14 @@ module AuthProvider = {
   external make: (~sdk: Auth.t, ~children: React.element) => React.element = "AuthProvider"
 }
 
-type observableStatus<'a> = {status: @string [#error | #loading | #success], data: option<'a>}
+type observableStatus<'a> = {
+  data: option<'a>,
+  error: option<Js.Exn.t>,
+  firstValuePromise: promise<unit>,
+  hasEmmited: bool,
+  isComplete: bool,
+  status: @string [#error | #loading | #success],
+}
 
 @module("reactfire")
 external useAuth: unit => Auth.t = "useAuth"

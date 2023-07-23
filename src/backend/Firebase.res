@@ -72,7 +72,13 @@ external deleteDoc: documentReference<'a> => promise<unit> = "deleteDoc"
 @module("firebase/firestore")
 external serverTimestamp: unit => 'a = "serverTimestamp"
 
-type documentSnapshot<'a> = {data: (. snapshotOptions) => 'a, exists: (. unit) => bool, id: string}
+type documentSnapshot<'a> = {
+  data: (. snapshotOptions) => 'a,
+  exists: (. unit) => bool,
+  get: (. ~fieldPath: string, ~options: snapshotOptions) => unknown,
+  id: string,
+  ref: documentReference<'a>,
+}
 @module("firebase/firestore")
 external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDoc"
 

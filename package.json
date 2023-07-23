@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#c72333c1c61dba1628b6827a68a79595bf1b4d77",
+    "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#a85312969a9cddba8d4cc3cd11d9c947512f8a05",
     "@oddbird/popover-polyfill": "^0.2.2",
     "@rescript/core": "^0.4.0",
     "@rescript/react": "^0.11.0",

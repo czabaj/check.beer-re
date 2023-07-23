@@ -52,7 +52,7 @@ let make = (
   )
 
   <DialogForm
-    formId="addFinancialTransaction" heading="Peněžní transakce" onDismiss visible=true>
+    formId="addFinancialTransaction" heading="Platba mezi účastníky" onDismiss visible=true>
     <p>
       <b> {React.string(personName)} </b>
       {React.string(` předává peníze.`)}
