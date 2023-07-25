@@ -451,9 +451,7 @@ module Place = {
     ->Firebase.WriteBatch.set(
       personDoc,
       {
-        account: Js.Null.return(userId),
         createdAt: now,
-        name: personName,
         transactions: [],
       },
       {},
@@ -541,9 +539,7 @@ module Person = {
     let now = Firebase.Timestamp.now()
     let personDoc = Firebase.seedDoc(placePersonsCollection(firestore, placeId))
     let newPerson: FirestoreModels.person = {
-      account: Null.null,
       createdAt: now,
-      name: personName,
       transactions: [],
     }
     let newPersonsAllRecord = {
@@ -630,7 +626,8 @@ module Person = {
 module PersonsIndex = {
   let allEntriesSortedRx = (firestore, ~placeId) => {
     let personsIndexRef = personsIndexConverted(firestore, placeId)
-    Rxfire.docData(personsIndexRef)->Rxjs.pipe(
+    Rxfire.docData(personsIndexRef)->Rxjs.pipe2(
+      Rxjs.keepSome,
       Rxjs.map((personsIndex: personsIndexConverted, _) => {
         let personsAllEntries = personsIndex.all->Js.Dict.entries
         personsAllEntries->Array.sort(((_, a), (_, b)) => {
@@ -656,6 +653,11 @@ module ShareLink = {
 
   let document = (firestore, linkId): Firebase.documentReference<shareLink> => {
     Firebase.doc(firestore, ~path=`shareLinks/${linkId}`)
+  }
+
+  let delete = (firestore, ~linkId) => {
+    let shareLinkDocument = document(firestore, linkId)
+    Firebase.deleteDoc(shareLinkDocument)
   }
 
   let upsert = async (firestore, ~placeId, ~personId, ~role) => {
@@ -695,10 +697,16 @@ module ShareLink = {
         Exn.raiseError("Share link does not exist")
       }
       let {place, person, role} = shareLinkSnapshot.data(. {})
-      let placeIndexDocument = personsIndexDocument(firestore, place)
+      let placeIndexDocument = personsIndexConverted(firestore, place)
       let placeIndex = (await transaction->Transaction.get(placeIndexDocument)).data(. {})
-      let personTuple = placeIndex.all->Js.Dict.get(person)->Option.getExn
-      let personRecord = personsAllTupleToRecord(. personTuple)
+      let userAlreadyInPlace =
+        placeIndex.all
+        ->Dict.valuesToArray
+        ->Array.some(p => p.userId->Null.mapWithDefault(false, id => id === userId))
+      if userAlreadyInPlace {
+        Exn.raiseError("User already in place")
+      }
+      let personRecord = placeIndex.all->Js.Dict.get(person)->Option.getExn
       if personRecord.userId !== Null.null {
         Exn.raiseError("Person already has a connected user account")
       }

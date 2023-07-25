@@ -10,7 +10,7 @@ type dialogState =
 let pageDataRx = (firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
-  let placeRx = Rxfire.docData(placeRef)
+  let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
   let unfinishedConsumptionsByUserRx = allChargedKegsRx->pipe(
     map((chargedKegs, _) => {

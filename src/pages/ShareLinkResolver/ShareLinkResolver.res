@@ -58,27 +58,54 @@ module Pure = {
   }
 }
 
-let pageDataRx = (firestore, ~linkId) => {
+let redirectToPlace = placeId => {
+  RescriptReactRouter.replace(`/misto/${placeId}`)
+}
+
+let pageDataRx = (auth, firestore, ~linkId) => {
   open Rxjs
-  Rxfire.docData(Db.ShareLink.document(firestore, linkId))->pipe(
-    mergeMap((shareLink: FirestoreModels.shareLink) => {
-      Rxfire.docData(Db.placeDocument(firestore, shareLink.place))->pipe(
-        map((place, _) => (shareLink, place)),
-      )
+  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  let shareLinkRx = Rxfire.docData(Db.ShareLink.document(firestore, linkId))
+  let shareLinkPlaceRx = shareLinkRx->pipe(
+    switchMap((maybeShareLink: option<FirestoreModels.shareLink>) => {
+      switch maybeShareLink {
+      | None => return(None)
+      | Some(shareLink) => Rxfire.docData(Db.placeDocument(firestore, shareLink.place))
+      }
     }),
   )
+  combineLatest2(currentUserRx, shareLinkPlaceRx)
+  ->pipe2(
+    first(),
+    tap(((currentUser, maybeShareLinkPlace): (Firebase.User.t, option<FirestoreModels.place>)) => {
+      switch maybeShareLinkPlace {
+      | None => ()
+      | Some(shareLinkPlace) => {
+          let userAlreadyInPlace = shareLinkPlace.users->Dict.get(currentUser.uid)->Option.isSome
+          if userAlreadyInPlace {
+            Db.ShareLink.delete(firestore, ~linkId)->ignore
+            redirectToPlace(Db.getUid(shareLinkPlace))
+          }
+        }
+      }
+    }),
+  )
+  ->subscribeFn(_ => ())
+  ->ignore
+  combineLatest3(currentUserRx, shareLinkRx, shareLinkPlaceRx)
 }
 
 @react.component
 let make = (~linkId) => {
+  let auth = Reactfire.useAuth()
   let firestore = Reactfire.useFirestore()
   let pageDataStatus = Reactfire.useObservable(
     ~observableId=`page_ShareLinkResolver_${linkId}`,
-    ~source=pageDataRx(firestore, ~linkId),
+    ~source=pageDataRx(auth, firestore, ~linkId),
   )
-  let {currentUser} = Reactfire.useAuth()
-  switch (pageDataStatus.data, currentUser->Null.toOption) {
-  | (Some(data), Some({uid: userId})) =>
+
+  switch pageDataStatus.data {
+  | Some((currentUser, Some(shareLink), Some(shareLinkPlace))) =>
     let (acceptInviteState, acceptInviteSend) = ReactUpdate.useReducer(Ready, (action, state) => {
       switch (action, state) {
       | (Run, Error(_)) // allow retry
@@ -86,7 +113,7 @@ let make = (~linkId) => {
         ReactUpdate.UpdateWithSideEffects(
           Pending,
           ({send}) => {
-            Db.ShareLink.acceptInvitation(firestore, ~linkId, ~userId)
+            Db.ShareLink.acceptInvitation(firestore, ~linkId, ~userId=currentUser.uid)
             ->Promise.then(() => {
               send(Resolved)
               Promise.resolve()
@@ -103,8 +130,7 @@ let make = (~linkId) => {
         ReactUpdate.UpdateWithSideEffects(
           Success,
           _ => {
-            let shareLink = data->fst
-            RescriptReactRouter.replace(`/misto/${shareLink.place}`)
+            redirectToPlace(shareLink.place)
             None
           },
         )
@@ -113,7 +139,7 @@ let make = (~linkId) => {
       }
     })
     <Pure
-      data=pageDataStatus.data
+      data=Some(shareLink, shareLinkPlace)
       loading={acceptInviteState == Pending}
       onAccept={_ => acceptInviteSend(Run)}
     />

@@ -10,6 +10,9 @@
 .list li > div:first-child {
   margin-inline-end: auto;
 }
+.list li[aria-current="true"] > div:first-child {
+  font-weight: var(--font-weight-semibold);
+}
 
 .listEmpty {
   padding-block: 0.5rem;

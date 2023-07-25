@@ -26,7 +26,7 @@ external doc: Firebase.documentReference<'a> => Rxjs.t<
 external docData: (
   Firebase.documentReference<'a>,
   @as(json`{ "idField": "uid" }`) _,
-) => Rxjs.t<Rxjs.foreign, Rxjs.void, 'a> = "docData"
+) => Rxjs.t<Rxjs.foreign, Rxjs.void, option<'a>> = "docData"
 
 @module("rxfire/firestore")
 external snapToData: (Firebase.documentSnapshot<'a>, @as(json`{ "idField": "uid" }`) _) => 'a =

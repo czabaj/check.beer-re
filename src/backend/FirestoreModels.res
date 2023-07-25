@@ -28,9 +28,7 @@ and keg = {
 }
 @genType
 and person = {
-  account: Js.null<string>,
   createdAt: Firebase.Timestamp.t,
-  name: personName,
   transactions: array<financialTransaction>,
 }
 

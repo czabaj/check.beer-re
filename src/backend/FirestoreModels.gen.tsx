@@ -40,12 +40,7 @@ export type keg = {
 };
 
 // tslint:disable-next-line:interface-over-type-literal
-export type person = {
-  readonly account: (null | string); 
-  readonly createdAt: Firebase_Timestamp_t; 
-  readonly name: personName; 
-  readonly transactions: financialTransaction[]
-};
+export type person = { readonly createdAt: Firebase_Timestamp_t; readonly transactions: financialTransaction[] };
 
 // tslint:disable-next-line:interface-over-type-literal
 export type role = $$role;

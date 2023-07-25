@@ -37,6 +37,7 @@ module ActivePersonListItem = {
   let make = (
     ~activeCheckbox: option<React.element>,
     ~consumptions: array<Db.userConsumption>,
+    ~isCurrent,
     ~onAddConsumption,
     ~personName,
   ) => {
@@ -75,7 +76,7 @@ module ActivePersonListItem = {
       None
     }, [consumptionsStr])
 
-    <li ref={ReactDOM.Ref.domRef(listItemEl)}>
+    <li ariaCurrent={isCurrent ? #"true" : #"false"} ref={ReactDOM.Ref.domRef(listItemEl)}>
       <div> {React.string(personName)} </div>
       {switch activeCheckbox {
       | Some(node) => node
@@ -101,10 +102,10 @@ type dialogState =
 
 type userConsumption = {milliliters: int, timestamp: float}
 
-let pageDataRx = (firestore, placeId) => {
+let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
-  let placeRx = Rxfire.docData(placeRef)
+  let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
   let tapsWithKegsRx = placeRx->pipe2(
     distinctUntilChanged((prev: FirestoreModels.place, curr) => prev.taps == curr.taps),
     mergeMap((place: FirestoreModels.place) => {
@@ -196,21 +197,24 @@ let pageDataRx = (firestore, placeId) => {
       (all, active, inactive)
     }),
   )
-  combineLatest5(
+  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  combineLatest6(
     placeRx,
     personsAllRx,
     tapsWithKegsRx,
     unfinishedConsumptionsByUserRx,
     recentConsumptionsByUserRx,
+    currentUserRx,
   )
 }
 
 @react.component
 let make = (~placeId) => {
+  let auth = Reactfire.useAuth()
   let firestore = Reactfire.useFirestore()
   let pageDataStatus = Reactfire.useObservable(
     ~observableId=`Page_Place_${placeId}`,
-    ~source=pageDataRx(firestore, placeId),
+    ~source=pageDataRx(auth, firestore, placeId),
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
@@ -224,6 +228,7 @@ let make = (~placeId) => {
       tapsWithKegs,
       unfinishedConsumptionsByUser,
       recentConsumptionsByUser,
+      currentUser,
     ) =>
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
@@ -264,6 +269,9 @@ let make = (~placeId) => {
                         />
                       )}
                       consumptions={consumptions}
+                      isCurrent={person.userId->Null.mapWithDefault(false, userId =>
+                        userId === currentUser.uid
+                      )}
                       key={personId}
                       onAddConsumption={() => {
                         setDialog(_ => AddConsumption({personId, person}))
@@ -315,7 +323,11 @@ let make = (~placeId) => {
                       ->Array.map(inactivePerson => {
                         let (personId, person) = inactivePerson
                         let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
-                        <li key={personId}>
+                        let isCurrent =
+                          person.userId->Null.mapWithDefault(false, userId =>
+                            userId === currentUser.uid
+                          )
+                        <li ariaCurrent={isCurrent ? #"true" : #"false"} key={personId}>
                           <div>
                             {React.string(`${person.name} `)}
                             <time dateTime={recentActivityDate->Js.Date.toISOString}>
