@@ -1,5 +1,6 @@
 .root {
   row-gap: 1rem;
+  max-inline-size: 30ch;
 }
 
 section[aria-labelledby="other_methods"] {

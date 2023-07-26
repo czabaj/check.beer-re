@@ -21,11 +21,13 @@ let make = (~children) => {
     | None => {
         let firestore = initializeFirestore(
           app,
-          {
-            localCache: FirestoreLocalCache.persistentLocalCache({
-              tabManager: FirestoreLocalCache.PersistentTabManager.persistentMultipleTabManager(.),
-            }),
-          },
+          AppStorage.getThrustDevice() === None
+            ? {}
+            : {
+                localCache: FirestoreLocalCache.persistentLocalCache({
+                  tabManager: FirestoreLocalCache.PersistentTabManager.persistentMultipleTabManager(.),
+                }),
+              },
         )
         // if %raw(`import.meta.env.DEV && window.localStorage.getItem('USE_EMULATOR') === '1'`) {
         //   Firebase.connectFirestoreEmulator(. firestore, "127.0.0.1", 9090)

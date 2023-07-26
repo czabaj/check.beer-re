@@ -305,7 +305,7 @@ module FirestoreLocalCache = {
   external persistentLocalCache: persistentCacheSettings => t = "persistentLocalCache"
 }
 
-type firestoreSettings = {localCache: FirestoreLocalCache.t}
+type firestoreSettings = {localCache?: FirestoreLocalCache.t}
 @module("firebase/firestore")
 external initializeFirestore: (FirebaseApp.t, firestoreSettings) => firestore =
   "initializeFirestore"

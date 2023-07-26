@@ -49,6 +49,7 @@ let make = (~initialName, ~onDismiss, ~onSubmit) => {
               />
             }}
           />
+          <InputThrustDevice />
         </fieldset>
       </form>
     </Form.Provider>

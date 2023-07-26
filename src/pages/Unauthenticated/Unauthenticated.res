@@ -2,36 +2,16 @@ type classesType = {root: string}
 
 @module("./Unauthenticated.module.css") external classes: classesType = "default"
 
-module UnauthenticatedQueryString = {
-  open Webapi
-
-  let keyRemember = "r"
-
-  let isRememberOn = href => {
-    let rememberParam =
-      Url.make(href)
-      ->Url.searchParams
-      ->Url.URLSearchParams.get(keyRemember)
-      ->Option.getWithDefault("0")
-    rememberParam === "1"
-  }
-  let setRememberOn = href => {
-    let url = Url.make(href)
-    url->Url.setSearch(`${keyRemember}=1`)
-    url->Url.href
-  }
-}
-
-module FormFields = %lenses(type state = {email: string, remember: bool})
+module FormFields = %lenses(type state = {email: string})
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 module Pure = {
-  @react.component
+  @genType @react.component
   let make = (~initialEmail, ~onBackToForm, ~onGoogleAuth, ~onPasswordAuth, ~signInEmailSent=?) => {
     let form = Form.use(
-      ~initialState={email: initialEmail, remember: initialEmail !== ""},
+      ~initialState={email: initialEmail},
       ~onSubmit=({state, raiseSubmitFailed}) => {
         onPasswordAuth(state.values)
         ->Promise.catch(error => {
@@ -76,6 +56,7 @@ module Pure = {
           <Form.Provider value=Some(form)>
             <form onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
               <fieldset className={`reset ${Styles.fieldset.grid}`}>
+                <InputThrustDevice />
                 <Form.Field
                   field=Email
                   render={field => {
@@ -89,23 +70,6 @@ module Pure = {
                       />}
                       labelSlot={React.string(`E${HtmlEntities.nbhp}mail`)}
                     />
-                  }}
-                />
-                <Form.Field
-                  field=Remember
-                  render={field => {
-                    <label className=Styles.fieldset.checkboxLabel>
-                      {React.string(`Důvěřovat tomuto zařízení`)}
-                      <input
-                        checked={field.value}
-                        className={Styles.checkbox.base}
-                        onChange={event => {
-                          let target = event->ReactEvent.Form.target
-                          field.handleChange(target["checked"])
-                        }}
-                        type_="checkbox"
-                      />
-                    </label>
                   }}
                 />
                 <button
@@ -145,12 +109,10 @@ let useSignInWithEmailRedirect = auth => {
     if !signInWithEmailChecked.contents {
       signInWithEmailChecked := true
       let href = Webapi.Dom.location->Webapi.Dom.Location.href
-      let remember = ref(false)
       if Firebase.Auth.isSignInWithEmailLink(. auth, ~href) {
         let email = switch AppStorage.getPendingEmail() {
         | Some(email) => {
             AppStorage.removePendingEmail()
-            remember := UnauthenticatedQueryString.isRememberOn(href)
             email
           }
         | None => Webapi.Dom.Window.prompt(window, "Zadejte svůj e-mail")
@@ -158,7 +120,7 @@ let useSignInWithEmailRedirect = auth => {
         Firebase.Auth.signInWithEmailLink(. auth, ~email, ~href)
         ->Promise.then(_ => {
           AppStorage.removePendingEmail()
-          if remember.contents {
+          if AppStorage.getThrustDevice()->Option.isSome {
             AppStorage.setRememberEmail(email)
           }
           let hrefWOParams = RouterUtils.truncateQueryString(href)
@@ -190,13 +152,13 @@ let make = () => {
       })
       ->ignore
     }}
-    onPasswordAuth={async ({email, remember}) => {
+    onPasswordAuth={async ({email}) => {
       let href = Webapi.Dom.location->Webapi.Dom.Location.href
       let _ = await sendSignInLinkToEmail(.
         auth,
         ~email,
         ~actionCodeSettings={
-          url: remember ? UnauthenticatedQueryString.setRememberOn(href) : href,
+          url: href,
           handleCodeInApp: true,
         },
       )
