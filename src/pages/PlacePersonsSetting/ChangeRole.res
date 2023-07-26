@@ -4,13 +4,13 @@ module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
-let make = (~onDismiss, ~onSubmit) => {
+let make = (~currentRole, ~onDismiss, ~onSubmit, ~personName) => {
   open FirestoreModels
   let roleOptions = [Viewer, SelfService, Staff, Admin]
   let form = Form.use(
-    ~initialState={role: Viewer},
+    ~initialState={role: currentRole},
     ~onSubmit=({state}) => {
-      onSubmit(state.values)->ignore
+      onSubmit(state.values)
       None
     },
     ~schema={
@@ -19,9 +19,14 @@ let make = (~onDismiss, ~onSubmit) => {
     ~validationStrategy=OnDemand,
     (),
   )
-  <DialogForm formId="send_invitation" heading="Poslat pozvánku" onDismiss visible=true>
+  <DialogForm formId="change_role" heading="Změnit roli" onDismiss visible=true>
     <Form.Provider value=Some(form)>
-      <form id="send_invitation" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+      <p>
+        <b> {personName->React.string} </b>
+        {React.string(" je aktuálně ")}
+        <b> {currentRole->roleI18n->React.string} </b>
+      </p>
+      <form id="change_role" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className="reset">
           <Form.Field
             field=Role
@@ -44,7 +49,7 @@ let make = (~onDismiss, ~onSubmit) => {
                   })
                   ->React.array}
                 </select>}
-                labelSlot={React.string("Role")}
+                labelSlot={React.string("Nová role")}
               />
             }}
           />

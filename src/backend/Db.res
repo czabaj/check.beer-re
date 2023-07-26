@@ -470,6 +470,17 @@ module Place = {
     let placeRef = placeDocument(firestore, placeId)
     Firebase.deleteDoc(placeRef)
   }
+  let changePersonRole = async (firestore, ~placeId, ~personId, ~role) => {
+    let personsIndexRef = personsIndexDocument(firestore, placeId)
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personTuple = personsIndex.all->Js.Dict.get(personId)->Option.getExn
+    let personRecord = personsAllTupleToRecord(. personTuple)
+    let personUserId = personRecord.userId->Null.toOption->Option.getExn
+    let placeRef = placeDocument(firestore, placeId)
+    let updateObject = Object.empty()
+    updateObject->Object.set(`users.${personUserId}`, FirestoreModels.roleToJs(role))
+    await Firebase.updateDoc(placeRef, updateObject)
+  }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)
     let updateObject = Object.empty()

@@ -4,6 +4,7 @@ type classesType = {root: string, unclosed: string}
 type dialogState =
   | Hidden
   | AddTransaction
+  | ChangeRole(FirestoreModels.role)
   | ConfirmDeletePerson
   | SendInvitation
 
@@ -38,75 +39,74 @@ let make = (
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
   let personsAllDict = React.useMemo1(() => personsAll->Dict.fromArray, [personsAll])
-  <DialogCycling
-    className={classes.root}
-    hasNext
-    hasPrevious
-    header={person.name}
-    onDismiss
-    onNext=onNextPerson
-    onPrevious=onPreviousPerson
-    visible={true}>
-    <section ariaLabel="Základní údaje">
-      <dl className={`reset ${Styles.descriptionList.inline}`}>
-        <div>
-          <dt> {React.string("již od")} </dt>
-          <dd>
-            {switch maybePersonDoc {
-            | None => <LoadingInline />
-            | Some(personDoc) =>
-              <FormattedDateTime value={personDoc.createdAt->Firebase.Timestamp.toDate} />
+  let personRole =
+    person.userId
+    ->Null.toOption
+    ->Option.flatMap(userId => place.users->Dict.get(userId))
+    ->Option.flatMap(FirestoreModels.roleFromJs)
+  <>
+    <DialogCycling
+      className={classes.root}
+      hasNext
+      hasPrevious
+      header={person.name}
+      onDismiss
+      onNext=onNextPerson
+      onPrevious=onPreviousPerson
+      visible={true}>
+      <section ariaLabel="Základní údaje">
+        <dl className={`reset ${Styles.descriptionList.inline}`}>
+          <div>
+            <dt> {React.string("již od")} </dt>
+            <dd>
+              {switch maybePersonDoc {
+              | None => <LoadingInline />
+              | Some(personDoc) =>
+                <FormattedDateTime value={personDoc.createdAt->Firebase.Timestamp.toDate} />
+              }}
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("naposledy")} </dt>
+            <dd>
+              <FormattedDateTime value={person.recentActivityAt->Firebase.Timestamp.toDate} />
+            </dd>
+          </div>
+          <div>
+            <dt> {React.string("stav konta")} </dt>
+            <dd>
+              <FormattedCurrency format={FormattedCurrency.formatAccounting} value=person.balance />
+            </dd>
+          </div>
+        </dl>
+      </section>
+      {unfinishedConsumptions->Array.length === 0
+        ? <p>
+            {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
+            {switch (pendingTransactions, maybePersonDoc) {
+            | ([], Some({transactions: []})) =>
+              <>
+                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
+                <button
+                  className={Styles.link.base}
+                  onClick={_ => setDialog(_ => ConfirmDeletePerson)}
+                  type_="button">
+                  {React.string("zcela odebrat z aplikace")}
+                </button>
+                {React.string(". S účetním záznamem to později již není možné ☝️")}
+              </>
+            | _ => React.null
             }}
-          </dd>
-        </div>
-        <div>
-          <dt> {React.string("naposledy")} </dt>
-          <dd>
-            <FormattedDateTime value={person.recentActivityAt->Firebase.Timestamp.toDate} />
-          </dd>
-        </div>
-        <div>
-          <dt> {React.string("stav konta")} </dt>
-          <dd>
-            <FormattedCurrency format={FormattedCurrency.formatAccounting} value=person.balance />
-          </dd>
-        </div>
-      </dl>
-    </section>
-    {unfinishedConsumptions->Array.length === 0
-      ? <p>
-          {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
-          {switch (pendingTransactions, maybePersonDoc) {
-          | ([], Some({transactions: []})) =>
-            <>
-              {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
-              <button
-                className={Styles.link.base}
-                onClick={_ => setDialog(_ => ConfirmDeletePerson)}
-                type_="button">
-                {React.string("zcela odebrat z aplikace")}
-              </button>
-              {React.string(". S účetním záznamem to později již není možné ☝️")}
-            </>
-          | _ => React.null
-          }}
-        </p>
-      : <TableConsumptions
-          captionSlot={React.string("Nezaúčtované konzumace")}
-          onDeleteConsumption
-          unfinishedConsumptions
-        />}
-    {
-      let personRole =
-        person.userId
-        ->Null.toOption
-        ->Option.flatMap(userId => place.users->Dict.get(userId))
-        ->Option.flatMap(FirestoreModels.roleFromJs)
-        ->Option.map(FirestoreModels.roleI18n)
-      switch personRole {
+          </p>
+        : <TableConsumptions
+            captionSlot={React.string("Nezaúčtované konzumace")}
+            onDeleteConsumption
+            unfinishedConsumptions
+          />}
+      {switch personRole {
       | None =>
         <p className={Styles.messageBar.info}>
-          {React.string(`Osoba nemá propojený účet. `)}
+          {React.string(`Nemá propojený účet. `)}
           <button
             className={Styles.link.base}
             onClick={_ => setDialog(_ => SendInvitation)}
@@ -116,101 +116,116 @@ let make = (
         </p>
       | Some(role) =>
         <p className={Styles.messageBar.info}>
-          {React.string(`Osoba má přiřazenou roli ${role}`)}
+          {React.string(`Má propojený účet a oprávnění jako `)}
+          <b> {role->FirestoreModels.roleI18n->React.string} </b>
+          {switch role {
+          | Owner => React.null
+          | _ =>
+            <>
+              {React.string(` (`)}
+              <button
+                className={Styles.link.base}
+                onClick={_ => setDialog(_ => ChangeRole(role))}
+                type_="button">
+                {React.string(`změnit oprávnění`)}
+              </button>
+              {React.string(`)`)}
+            </>
+          }}
         </p>
-      }
-    }
-    <section ariaLabelledby="financial_transactions">
-      <header>
-        <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
-        {React.cloneElement(
-          <button
-            className={Styles.button.base}
-            onClick={_ => setDialog(_ => AddTransaction)}
-            type_="button">
-            {React.string("Zaznamenat platbu")}
-          </button>,
-          personsAll->Array.length < 2
-            ? {"disabled": true, "title": "Přidejte další osoby"}
-            : Object.empty(),
-        )}
-      </header>
-      {switch (pendingTransactions, maybePersonDoc) {
-      | (_, None) => <LoadingInline />
-      | ([], Some({transactions: []})) =>
-        <p> {React.string("Tato osoba zatím nemá účetní záznamy.")} </p>
-      | (pending, Some({transactions})) =>
-        pending->Array.sort(byCreatedDesc)
-        transactions->Array.sort(byCreatedDesc)
-        <table ariaLabelledby="financial_transactions" className={Styles.table.inDialog}>
-          <thead>
-            <tr>
-              <th scope="col"> {React.string("Datum")} </th>
-              <th scope="col"> {React.string("Částka")} </th>
-              <th scope="col"> {React.string("Poznámka")} </th>
-            </tr>
-          </thead>
-          <tbody>
-            {pending
-            ->Array.map(pendingTransaction => {
-              let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
-              <tr className={classes.unclosed} key={createdDate->Js.Date.getTime->Float.toString}>
-                <td>
-                  <FormattedDateTime value={createdDate} />
-                </td>
-                <td>
-                  <FormattedCurrency value={pendingTransaction.amount} />
-                </td>
-                <td>
-                  {switch pendingTransaction.keg->Null.toOption {
-                  | None => React.null
-                  | Some(kegSerial) =>
-                    React.string(`Nezaúčtované: vklad za sud ${kegSerial->Db.formatKegSerial}`)
-                  }}
-                </td>
-              </tr>
-            })
-            ->React.array}
-            {transactions
-            ->Array.map(finalTransaction => {
-              let createdDate = finalTransaction.createdAt->Firebase.Timestamp.toDate
-              <tr key={createdDate->Js.Date.getTime->Float.toString}>
-                <td>
-                  <FormattedDateTime value={createdDate} />
-                </td>
-                <td>
-                  <FormattedCurrency value={finalTransaction.amount} />
-                </td>
-                <td>
-                  {switch (
-                    finalTransaction.keg->Null.toOption,
-                    finalTransaction.note->Null.toOption,
-                    finalTransaction.person->Null.toOption,
-                    finalTransaction.amount > 0,
-                  ) {
-                  | (_, Some(note), _, _) => React.string(note)
-                  | (Some(kegSerial), _, _, false) =>
-                    React.string(`Konzumace ze sudu ${kegSerial->Db.formatKegSerial}`)
-                  | (Some(kegSerial), _, _, true) =>
-                    React.string(`Vklad sudu ${kegSerial->Db.formatKegSerial}`)
-                  | (_, _, Some(counterparty), false) =>
-                    React.string(
-                      `Převod od ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
-                    )
-                  | (_, _, Some(counterparty), true) =>
-                    React.string(
-                      `Převod pro ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
-                    )
-                  | _ => React.null
-                  }}
-                </td>
-              </tr>
-            })
-            ->React.array}
-          </tbody>
-        </table>
       }}
-    </section>
+      <section ariaLabelledby="financial_transactions">
+        <header>
+          <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>
+          {React.cloneElement(
+            <button
+              className={Styles.button.base}
+              onClick={_ => setDialog(_ => AddTransaction)}
+              type_="button">
+              {React.string("Zaznamenat platbu")}
+            </button>,
+            personsAll->Array.length < 2
+              ? {"disabled": true, "title": "Přidejte další osoby"}
+              : Object.empty(),
+          )}
+        </header>
+        {switch (pendingTransactions, maybePersonDoc) {
+        | (_, None) => <LoadingInline />
+        | ([], Some({transactions: []})) =>
+          <p> {React.string("Tato osoba zatím nemá účetní záznamy.")} </p>
+        | (pending, Some({transactions})) =>
+          pending->Array.sort(byCreatedDesc)
+          transactions->Array.sort(byCreatedDesc)
+          <table ariaLabelledby="financial_transactions" className={Styles.table.inDialog}>
+            <thead>
+              <tr>
+                <th scope="col"> {React.string("Datum")} </th>
+                <th scope="col"> {React.string("Částka")} </th>
+                <th scope="col"> {React.string("Poznámka")} </th>
+              </tr>
+            </thead>
+            <tbody>
+              {pending
+              ->Array.map(pendingTransaction => {
+                let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
+                <tr className={classes.unclosed} key={createdDate->Js.Date.getTime->Float.toString}>
+                  <td>
+                    <FormattedDateTime value={createdDate} />
+                  </td>
+                  <td>
+                    <FormattedCurrency value={pendingTransaction.amount} />
+                  </td>
+                  <td>
+                    {switch pendingTransaction.keg->Null.toOption {
+                    | None => React.null
+                    | Some(kegSerial) =>
+                      React.string(`Nezaúčtované: vklad za sud ${kegSerial->Db.formatKegSerial}`)
+                    }}
+                  </td>
+                </tr>
+              })
+              ->React.array}
+              {transactions
+              ->Array.map(finalTransaction => {
+                let createdDate = finalTransaction.createdAt->Firebase.Timestamp.toDate
+                <tr key={createdDate->Js.Date.getTime->Float.toString}>
+                  <td>
+                    <FormattedDateTime value={createdDate} />
+                  </td>
+                  <td>
+                    <FormattedCurrency value={finalTransaction.amount} />
+                  </td>
+                  <td>
+                    {switch (
+                      finalTransaction.keg->Null.toOption,
+                      finalTransaction.note->Null.toOption,
+                      finalTransaction.person->Null.toOption,
+                      finalTransaction.amount > 0,
+                    ) {
+                    | (_, Some(note), _, _) => React.string(note)
+                    | (Some(kegSerial), _, _, false) =>
+                      React.string(`Konzumace ze sudu ${kegSerial->Db.formatKegSerial}`)
+                    | (Some(kegSerial), _, _, true) =>
+                      React.string(`Vklad sudu ${kegSerial->Db.formatKegSerial}`)
+                    | (_, _, Some(counterparty), false) =>
+                      React.string(
+                        `Převod od ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                      )
+                    | (_, _, Some(counterparty), true) =>
+                      React.string(
+                        `Převod pro ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                      )
+                    | _ => React.null
+                    }}
+                  </td>
+                </tr>
+              })
+              ->React.array}
+            </tbody>
+          </table>
+        }}
+      </section>
+    </DialogCycling>
     {switch dialogState {
     | Hidden => React.null
     | AddTransaction => {
@@ -257,6 +272,16 @@ let make = (
           personsAll
         />
       }
+    | ChangeRole(currentRole) =>
+      <ChangeRole
+        currentRole
+        onDismiss={hideDialog}
+        onSubmit={({role}) => {
+          Db.Place.changePersonRole(firestore, ~personId, ~placeId, ~role)->ignore
+          hideDialog()
+        }}
+        personName={person.name}
+      />
     | ConfirmDeletePerson =>
       <DialogConfirmation
         className={DialogConfirmation.classes.deleteConfirmation}
@@ -265,7 +290,7 @@ let make = (
           hideDialog()
           onDeletePerson()
         }}
-        onDismiss={() => hideDialog()}
+        onDismiss={hideDialog}
         visible=true>
         <p>
           {React.string(`Chystáte se odstranit osobu `)}
@@ -293,5 +318,5 @@ let make = (
         }}
       />
     }}
-  </DialogCycling>
+  </>
 }
