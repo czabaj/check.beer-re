@@ -60,3 +60,7 @@ textarea {
 :where(input, select) {
   border: var(--border-size-1) solid var(--surface-1);
 }
+
+body:has(dialog[open]) {
+  overflow: hidden;
+}
