@@ -6,6 +6,15 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
 
   let email = Validation.email(~error="Neplatný email")
 
+  let equals = (~expected, ~error, field) => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      if value == expected {
+        Valid
+      } else {
+        Error(error)
+      }
+    }, field)
+
   let float = Validation.float
 
   let int = Validation.int

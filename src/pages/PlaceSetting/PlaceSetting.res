@@ -113,6 +113,10 @@ let make = (~placeId) => {
             name: place.name,
           }}
           onDismiss={hideDialog}
+          onPlaceDelete={_ => {
+            Db.Place.delete(firestore, ~placeId)->ignore
+            RescriptReactRouter.replace("/misto")
+          }}
           onSubmit={values => {
             Db.Place.update(
               firestore,

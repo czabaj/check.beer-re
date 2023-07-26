@@ -25,7 +25,7 @@ module.exports = {
     "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-unused-vars": 0,
-    quotes: ["error", "double"],
+    quotes: 0,
     "import/no-unresolved": 0,
     indent: ["error", 2],
     "object-curly-spacing": 0,

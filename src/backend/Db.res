@@ -466,6 +466,10 @@ module Place = {
     ->Firebase.WriteBatch.commit
     placeDoc
   }
+  let delete = (firestore, ~placeId) => {
+    let placeRef = placeDocument(firestore, placeId)
+    Firebase.deleteDoc(placeRef)
+  }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)
     let updateObject = Object.empty()
