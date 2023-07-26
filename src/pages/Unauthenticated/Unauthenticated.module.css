@@ -11,6 +11,7 @@ section[aria-labelledby="other_methods"] {
 section[aria-labelledby="other_methods"] h3 {
   font-size: var(--font-size-16);
   font-weight: var(--font-weight-medium);
+  margin-block-start: 0;
   overflow: hidden;
   position: relative;
   text-align: center;
