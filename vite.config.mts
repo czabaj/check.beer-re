@@ -3,7 +3,7 @@
 
 import createReScriptPlugin from "@jihchi/vite-plugin-rescript";
 import createReactPlugin from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, splitVendorChunkPlugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     createReactPlugin(),
     mode !== `test` && createReScriptPlugin(),
+    splitVendorChunkPlugin(),
     VitePWA({
       registerType: `autoUpdate`,
       workbox: {
