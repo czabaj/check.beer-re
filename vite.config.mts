@@ -11,7 +11,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     createReactPlugin(),
     mode !== `test` && createReScriptPlugin(),
-    VitePWA({ registerType: `autoUpdate` }),
+    VitePWA({
+      registerType: `autoUpdate`,
+      workbox: {
+        globPatterns: [`**/*.{js,css,html}`, `assets/**/*.svg`],
+      },
+    }),
   ].filter(Boolean),
   server: {
     host: `0.0.0.0`,
