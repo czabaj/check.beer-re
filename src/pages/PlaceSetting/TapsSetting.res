@@ -131,7 +131,7 @@ let make = (
         existingNames={place.taps->Js.Dict.keys}
         initialName=tapName
         onDismiss={hideDialog}
-        onSubmit={async values => {
+        onSubmit={values => {
           Db.Place.tapRename(
             firestore,
             ~placeId,
@@ -144,7 +144,7 @@ let make = (
     | TapKegOn(tapName) =>
       <TapKegOn
         onDismiss={hideDialog}
-        onSubmit={async values => {
+        onSubmit={values => {
           Db.Place.tapKegOn(firestore, ~placeId, ~tapName, ~kegId=values.keg)->ignore
           hideDialog()
         }}

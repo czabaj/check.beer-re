@@ -19,21 +19,8 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
   })
   let form = Form.use(
     ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getWithDefault("")},
-    ~onSubmit=({state, raiseSubmitFailed}) => {
-      onSubmit(state.values)
-      ->Promise.catch(error => {
-        let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
-          | Some(msg) => `Chyba: ${msg}`
-          | None => "Neznámá chyba"
-          }
-        | _ => "Neznámá chyba"
-        }
-        raiseSubmitFailed(Some(errorMessage))
-        Promise.resolve()
-      })
-      ->ignore
+    ~onSubmit=({state}) => {
+      onSubmit(state.values)->ignore
       None
     },
     ~schema={

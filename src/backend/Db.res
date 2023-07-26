@@ -688,6 +688,7 @@ module ShareLink = {
     }
   }
 
+  // this method uses transaction, thus requures the user to be online
   let acceptInvitation = (firestore, ~linkId, ~userId) => {
     let shareLinkDocument = document(firestore, linkId)
     open Firebase

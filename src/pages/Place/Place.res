@@ -359,7 +359,7 @@ let make = (~placeId) => {
               )->ignore
             }}
             onDismiss={hideDialog}
-            onSubmit={async values => {
+            onSubmit={values => {
               let kegRef = place.taps->Js.Dict.unsafeGet(values.tap)->Null.getExn
               Db.Keg.addConsumption(
                 firestore,
@@ -400,8 +400,8 @@ let make = (~placeId) => {
               )->ignore
               hideDialog()
             }}
-            onSubmit={async values => {
-              await Db.Person.add(firestore, ~placeId, ~personName=values.name)
+            onSubmit={values => {
+              Db.Person.add(firestore, ~placeId, ~personName=values.name)->ignore
               hideDialog()
             }}
           />

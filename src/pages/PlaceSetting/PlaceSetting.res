@@ -64,7 +64,7 @@ let make = (~placeId) => {
       | AddKeg =>
         <KegAddNew
           onDismiss={hideDialog}
-          onSubmit={async ({beer, donors, milliliters, ownerIsDonor, price, serial}) => {
+          onSubmit={({beer, donors, milliliters, ownerIsDonor, price, serial}) => {
             let resolvedDonors = if !ownerIsDonor {
               donors
             } else {
@@ -87,7 +87,7 @@ let make = (~placeId) => {
                 ->fst
               Js.Dict.fromArray([(placeOwnerPersonId, price)])
             }
-            let _ = await Firebase.addDoc(
+            Firebase.addDoc(
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
@@ -100,7 +100,7 @@ let make = (~placeId) => {
                 recentConsumptionAt: Null.null,
                 serial,
               },
-            )
+            )->ignore
             hideDialog()
           }}
           personsAll
@@ -113,13 +113,13 @@ let make = (~placeId) => {
             name: place.name,
           }}
           onDismiss={hideDialog}
-          onSubmit={async values => {
-            await Db.Place.update(
+          onSubmit={values => {
+            Db.Place.update(
               firestore,
               ~placeId,
               ~createdAt=values.createdAt->DateUtils.fromIsoDateString->Firebase.Timestamp.fromDate,
               ~name=values.name,
-            )
+            )->ignore
             hideDialog()
           }}
         />

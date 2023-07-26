@@ -115,6 +115,16 @@ module Pure = {
               </fieldset>
             </form>
           </Form.Provider>
+          {switch form.state.formState {
+          | SubmitFailed(maybeErrorMessage) => {
+              let errorMessage = switch maybeErrorMessage {
+              | Some(msg) => msg
+              | None => "Neznámá chyba"
+              }
+              React.string(errorMessage)
+            }
+          | _ => React.null
+          }}
           <section ariaLabelledby="other_methods">
             <h3 id="other_methods">
               <span> {React.string("nebo")} </span>

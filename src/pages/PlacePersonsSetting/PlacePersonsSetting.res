@@ -184,8 +184,8 @@ let make = (~placeId) => {
           <PersonAddPersonsSetting
             existingNames={personsAll->Array.map(((_, person)) => person.name)}
             onDismiss={hideDialog}
-            onSubmit={async values => {
-              await Db.Person.add(firestore, ~placeId, ~personName=values.name)
+            onSubmit={values => {
+              Db.Person.add(firestore, ~placeId, ~personName=values.name)->ignore
               hideDialog()
             }}
           />

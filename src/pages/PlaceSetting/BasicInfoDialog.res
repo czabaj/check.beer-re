@@ -12,21 +12,8 @@ module Validators = Validators.CustomValidators(FormFields)
 let make = (~initialValues, ~onDismiss, ~onSubmit) => {
   let form = Form.use(
     ~initialState=initialValues,
-    ~onSubmit=({state, raiseSubmitFailed}) => {
+    ~onSubmit=({state}) => {
       onSubmit(state.values)
-      ->Promise.catch(error => {
-        let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
-          | Some(msg) => `Chyba: ${msg}`
-          | None => "Neznámá chyba"
-          }
-        | _ => "Neznámá chyba"
-        }
-        raiseSubmitFailed(Some(errorMessage))
-        Promise.resolve()
-      })
-      ->ignore
       None
     },
     ~validationStrategy=OnDemand,

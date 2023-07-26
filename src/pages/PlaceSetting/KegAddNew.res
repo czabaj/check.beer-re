@@ -56,21 +56,8 @@ module FormComponent = {
           })
         let form = Form.use(
           ~initialState={recentKegState},
-          ~onSubmit=({state, raiseSubmitFailed}) => {
+          ~onSubmit=({state}) => {
             onSubmit(state.values)
-            ->Promise.catch(error => {
-              let errorMessage = switch error {
-              | Js.Exn.Error(e) =>
-                switch Js.Exn.message(e) {
-                | Some(msg) => `Chyba: ${msg}`
-                | None => "Neznámá chyba"
-                }
-              | _ => "Neznámá chyba"
-              }
-              raiseSubmitFailed(Some(errorMessage))
-              Promise.resolve()
-            })
-            ->ignore
             None
           },
           ~schema={

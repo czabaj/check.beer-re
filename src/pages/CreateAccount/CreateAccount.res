@@ -57,6 +57,16 @@ module Pure = {
             </button>
           </fieldset>
         </form>
+        {switch form.state.formState {
+        | SubmitFailed(maybeErrorMessage) => {
+            let errorMessage = switch maybeErrorMessage {
+            | Some(msg) => msg
+            | None => "Neznámá chyba"
+            }
+            React.string(errorMessage)
+          }
+        | _ => React.null
+        }}
       </Form.Provider>
     </div>
   }

@@ -7,21 +7,8 @@ module Validators = Validators.CustomValidators(FormFields)
 let make = (~existingNames, ~initialName, ~onDismiss, ~onSubmit) => {
   let form = Form.use(
     ~initialState={name: initialName},
-    ~onSubmit=({state, raiseSubmitFailed}) => {
-      onSubmit(state.values)
-      ->Promise.catch(error => {
-        let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
-          | Some(msg) => `Chyba: ${msg}`
-          | None => "Neznámá chyba"
-          }
-        | _ => "Neznámá chyba"
-        }
-        raiseSubmitFailed(Some(errorMessage))
-        Promise.resolve()
-      })
-      ->ignore
+    ~onSubmit=({state}) => {
+      onSubmit(state.values)->ignore
       None
     },
     ~schema={

@@ -236,8 +236,8 @@ let make = (
           ->Option.map(fst)
           ->Option.getWithDefault("")}
           onDismiss={hideDialog}
-          onSubmit={async values => {
-            await Db.Person.addFinancialTransaction(
+          onSubmit={values => {
+            Db.Person.addFinancialTransaction(
               firestore,
               ~counterPartyId=values.person,
               ~placeId,
@@ -249,7 +249,7 @@ let make = (
                 note: values.note === "" ? Null.null : Null.make(values.note),
                 person: Null.make(values.person),
               },
-            )
+            )->ignore
             hideDialog()
           }}
           personId

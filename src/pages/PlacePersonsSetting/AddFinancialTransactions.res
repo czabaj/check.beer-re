@@ -17,27 +17,14 @@ let make = (
   let {minorUnit} = FormattedCurrency.useCurrency()
   let form = Form.use(
     ~initialState={amount: "", note: "", person: initialCounterParty},
-    ~onSubmit=({state, raiseSubmitFailed}) => {
+    ~onSubmit=({state}) => {
       let amountFloat = state.values.amount->Float.fromString->Option.getExn
       let amountMinor = amountFloat *. minorUnit
       onSubmit({
         amount: amountMinor->Int.fromFloat,
         note: state.values.note,
         person: state.values.person,
-      })
-      ->Promise.catch(error => {
-        let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
-          | Some(msg) => `Chyba: ${msg}`
-          | None => "Neznámá chyba"
-          }
-        | _ => "Neznámá chyba"
-        }
-        raiseSubmitFailed(Some(errorMessage))
-        Promise.resolve()
-      })
-      ->ignore
+      })->ignore
       None
     },
     ~schema={
