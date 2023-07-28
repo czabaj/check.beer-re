@@ -444,7 +444,7 @@ module Place = {
         currency: "CZK",
         name: placeName,
         taps: Dict.fromArray([(defaultTapName, Null.null)]),
-        users: Dict.fromArray([(userId, FirestoreModels.roleToJs(FirestoreModels.Owner))]),
+        users: Dict.fromArray([(userId, UserRoles.roleToJs(UserRoles.Owner))]),
       },
       {},
     )
@@ -478,7 +478,7 @@ module Place = {
     let personUserId = personRecord.userId->Null.toOption->Option.getExn
     let placeRef = placeDocument(firestore, placeId)
     let updateObject = Object.empty()
-    updateObject->Object.set(`users.${personUserId}`, FirestoreModels.roleToJs(role))
+    updateObject->Object.set(`users.${personUserId}`, UserRoles.roleToJs(role))
     await Firebase.updateDoc(placeRef, updateObject)
   }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
@@ -676,7 +676,7 @@ module ShareLink = {
   }
 
   let upsert = async (firestore, ~placeId, ~personId, ~role) => {
-    if role === FirestoreModels.Owner {
+    if role === UserRoles.Owner {
       Exn.raiseError("Changing owner is currently not supported")
     }
     let shareLinkCollection = collection(firestore)
@@ -690,14 +690,14 @@ module ShareLink = {
     | [shareLinkSnapshot] => {
         await updateDoc(
           shareLinkSnapshot.ref,
-          {"createdAt": Timestamp.now(), "role": role->roleToJs},
+          {"createdAt": Timestamp.now(), "role": role->UserRoles.roleToJs},
         )
         shareLinkSnapshot.id
       }
     | _ =>
       let newDoc = await addDoc(
         shareLinkCollection,
-        {createdAt: Timestamp.now(), person: personId, place: placeId, role: role->roleToJs},
+        {createdAt: Timestamp.now(), person: personId, place: placeId, role: role->UserRoles.roleToJs},
       )
       newDoc.id
     }

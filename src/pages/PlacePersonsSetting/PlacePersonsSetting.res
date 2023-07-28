@@ -107,8 +107,8 @@ let make = (~placeId) => {
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
-                      ->Option.flatMap(FirestoreModels.roleFromJs)
-                      ->Option.map(FirestoreModels.roleI18n)
+                      ->Option.flatMap(UserRoles.roleFromJs)
+                      ->Option.map(UserRoles.roleI18n)
                       ->Option.mapWithDefault(React.null, React.string)}
                     </td>
                     <td>

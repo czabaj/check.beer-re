@@ -16,8 +16,8 @@ module Pure = {
       | (Some(shareLink, place), Some(handleAccept)) =>
         let role =
           shareLink.role
-          ->FirestoreModels.roleFromJs
-          ->Option.map(FirestoreModels.roleI18n)
+          ->UserRoles.roleFromJs
+          ->Option.map(UserRoles.roleI18n)
           ->Option.getExn
         <>
           <p>

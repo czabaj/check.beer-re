@@ -4,7 +4,7 @@ type classesType = {root: string, unclosed: string}
 type dialogState =
   | Hidden
   | AddTransaction
-  | ChangeRole(FirestoreModels.role)
+  | ChangeRole(UserRoles.role)
   | ConfirmDeletePerson
   | SendInvitation
 
@@ -43,7 +43,7 @@ let make = (
     person.userId
     ->Null.toOption
     ->Option.flatMap(userId => place.users->Dict.get(userId))
-    ->Option.flatMap(FirestoreModels.roleFromJs)
+    ->Option.flatMap(UserRoles.roleFromJs)
   <>
     <DialogCycling
       className={classes.root}
@@ -117,7 +117,7 @@ let make = (
       | Some(role) =>
         <p className={Styles.messageBar.info}>
           {React.string(`Má propojený účet a oprávnění jako `)}
-          <b> {role->FirestoreModels.roleI18n->React.string} </b>
+          <b> {role->UserRoles.roleI18n->React.string} </b>
           {switch role {
           | Owner => React.null
           | _ =>

@@ -2,14 +2,16 @@ type classesType = {descriptionList: string}
 @module("./PlaceStats.module.css") external classes: classesType = "default"
 
 @react.component
-let make = (~chargedKegsValue, ~personsCount, ~totalBalance) => {
+let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount, ~totalBalance) => {
   <SectionWithHeader
-    buttonsSlot={<a
-      {...RouterUtils.createAnchorProps("./osob")}
-      className={Styles.button.base}
-      type_="button">
-      {React.string("Osobní účty")}
-    </a>}
+    buttonsSlot={isUserAuthorized(UserRoles.Admin)
+      ? <a
+          {...RouterUtils.createAnchorProps("./osob")}
+          className={Styles.button.base}
+          type_="button">
+          {React.string("Osobní účty")}
+        </a>
+      : React.null}
     headerId="accounting_overview"
     headerSlot={React.string("Účetnictví")}>
     <dl className={classes.descriptionList}>

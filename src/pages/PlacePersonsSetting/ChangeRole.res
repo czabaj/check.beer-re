@@ -1,11 +1,11 @@
-module FormFields = %lenses(type state = {role: FirestoreModels.role})
+module FormFields = %lenses(type state = {role: UserRoles.role})
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
 let make = (~currentRole, ~onDismiss, ~onSubmit, ~personName) => {
-  open FirestoreModels
+  open UserRoles
   let roleOptions = [Viewer, SelfService, Staff, Admin]
   let form = Form.use(
     ~initialState={role: currentRole},
@@ -60,10 +60,10 @@ let make = (~currentRole, ~onDismiss, ~onSubmit, ~personName) => {
         <ol className="reset">
           {roleOptions
           ->Array.map(role => {
-            let name = role->FirestoreModels.roleI18n
+            let name = role->UserRoles.roleI18n
             <li key=name>
               <b> {React.string(name)} </b>
-              {React.string(` - ${role->FirestoreModels.roleDescription}`)}
+              {React.string(` - ${role->UserRoles.roleDescription}`)}
             </li>
           })
           ->React.array}

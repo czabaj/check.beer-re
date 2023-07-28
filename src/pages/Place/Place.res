@@ -38,6 +38,7 @@ module ActivePersonListItem = {
     ~activeCheckbox: option<React.element>,
     ~consumptions: array<Db.userConsumption>,
     ~isCurrent,
+    ~isUserAuthorized,
     ~onAddConsumption,
     ~personName,
   ) => {
@@ -82,12 +83,15 @@ module ActivePersonListItem = {
       | Some(node) => node
       | None =>
         <div className={classes.consumption}>
-          <button
-            className={Styles.utility.breakout}
-            onClick={_ => onAddConsumption()}
-            title="Detail konzumace"
-            type_="button"
-          />
+          {isUserAuthorized(UserRoles.Staff) ||
+          (isCurrent && isUserAuthorized(UserRoles.SelfService))
+            ? <button
+                className={Styles.utility.breakout}
+                onClick={_ => onAddConsumption()}
+                title="Detail konzumace"
+                type_="button"
+              />
+            : React.null}
           {React.string(consumptionsStr)}
         </div>
       }}
@@ -230,26 +234,32 @@ let make = (~placeId) => {
       recentConsumptionsByUser,
       currentUser,
     ) =>
+    let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
-          buttonRightSlot={<a
-            {...RouterUtils.createAnchorProps("./nastaveni")}
-            className={Header.classes.buttonRight}>
-            <span> {React.string("⚙️")} </span>
-            <span> {React.string("Nastavení")} </span>
-          </a>}
+          buttonRightSlot={isUserAuthorized(UserRoles.Staff)
+            ? <a
+                {...RouterUtils.createAnchorProps("./nastaveni")}
+                className={Header.classes.buttonRight}>
+                <span> {React.string("⚙️")} </span>
+                <span> {React.string("Nastavení")} </span>
+              </a>
+            : React.null}
           createdTimestamp={place.createdAt}
           placeName={place.name}
         />
         <main>
           <SectionWithHeader
-            buttonsSlot={<button
-              className={Styles.button.base}
-              type_="button"
-              onClick={_ => setDialog(_ => AddPerson)}>
-              {React.string("Přidat návštěvníka")}
-            </button>}
+            buttonsSlot={isUserAuthorized(UserRoles.Staff)
+              ? <button
+                  className={Styles.button.base}
+                  type_="button"
+                  onClick={_ => setDialog(_ => AddPerson)}>
+                  {React.string("Přidat návštěvníka")}
+                </button>
+              : React.null}
             headerId="active_persons"
             headerSlot={React.string("Lístek")}>
             {activePersonEntries->Array.length === 0
@@ -272,6 +282,7 @@ let make = (~placeId) => {
                       isCurrent={person.userId->Null.mapWithDefault(false, userId =>
                         userId === currentUser.uid
                       )}
+                      isUserAuthorized
                       key={personId}
                       onAddConsumption={() => {
                         setDialog(_ => AddConsumption({personId, person}))
@@ -284,12 +295,14 @@ let make = (~placeId) => {
           </SectionWithHeader>
           {switch activePersonsChanges {
           | None =>
-            <button
-              className={Styles.button.base}
-              onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
-              type_="button">
-              {React.string("Nepřítomní")}
-            </button>
+            isUserAuthorized(UserRoles.SelfService)
+              ? <button
+                  className={Styles.button.base}
+                  onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
+                  type_="button">
+                  {React.string("Nepřítomní")}
+                </button>
+              : React.null
           | Some(changes) =>
             <>
               <button

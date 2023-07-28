@@ -1,27 +1,31 @@
-let pageDataRx = (firestore, placeId) => {
+let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
   let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  combineLatest3(placeRx, personsAllRx, chargedKegsRx)
+  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  combineLatest4(placeRx, personsAllRx, chargedKegsRx, currentUserRx)
 }
 
 type dialogState = Hidden | AddKeg | BasicInfoEdit | KegDetail(string)
 
 @react.component
 let make = (~placeId) => {
+  let auth = Reactfire.useAuth()
   let firestore = Reactfire.useFirestore()
   // this paginated call do not use suspense, call it above the placePageStatus which _is_ suspended
   let (maybeDepletedKegs, maybeFetchMoreDepletedKegs) = UsePaginatedDepletedKegsData.use(placeId)
   let pageDataStatus = Reactfire.useObservable(
     ~observableId=`Page_PlaceSetting_${placeId}`,
-    ~source=pageDataRx(firestore, placeId),
+    ~source=pageDataRx(auth, firestore, placeId),
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
-  | Some((place, personsAll, chargedKegs)) =>
+  | Some((place, personsAll, chargedKegs, currentUser)) =>
+    let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
     let kegsOnTapUids =
       place.taps
       ->Js.Dict.values
@@ -34,19 +38,22 @@ let make = (~placeId) => {
     <FormattedCurrency.Provider value={place.currency}>
       <div className={Styles.page.narrow}>
         <PlaceHeader
-          buttonRightSlot={<button
-            className={Header.classes.buttonRight}
-            onClick={_ => setDialog(_ => BasicInfoEdit)}
-            type_="button">
-            <span> {React.string("✏️")} </span>
-            <span> {React.string("Změnit")} </span>
-          </button>}
+          buttonRightSlot={isUserAuthorized(UserRoles.Owner)
+            ? <button
+                className={Header.classes.buttonRight}
+                onClick={_ => setDialog(_ => BasicInfoEdit)}
+                type_="button">
+                <span> {React.string("✏️")} </span>
+                <span> {React.string("Změnit")} </span>
+              </button>
+            : React.null}
           createdTimestamp={place.createdAt}
           placeName={place.name}
         />
         <main>
           <PlaceStats
             chargedKegsValue={chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)}
+            isUserAuthorized
             personsCount={personsAll->Array.length}
             totalBalance={personsAll->Array.reduce(0, (sum, (_, person)) => sum + person.balance)}
           />
@@ -68,11 +75,11 @@ let make = (~placeId) => {
             let resolvedDonors = if !ownerIsDonor {
               donors
             } else {
-              let userRole = FirestoreModels.roleToJs(FirestoreModels.Owner)
+              let ownerRoleInt = UserRoles.roleToJs(UserRoles.Owner)
               let placeOwnerUid =
                 place.users
                 ->Dict.toArray
-                ->Array.find(((_, role)) => role === userRole)
+                ->Array.find(((_, role)) => role === ownerRoleInt)
                 ->Option.getExn
                 ->fst
               let placeOwnerPersonId =

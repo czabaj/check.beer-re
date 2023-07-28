@@ -2,8 +2,6 @@
 /* eslint-disable import/first */
 
 
-import type {Role as $$role} from './roles';
-
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 
 import type {documentReference as Firebase_documentReference} from './Firebase.gen';
@@ -41,9 +39,6 @@ export type keg = {
 
 // tslint:disable-next-line:interface-over-type-literal
 export type person = { readonly createdAt: Firebase_Timestamp_t; readonly transactions: financialTransaction[] };
-
-// tslint:disable-next-line:interface-over-type-literal
-export type role = $$role;
 
 // tslint:disable-next-line:interface-over-type-literal
 export type place = {
