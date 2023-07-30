@@ -17,3 +17,8 @@ let share = (data: shareData) => {
     navigatorWriteToClipboard(data.url)->Promise.then(() => Promise.resolve(Clipboard))
   }
 }
+
+@get external matches: Webapi.Dom.Window.mediaQueryList => bool = "matches"
+
+let isStandaloneMode =
+  Webapi.Dom.window->Webapi.Dom.Window.matchMedia("(display-mode: standalone)")->matches

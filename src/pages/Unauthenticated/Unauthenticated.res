@@ -56,7 +56,7 @@ module Pure = {
           <Form.Provider value=Some(form)>
             <form onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
               <fieldset className={`reset ${Styles.fieldset.grid}`}>
-                <InputThrustDevice />
+                {DomUtils.isStandaloneMode ? React.null : <InputThrustDevice />}
                 <Form.Field
                   field=Email
                   render={field => {

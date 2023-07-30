@@ -61,7 +61,7 @@ let make = (~initialName, ~onDismiss, ~onSubmit) => {
               />
             }}
           />
-          <InputThrustDevice />
+          {DomUtils.isStandaloneMode ? React.null : <InputThrustDevice />}
         </fieldset>
       </form>
     </Form.Provider>

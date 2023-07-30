@@ -11,7 +11,7 @@ let make = (~children) => {
     | None => {
         let firestore = initializeFirestore(
           app,
-          AppStorage.getThrustDevice() === None
+          !DomUtils.isStandaloneMode && AppStorage.getThrustDevice() === None
             ? {}
             : {
                 localCache: FirestoreLocalCache.persistentLocalCache({
