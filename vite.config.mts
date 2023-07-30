@@ -13,9 +13,27 @@ export default defineConfig(({ mode }) => ({
     mode !== `test` && createReScriptPlugin(),
     splitVendorChunkPlugin(),
     VitePWA({
+      manifest: {
+        name: "Check Beer",
+        short_name: "CheckBeer",
+        description: "Kamarádské pivní účetnictví",
+        theme_color: "#edeeed",
+        icons: [
+          {
+            src: "pwa-192.png",
+            sizes: "192x192",
+            type: "image/png",
+          },
+          {
+            src: "pwa-512.png",
+            sizes: "512x512",
+            type: "image/png",
+          },
+        ],
+      },
       registerType: `autoUpdate`,
       workbox: {
-        globPatterns: [`**/*.{js,css,html}`, `assets/**/*.svg`],
+        globPatterns: [`**/*.{js,css,html,png,svg}`],
       },
     }),
   ].filter(Boolean),
