@@ -5,6 +5,18 @@ module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
 let make = (~initialName, ~onDismiss, ~onSubmit) => {
+  React.useEffect0(() => {
+    let initialThrustDevide = AppStorage.getThrustDevice() !== None
+    Some(
+      () => {
+        let unmountThrustDevice = AppStorage.getThrustDevice() !== None
+        if initialThrustDevide != unmountThrustDevice {
+          // we need to reload the page to re-initialize the Firestore SDK
+          Webapi.Dom.location->Webapi.Dom.Location.reload
+        }
+      },
+    )
+  })
   let form = Form.use(
     ~initialState={name: initialName},
     ~onSubmit=({state, raiseSubmitFailed}) => {

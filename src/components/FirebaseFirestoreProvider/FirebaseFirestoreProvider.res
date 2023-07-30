@@ -5,16 +5,6 @@ let make = (~children) => {
   open Reactfire
   open Firebase
 
-  let app = useFirebaseApp()
-  let appCheck = initializeAppCheck(
-    app,
-    {
-      provider: createReCaptchaV3Provider(appCheckToken),
-      isTokenAutoRefreshEnabled: true,
-    },
-  )
-  let auth = app->Auth.getAuth
-
   let {status, data: firestore} = useInitFirestore(async app => {
     switch initializedFirestore.contents {
     | Some(firestore) => firestore
@@ -45,12 +35,7 @@ let make = (~children) => {
   | #success =>
     switch firestore {
     | None => React.null
-    | Some(firestore) =>
-      <AppCheckProvider sdk=appCheck>
-        <AuthProvider sdk=auth>
-          <FirestoreProvider sdk={firestore}> ...children </FirestoreProvider>
-        </AuthProvider>
-      </AppCheckProvider>
+    | Some(firestore) => <FirestoreProvider sdk={firestore}> ...children </FirestoreProvider>
     }
   }
 }
