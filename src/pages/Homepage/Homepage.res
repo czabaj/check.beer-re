@@ -5,14 +5,16 @@ type classesType = {root: string}
 @gentype @react.component
 let make = () => {
   <div className={`${Styles.page.centered} ${classes.root}`}>
-    <div>
+    <header>
       <h1 ariaLabel="Check Beerk" className="text-center" />
-      <p> {React.string("Pivní zápisník 🍻")} </p>
+      <p> {React.string("Pivní zápisník")} </p>
+    </header>
+    <main>
       <a
         {...RouterUtils.createAnchorProps(`/misto`)}
-        className={`${Styles.button.base} ${Styles.button.variantPrimary}`}>
+        className={`${Styles.button.base} ${Styles.button.sizeLarge}`}>
         {React.string("Otevřít")}
       </a>
-    </div>
+    </main>
   </div>
 }

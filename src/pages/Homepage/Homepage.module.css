@@ -1,8 +1,10 @@
-.root > div {
-  border-image: url("../../assets/label.png") 50 fill;
-  border-width: 3rem;
+.root > header {
+  border-image: url("../../assets/label.png") 55 fill;
+  border-width: 55px;
   border-style: solid;
-  max-inline-size: 50ch;
+  inline-size: 45ch;
+  max-inline-size: calc(100vw - 2rem);
+  min-block-size: 15rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -17,7 +19,6 @@
   block-size: 2rem;
   margin: 0;
 }
-
 .root h1 img {
   width: 100%;
 }
@@ -29,6 +30,24 @@
   text-align: left;
 }
 
-.root > div > a {
-  align-self: center;
+.root main {
+  padding-block-start: 7rem;
+  text-align: center;
+}
+.root main > a {
+  --_background: hsl(78deg 26% 90%);
+  transform: rotate(-5deg);
+  font-size: var(--font-size-24);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 2px;
+  outline: 4px solid var(--_background);
+}
+
+.root::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: #70804b;
+  z-index: -1;
+  filter: url(../../assets/noise.svg#wavy2);
 }
