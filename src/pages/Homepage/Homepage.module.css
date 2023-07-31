@@ -28,6 +28,7 @@
   font-family: var(--font-cursive);
   margin: 0;
   text-align: left;
+  text-align: center;
 }
 
 .root main {
@@ -35,7 +36,7 @@
   text-align: center;
 }
 .root main > a {
-  --_background: hsl(78deg 26% 90%);
+  --_background: hsl(99deg 6% 90%);
   transform: rotate(-5deg);
   font-size: var(--font-size-24);
   font-weight: var(--font-weight-semibold);
@@ -47,7 +48,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background-color: #70804b;
+  background-color: hsl(99deg 13% 46%);
   z-index: -1;
   filter: url(../../assets/noise.svg#wavy2);
 }
