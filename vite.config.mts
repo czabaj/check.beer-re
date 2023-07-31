@@ -17,7 +17,7 @@ export default defineConfig(({ mode }) => ({
         name: "Check Beer",
         short_name: "CheckBeer",
         description: "Kamarádské pivní účetnictví",
-        theme_color: "#edeeed",
+        theme_color: "#708465",
         icons: [
           {
             src: "pwa-192.png",

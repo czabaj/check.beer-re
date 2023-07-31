@@ -21,6 +21,17 @@
   ],
   "hosting": {
     "public": "dist",
+    "headers": [
+      {
+        "source": "assets/*",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ],
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
