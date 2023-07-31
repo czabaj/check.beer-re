@@ -5,6 +5,7 @@ module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
 let make = (~initialName, ~onDismiss, ~onSubmit) => {
+  let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
   React.useEffect0(() => {
     let initialThrustDevide = AppStorage.getThrustDevice() !== None
     Some(
@@ -61,7 +62,10 @@ let make = (~initialName, ~onDismiss, ~onSubmit) => {
               />
             }}
           />
-          {DomUtils.isStandaloneMode ? React.null : <InputThrustDevice />}
+          {switch isStandaloneModeStatus.data {
+          | Some(true) => React.null
+          | _ => <InputThrustDevice />
+          }}
         </fieldset>
       </form>
     </Form.Provider>

@@ -10,6 +10,7 @@ module Validators = Validators.CustomValidators(FormFields)
 module Pure = {
   @genType @react.component
   let make = (~initialEmail, ~onBackToForm, ~onGoogleAuth, ~onPasswordAuth, ~signInEmailSent=?) => {
+    let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
     let form = Form.use(
       ~initialState={email: initialEmail},
       ~onSubmit=({state, raiseSubmitFailed}) => {
@@ -56,7 +57,10 @@ module Pure = {
           <Form.Provider value=Some(form)>
             <form onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
               <fieldset className={`reset ${Styles.fieldset.grid}`}>
-                {DomUtils.isStandaloneMode ? React.null : <InputThrustDevice />}
+                {switch isStandaloneModeStatus.data {
+                | Some(true) => React.null
+                | _ => <InputThrustDevice />
+                }}
                 <Form.Field
                   field=Email
                   render={field => {

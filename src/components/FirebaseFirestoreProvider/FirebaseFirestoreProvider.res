@@ -5,13 +5,15 @@ let make = (~children) => {
   open Reactfire
   open Firebase
 
+  let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
   let {status, data: firestore} = useInitFirestore(async app => {
     switch initializedFirestore.contents {
     | Some(firestore) => firestore
     | None => {
+        let isStandaloneMode = isStandaloneModeStatus.data->Option.getWithDefault(false)
         let firestore = initializeFirestore(
           app,
-          !DomUtils.isStandaloneMode && AppStorage.getThrustDevice() === None
+          !isStandaloneMode && AppStorage.getThrustDevice() === None
             ? {}
             : {
                 localCache: FirestoreLocalCache.persistentLocalCache({
