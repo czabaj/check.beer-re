@@ -18,5 +18,5 @@
   padding-inline: var(--list-padding-inline);
 }
 .base li + li {
-  border-block-start: var(--border-size-2) solid var(--surface-1);
+  border-block-start: var(--border-size-2) solid var(--border-ink);
 }

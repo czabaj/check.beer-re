@@ -21,6 +21,7 @@ html.themeDark {
 }
 
 html {
+  --border-ink: hsl(210, 100%, 91%);
   --form-control-disabled: hsl(300deg 0% 58%);
   --form-control-focus: hsl(210deg 100% 96%);
   --surface-1: var(--light, hsl(86deg 3% 93%)) var(--dark, hsl(210deg 14% 7%));

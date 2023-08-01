@@ -6,7 +6,7 @@
 
 html {
   background-color: var(--surface-1);
-  background-image: url(../assets/roughPaper.svg);
+  background-image: url("../assets/noise.svg");
   color: var(--text-1);
   font-family: var(--font-sans);
   line-height: var(--ratio);
