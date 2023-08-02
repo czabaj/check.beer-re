@@ -80,29 +80,6 @@ let make = (
           </div>
         </dl>
       </section>
-      {unfinishedConsumptions->Array.length === 0
-        ? <p>
-            {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
-            {switch (pendingTransactions, maybePersonDoc) {
-            | ([], Some({transactions: []})) =>
-              <>
-                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
-                <button
-                  className={Styles.link.base}
-                  onClick={_ => setDialog(_ => ConfirmDeletePerson)}
-                  type_="button">
-                  {React.string("zcela odebrat z aplikace")}
-                </button>
-                {React.string(". S účetním záznamem to později již není možné ☝️")}
-              </>
-            | _ => React.null
-            }}
-          </p>
-        : <TableConsumptions
-            captionSlot={React.string("Nezaúčtované konzumace")}
-            onDeleteConsumption
-            unfinishedConsumptions
-          />}
       {switch personRole {
       | None =>
         <p className={Styles.messageBar.info}>
@@ -134,6 +111,29 @@ let make = (
           }}
         </p>
       }}
+      {unfinishedConsumptions->Array.length === 0
+        ? <p>
+            {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
+            {switch (pendingTransactions, maybePersonDoc) {
+            | ([], Some({transactions: []})) =>
+              <>
+                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
+                <button
+                  className={Styles.link.base}
+                  onClick={_ => setDialog(_ => ConfirmDeletePerson)}
+                  type_="button">
+                  {React.string("zcela odebrat z aplikace")}
+                </button>
+                {React.string(". S účetním záznamem to později již není možné ☝️")}
+              </>
+            | _ => React.null
+            }}
+          </p>
+        : <TableConsumptions
+            captionSlot={React.string("Nezaúčtované konzumace")}
+            onDeleteConsumption
+            unfinishedConsumptions
+          />}
       <section ariaLabelledby="financial_transactions">
         <header>
           <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>

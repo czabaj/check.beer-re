@@ -17,3 +17,21 @@
   content: ",";
 }
 
+.hyphen {
+  display: grid;
+  column-gap: 0.5ch;
+  grid-template-columns: auto 1fr;
+}
+.hyphen > div {
+  display: contents;
+}
+.hyphen dt {
+  text-align: right;
+}
+.hyphen dt::after {
+  grid-column: 1;
+  content: "\00a0-";
+}
+.hyphen dd {
+  grid-column: 2;
+}

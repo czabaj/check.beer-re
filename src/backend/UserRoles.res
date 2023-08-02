@@ -17,9 +17,9 @@ let roleI18n = (role: role) =>
 
 let roleDescription = (role: role) => {
   switch role {
-  | Viewer => `může sledovat lístek, ale nemůže dělat čárky.`
+  | Viewer => `může sledovat lístek, ale nemůže psát čárky.`
   | SelfService => `může sledovat lístek a psát čárky sám sobě.`
-  | Staff => `může psát čárky komukoliv, může přidávat návštěvníky a naskladňovat 
+  | Staff => `může psát čárky komukoliv, může přidávat hosty a naskladňovat 
   nebo přerážet sudy. Nemůže ale provádět nevratné peněžní operace, jako je
   dopití a rozúčtování sudu nebo zadávat platby.`
   | Admin => `může dělat všechno, kromě úprav účtu vlastníka.`

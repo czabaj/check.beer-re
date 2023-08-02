@@ -49,31 +49,18 @@ let make = (~onDismiss, ~onSubmit) => {
             }}
           />
         </fieldset>
-      </form>
-      <section ariaLabelledby="role_description">
-        <h3 id="role_description"> {React.string("Popis rolí")} </h3>
-        <ol>
-          {roleOptions
-          ->Array.map(role => {
-            let name = role->UserRoles.roleI18n
-            <li key=name>
-              <b> {React.string(name)} </b>
-              {React.string(` - ${role->UserRoles.roleDescription}`)}
-            </li>
-          })
-          ->React.array}
-        </ol>
-      </section>
-      {switch form.state.formState {
-      | SubmitFailed(maybeErrorMessage) => {
-          let errorMessage = switch maybeErrorMessage {
-          | Some(msg) => msg
-          | None => "Neznámá chyba"
+        {switch form.state.formState {
+        | SubmitFailed(maybeErrorMessage) => {
+            let errorMessage = switch maybeErrorMessage {
+            | Some(msg) => msg
+            | None => "Neznámá chyba"
+            }
+            React.string(errorMessage)
           }
-          React.string(errorMessage)
-        }
-      | _ => React.null
-      }}
+        | _ => React.null
+        }}
+      </form>
+      <SectionRoleDescription />
     </Form.Provider>
   </DialogForm>
 }

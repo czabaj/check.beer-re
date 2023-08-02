@@ -17,7 +17,7 @@ type buttonClasses = {
 type checkboxClasses = {base: string}
 @module("./checkbox.module.css") external checkbox: checkboxClasses = "default"
 
-type descriptionListClasses = {inline: string}
+type descriptionListClasses = {hyphen: string, inline: string}
 @module("./descriptionList.module.css")
 external descriptionList: descriptionListClasses = "default"
 
