@@ -1,3 +1,7 @@
+type classesType = {empty: string}
+
+@module("./MyPlaces.module.css") external classes: classesType = "default"
+
 type dialogState = Hidden | AddPlace | EditUser
 
 let pageDataRx = (auth, firestore) => {
@@ -58,7 +62,7 @@ let make = () => {
             headerId="my_places"
             headerSlot={React.string("Moje místa")}>
             {switch userPlaces {
-            | [] => <p> {React.string("Nemáte žádná místa")} </p>
+            | [] => <p className=classes.empty> {React.string("Nemáte žádná místa")} </p>
             | places =>
               <nav>
                 <ul className={Styles.list.base}>

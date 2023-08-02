@@ -12,7 +12,7 @@ let make = (~buttonRightSlot, ~className=?, ~createdTimestamp, ~placeName) => {
     headingSlot={React.string(placeName)}
     subheadingSlot={<ReactIntl.FormattedMessage
       id="Place.established"
-      defaultMessage={"Již od {time}"}
+      defaultMessage={"Založeno {time}"}
       values={{
         "time": <time dateTime={createdDate->Js.Date.toISOString}>
           <ReactIntl.FormattedDate value={createdDate} />

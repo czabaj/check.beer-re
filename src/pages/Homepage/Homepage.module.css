@@ -37,18 +37,23 @@
 }
 .root main > a {
   --_background: hsl(99deg 6% 90%);
-  transform: rotate(-5deg);
+  background-image: url("../../assets/noise.svg");
   font-size: var(--font-size-24);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 2px;
   outline: 4px solid var(--_background);
+  transform: rotate(-5deg);
 }
 
 .root::before {
   content: "";
   position: absolute;
   inset: 0;
-  background-color: #718566;
-  background-image: url("../../assets/noise.svg");
+  background: radial-gradient(
+      ellipse at 80% 60%,
+      hsl(99deg 13% 26%) 10%,
+      hsl(99deg 13% 46%) 68%
+    ),
+    url("../../assets/noise.svg");
   z-index: -1;
 }
