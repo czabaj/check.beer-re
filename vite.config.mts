@@ -43,6 +43,8 @@ export default defineConfig(({ mode }) => ({
       registerType: `autoUpdate`,
       workbox: {
         globPatterns: [`**/*.{js,css,html,png,svg}`],
+        // avoid handling the Firebase Auth `__/auth/handler`
+        navigateFallbackDenylist: [/__/],
       },
     }),
   ].filter(Boolean),
