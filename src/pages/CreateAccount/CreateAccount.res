@@ -77,6 +77,7 @@ let make = (~user: Firebase.User.t) => {
   <Pure
     onSubmit={async values => {
       let _ = await Firebase.Auth.updateProfile(user, {displayName: values.name})
+      let _ = await user->Firebase.User.reload
     }}
   />
 }

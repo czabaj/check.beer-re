@@ -192,6 +192,9 @@ module User = {
     providerData: array<userInfo>,
     uid: string,
   }
+
+  @send
+  external reload: t => promise<unit> = "reload"
 }
 
 module Auth = {
