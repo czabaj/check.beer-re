@@ -11,13 +11,19 @@ const meta: Meta<typeof Pure.make> = {
   },
   argTypes: {
     initialEmail: { control: `text` },
-    onBackToForm: { action: "onBackToForm" },
-    onGoogleAuth: { action: "onGoogleAuth" },
-    onPasswordAuth: { action: "onPasswordAuth" },
-    signInEmailSent: { control: `boolean` },
+    onBackToForm: { action: `onBackToForm` },
+    onGoogleAuth: { action: `onGoogleAuth` },
+    onPasswordAuth: { action: `onPasswordAuth` },
+    signInEmailSent: { control: `text` },
   },
 };
 
 export default meta;
 
 export const Basic: StoryObj<typeof Pure.make> = {};
+
+export const EmailSent: StoryObj<typeof Pure.make> = {
+  args: {
+    signInEmailSent: `example@example.com`,
+  },
+};

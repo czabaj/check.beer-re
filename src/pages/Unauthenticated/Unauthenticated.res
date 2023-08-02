@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {root: string, small: string}
 
 @module("./Unauthenticated.module.css") external classes: classesType = "default"
 
@@ -45,8 +45,11 @@ module Pure = {
           <p>
             {React.string(`Poslali jsme vám odkaz na přihlášení.`)}
             <br />
-            {React.string(`Zkontrolujte schránku `)}
+            {React.string(`Zkontrolujte poštu na adrese `)}
             <b> {React.string(email)} </b>
+          </p>
+          <p className=classes.small>
+            {React.string(`❗️ Může to zapadnout do spamu 🤷‍♂️`)}
           </p>
           <button className={Styles.button.base} onClick={_ => onBackToForm()} type_="button">
             {React.string(`Zpět na přihlášení`)}

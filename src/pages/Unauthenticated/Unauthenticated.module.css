@@ -31,3 +31,7 @@ section[aria-labelledby="other_methods"] h3::before {
 section[aria-labelledby="other_methods"] h3 > span {
   padding-inline: 0.5rem;
 }
+
+.small {
+  font-size: var(--font-size-14);
+}
