@@ -112,33 +112,31 @@ module Pure = {
 
 let signInWithEmailChecked = ref(false)
 let useSignInWithEmailRedirect = auth => {
-  React.useEffect0(() => {
-    if !signInWithEmailChecked.contents {
-      signInWithEmailChecked := true
-      let href = Webapi.Dom.location->Webapi.Dom.Location.href
-      if Firebase.Auth.isSignInWithEmailLink(. auth, ~href) {
-        let email = switch AppStorage.getPendingEmail() {
-        | Some(email) => {
-            AppStorage.removePendingEmail()
-            email
-          }
-        | None => Webapi.Dom.Window.prompt(window, "Zadejte svůj e-mail")
-        }
+  if !signInWithEmailChecked.contents {
+    signInWithEmailChecked := true
+    let href = Webapi.Dom.location->Webapi.Dom.Location.href
+    if Firebase.Auth.isSignInWithEmailLink(. auth, ~href) {
+      let email = switch AppStorage.getPendingEmail() {
+      | Some(email) => email
+      | None => Webapi.Dom.Window.prompt(window, "Zadejte e-mail se kterým se chcete přihlásit")
+      }
+      let signInPromise =
         Firebase.Auth.signInWithEmailLink(. auth, ~email, ~href)
         ->Promise.then(_ => {
           AppStorage.removePendingEmail()
           if AppStorage.getThrustDevice()->Option.isSome {
             AppStorage.setRememberEmail(email)
           }
-          let hrefWOParams = RouterUtils.truncateQueryString(href)
-          Webapi.Dom.location->Webapi.Dom.Location.setHref(hrefWOParams)
           Promise.resolve()
         })
-        ->ignore
-      }
+        ->Promise.finally(() => {
+          let url = RescriptReactRouter.dangerouslyGetInitialUrl()
+          RescriptReactRouter.replace(RouterUtils.joinPath(url.path))
+        })
+      // throw promise which triggers a Suspense
+      raise(signInPromise->TypeUtils.any)
     }
-    None
-  })
+  }
 }
 
 @react.component

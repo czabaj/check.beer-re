@@ -1,11 +1,13 @@
+let joinPath = (path: list<string>) => "/" ++ path->List.toArray->Array.joinWith("/")
+
 type pathSegments = {subtract: int, segments: list<string>}
 let resolveRelativePath = pathname => {
-  if !(pathname->Js.String2.startsWith(".")) {
+  if !(pathname->String.startsWith(".")) {
     pathname
   } else {
     let pathnameSegments =
       pathname
-      ->Js.String2.split("/")
+      ->String.split("/")
       ->Array.reduceRight({subtract: 0, segments: list{}}, ({segments, subtract}, segment) => {
         switch segment {
         | "" => {subtract, segments}
@@ -20,7 +22,7 @@ let resolveRelativePath = pathname => {
     | Some(prefix) => prefix->List.concat(pathnameSegments.segments)
     | None => pathnameSegments.segments
     }
-    "/" ++ newPath->List.toArray->Js.Array2.joinWith("/")
+    joinPath(newPath)
   }
 }
 
@@ -48,12 +50,6 @@ let createLinkClickHandler = (~replace=false, pathname) => {
 let createAnchorProps = (~replace=false, pathname: string): JsxDOM.domProps => {
   let resolvedPath = resolveRelativePath(pathname)
   {href: resolvedPath, onClick: createLinkClickHandler(resolvedPath, ~replace)}
-}
-
-let truncateQueryString = (href): string => {
-  let url = Webapi.Url.make(href)
-  url->Webapi.Url.setSearch("")
-  url->Webapi.Url.href
 }
 
 let createShareLink = shareLinkId => {
