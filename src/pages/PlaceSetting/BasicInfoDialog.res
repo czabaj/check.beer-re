@@ -21,7 +21,7 @@ let make = (~initialValues, ~onDismiss, ~onPlaceDelete, ~onSubmit) => {
     ~validationStrategy=OnDemand,
     ~schema={
       open Validators
-      schema([required(Name)])
+      schema([required(Name), required(CreatedAt)])
     },
     (),
   )

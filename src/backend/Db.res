@@ -230,6 +230,7 @@ let groupKegConsumptionsByUser = (~target=Map.make(), keg: kegConverted) => {
 }
 
 let allChargedKegsRx = (firestore, placeId) => {
+  open Rxjs
   let chargedKegsQuery = Firebase.query(
     placeKegsCollectionConverted(firestore, placeId),
     [
@@ -238,7 +239,12 @@ let allChargedKegsRx = (firestore, placeId) => {
       Firebase.limit(50),
     ],
   )
-  Rxfire.collectionData(chargedKegsQuery)
+  Rxfire.collectionData(chargedKegsQuery)->pipe(
+    map((kegs, _) => {
+      kegs->Array.sort((a, b) => (a.serial - b.serial)->Int.toFloat)
+      kegs
+    }),
+  )
 }
 
 // Hooks
@@ -697,7 +703,12 @@ module ShareLink = {
     | _ =>
       let newDoc = await addDoc(
         shareLinkCollection,
-        {createdAt: Timestamp.now(), person: personId, place: placeId, role: role->UserRoles.roleToJs},
+        {
+          createdAt: Timestamp.now(),
+          person: personId,
+          place: placeId,
+          role: role->UserRoles.roleToJs,
+        },
       )
       newDoc.id
     }

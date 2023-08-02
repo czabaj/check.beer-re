@@ -257,7 +257,7 @@ let make = (~placeId) => {
                   className={Styles.button.base}
                   type_="button"
                   onClick={_ => setDialog(_ => AddPerson)}>
-                  {React.string("Přidat návštěvníka")}
+                  {React.string("Přidat hosta")}
                 </button>
               : React.null}
             headerId="active_persons"

@@ -57,7 +57,7 @@ let make = () => {
               className={`${Styles.button.base} `}
               onClick={_ => setDialogState(_ => AddPlace)}
               type_="button">
-              {React.string("Přidat místo")}
+              {React.string("Nové místo")}
             </button>}
             headerId="my_places"
             headerSlot={React.string("Moje místa")}>
