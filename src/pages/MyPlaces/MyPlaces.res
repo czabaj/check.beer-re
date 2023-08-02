@@ -28,7 +28,7 @@ let make = () => {
   {
     switch pageDataStatus.data {
     | Some((currentUser, userPlaces)) =>
-      let userDisplayName = currentUser.displayName->Option.getExn
+      let userDisplayName = currentUser.displayName->Null.getExn
       <div className=Styles.page.narrow>
         <Header
           buttonLeftSlot={<button

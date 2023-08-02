@@ -164,11 +164,13 @@ module WriteBatch = {
 external writeBatch: firestore => WriteBatch.t = "writeBatch"
 
 module User = {
-  type info = {
-    uid: string,
+  type userInfo = {
+    displayName: Js.null<string>,
+    email: Js.null<string>,
+    phoneNumber: Js.null<string>,
+    photoURL: Js.null<string>,
     providerId: string,
-    displayName: option<string>,
-    email: option<string>,
+    uid: string,
   }
   type metadata = {
     // timestamp in a string
@@ -181,13 +183,13 @@ module User = {
     lastSignInTime: string,
   }
   type t = {
-    displayName: option<string>,
-    email: option<string>,
+    displayName: Js.null<string>,
+    email: Js.null<string>,
     emailVerified: bool,
     isAnonymous: bool,
     metadata: metadata,
-    photoURL: option<string>,
-    providerData: array<info>,
+    photoURL: Js.null<string>,
+    providerData: array<userInfo>,
     uid: string,
   }
 }
