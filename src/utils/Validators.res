@@ -51,7 +51,8 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
       }
     }, field)
 
-  let required = Validation.nonEmpty(~error="Bez tohoto to nepůjde")
+  // requires the string to contain at least one non-whitespace character
+  let required = Validation.regExp(~error="Bez tohoto to nepůjde", ~matches="[^\s]")
 
   let schema = Validation.schema
 }
