@@ -8,11 +8,10 @@ let make = (~children) => {
     switch maybeUser->Null.toOption {
     | None => <Unauthenticated />
     | Some(user) =>
-      switch user.displayName {
-      | None
-      | Some("") =>
+      if user.displayName->Option.mapWithDefault("", String.trim) === "" {
         <CreateAccount user />
-      | _ => children
+      } else {
+        children
       }
     }
   }
