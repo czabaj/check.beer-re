@@ -24,16 +24,22 @@ let make = (
   ~tapsWithKegs: Js.Dict.t<Db.kegConverted>,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
-  let tapsEntries = tapsWithKegs->Js.Dict.entries
-  let tapsOptions = tapsEntries->Array.map(((tapName, keg)) => {
-    {
-      text: <>
-        {React.string(`${tapName}: ${keg.beer} ${keg.serialFormatted}`)}
-        <MeterKeg keg />
-      </>,
-      value: tapName,
-    }
-  })
+  let tapsOptions = React.useMemo1(() => {
+    let tapsEntries = tapsWithKegs->Js.Dict.entries
+    tapsEntries->Array.map(((tapName, keg)) => {
+      {
+        text: <>
+          {React.string(`${tapName}: ${keg.beer} ${keg.serialFormatted}`)}
+          <MeterKeg keg />
+        </>,
+        value: tapName,
+      }
+    })
+  }, [tapsWithKegs])
+  let unfinishedConsumptionsDesc = React.useMemo1(() => {
+    unfinishedConsumptions->Array.toReversed
+  }, [unfinishedConsumptions])
+
   let preferredTapHasKeg = tapsOptions->Array.some(({value}) => value === preferredTap)
   let form = Form.use(
     ~initialState={
@@ -132,7 +138,9 @@ let make = (
       {unfinishedConsumptions->Array.length === 0
         ? <p> {React.string(`${personName} nemá nezaúčtovaná piva.`)} </p>
         : <TableConsumptions
-            ariaLabelledby="unfinished_consumptions" onDeleteConsumption unfinishedConsumptions
+            ariaLabelledby="unfinished_consumptions"
+            onDeleteConsumption
+            unfinishedConsumptions=unfinishedConsumptionsDesc
           />}
     </details>
   </Dialog>
