@@ -55,7 +55,7 @@ let make = (
       onPrevious=onPreviousPerson
       visible={true}>
       <section ariaLabel="Základní údaje">
-        <dl className={`reset ${Styles.descriptionList.inline}`}>
+        <dl className={Styles.descriptionList.inline}>
           <div>
             <dt> {React.string("již od")} </dt>
             <dd>

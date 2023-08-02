@@ -40,163 +40,167 @@ let make = (
     ->Option.map(((tapName, _)) => tapName)
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
-  <DialogCycling
-    hasNext
-    hasPrevious
-    className=classes.root
-    header={kegName}
-    onDismiss
-    onNext=onNextKeg
-    onPrevious=onPreviousKeg
-    visible=true>
-    <dl className={`reset ${Styles.descriptionList.inline}`}>
-      <div>
-        <dt> {React.string("objem")} </dt>
-        <dd>
-          <FormattedVolume milliliters={keg.milliliters} />
-        </dd>
-      </div>
-      <div>
-        <dt> {React.string("naskladněno dne")} </dt>
-        <dd>
-          <FormattedDateTime value={keg.createdAt->Firebase.Timestamp.toDate} />
-        </dd>
-      </div>
-      <div>
-        <dt> {React.string("za")} </dt>
-        <dd>
-          <FormattedCurrency value={keg.price} />
-        </dd>
-      </div>
-      <div>
-        <dt> {React.string("t.j. velké pivo za")} </dt>
-        <dd>
-          <FormattedCurrency value={priceLargeBeer} />
-        </dd>
-      </div>
-      {switch firstConsumption {
-      | None => React.null
-      | Some(timestamp) =>
+  <>
+    <DialogCycling
+      hasNext
+      hasPrevious
+      className=classes.root
+      header={kegName}
+      onDismiss
+      onNext=onNextKeg
+      onPrevious=onPreviousKeg
+      visible=true>
+      <dl className={Styles.descriptionList.inline}>
         <div>
-          <dt> {React.string("první výtoč")} </dt>
+          <dt> {React.string("objem")} </dt>
           <dd>
-            <FormattedDateTime value={timestamp->Js.Date.fromFloat} />
+            <FormattedVolume milliliters={keg.milliliters} />
           </dd>
         </div>
-      }}
-      {switch keg.depletedAt->Null.toOption {
+        <div>
+          <dt> {React.string("naskladněno dne")} </dt>
+          <dd>
+            <FormattedDateTime value={keg.createdAt->Firebase.Timestamp.toDate} />
+          </dd>
+        </div>
+        <div>
+          <dt> {React.string("za")} </dt>
+          <dd>
+            <FormattedCurrency value={keg.price} />
+          </dd>
+        </div>
+        <div>
+          <dt> {React.string("t.j. velké pivo za")} </dt>
+          <dd>
+            <FormattedCurrency value={priceLargeBeer} />
+          </dd>
+        </div>
+        {switch firstConsumption {
+        | None => React.null
+        | Some(timestamp) =>
+          <div>
+            <dt> {React.string("první výtoč")} </dt>
+            <dd>
+              <FormattedDateTime value={timestamp->Js.Date.fromFloat} />
+            </dd>
+          </div>
+        }}
+        {switch keg.depletedAt->Null.toOption {
+        | None => React.null
+        | Some(depletedAt) =>
+          <>
+            <div>
+              <dt> {React.string("dopito")} </dt>
+              <dd>
+                <FormattedDateTime value={depletedAt->Firebase.Timestamp.toDate} />
+              </dd>
+            </div>
+            <div>
+              <dt> {React.string("ze sudu se vytočilo")} </dt>
+              <dd>
+                <FormattedVolume milliliters={keg.milliliters} />
+              </dd>
+            </div>
+            <div>
+              <dt> {React.string("efektivita")} </dt>
+              <dd>
+                <FormattedPercent value={effectivity *. 100.0} />
+              </dd>
+            </div>
+            <div>
+              <dt> {React.string("výsledná cena za velké pivo")} </dt>
+              <dd>
+                <FormattedCurrency
+                  value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
+                />
+              </dd>
+            </div>
+          </>
+        }}
+      </dl>
+      {switch maybeTapName {
       | None => React.null
-      | Some(depletedAt) =>
+      | Some(tapName) =>
+        <p className={Styles.messageBar.info}>
+          {React.string(`Sud je naražen na pípu `)}
+          <b> {React.string(tapName)} </b>
+        </p>
+      }}
+      {switch consumptionsByTimestampDesc {
+      | [] =>
+        <p>
+          {React.string("Ze sudu zatím neevidujeme čepování.")}
+          {switch maybeTapName {
+          | Some(_) => React.null
+          | None =>
+            <>
+              {React.string(" Pokud jste sud přidali omylem můžete ho ")}
+              <button
+                className={Styles.link.base}
+                onClick={_ => setDialog(_ => ConfirmDelete)}
+                type_="button">
+                {React.string("odebrat z aplikace")}
+              </button>
+              {React.string(".")}
+            </>
+          }}
+        </p>
+      | _ =>
         <>
+          <table className={Styles.table.inDialog}>
+            <caption> {React.string("Natočená piva")} </caption>
+            <thead>
+              <tr>
+                <th scope="col"> {React.string("Jméno")} </th>
+                <th scope="col"> {React.string("Objem")} </th>
+                <th scope="col"> {React.string("Kdy")} </th>
+                <th scope="col">
+                  <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {consumptionsByTimestampDesc
+              ->Array.map(((timestampStr, consumption)) => {
+                let person = personsAllById->Js.Dict.unsafeGet(consumption.person.id)
+                let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
+                <tr key={timestampStr}>
+                  <td> {React.string(person.name)} </td>
+                  <td>
+                    <FormattedVolume milliliters=consumption.milliliters />
+                  </td>
+                  <td>
+                    <FormattedDateTime value={createdData} />
+                  </td>
+                  <td>
+                    {keg.depletedAt !== Null.null
+                      ? React.null
+                      : <button
+                          className={`${Styles.button.base} ${Styles.button.sizeExtraSmall}`}
+                          onClick={_ => onDeleteConsumption(timestampStr)}
+                          type_="button">
+                          {React.string("🗑️ Smáznout")}
+                        </button>}
+                  </td>
+                </tr>
+              })
+              ->React.array}
+            </tbody>
+          </table>
           <div>
-            <dt> {React.string("dopito")} </dt>
-            <dd>
-              <FormattedDateTime value={depletedAt->Firebase.Timestamp.toDate} />
-            </dd>
-          </div>
-          <div>
-            <dt> {React.string("ze sudu se vytočilo")} </dt>
-            <dd>
-              <FormattedVolume milliliters={keg.milliliters} />
-            </dd>
-          </div>
-          <div>
-            <dt> {React.string("efektivita")} </dt>
-            <dd>
-              <FormattedPercent value={effectivity *. 100.0} />
-            </dd>
-          </div>
-          <div>
-            <dt> {React.string("výsledná cena za velké pivo")} </dt>
-            <dd>
-              <FormattedCurrency
-                value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
-              />
-            </dd>
+            {keg.depletedAt !== Null.null
+              ? React.null
+              : <button
+                  className={`${Styles.button.base} ${Styles.button.variantDanger}`}
+                  disabled={consumptionsByTimestampDesc->Array.length === 0}
+                  onClick={_ => setDialog(_ => ConfirmFinalize)}
+                  type_="button">
+                  {React.string("Odepsat ze skladu a rozúčtovat")}
+                </button>}
           </div>
         </>
       }}
-    </dl>
-    {switch maybeTapName {
-    | None => React.null
-    | Some(tapName) =>
-      <p className={Styles.messageBar.info}>
-        {React.string(`Sud je naražen na pípu `)}
-        <b> {React.string(tapName)} </b>
-      </p>
-    }}
-    {switch consumptionsByTimestampDesc {
-    | [] =>
-      <p>
-        {React.string("Ze sudu zatím neevidujeme čepování.")}
-        {switch maybeTapName {
-        | Some(_) => React.null
-        | None =>
-          <>
-            {React.string(" Pokud jste sud přidali omylem můžete ho ")}
-            <button
-              className={Styles.link.base}
-              onClick={_ => setDialog(_ => ConfirmDelete)}
-              type_="button">
-              {React.string("odebrat z aplikace")}
-            </button>
-            {React.string(".")}
-          </>
-        }}
-      </p>
-    | _ =>
-      <>
-        <table className={Styles.table.inDialog}>
-          <caption> {React.string("Natočená piva")} </caption>
-          <thead>
-            <tr>
-              <th scope="col"> {React.string("Jméno")} </th>
-              <th scope="col"> {React.string("Objem")} </th>
-              <th scope="col"> {React.string("Kdy")} </th>
-              <th scope="col">
-                <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {consumptionsByTimestampDesc
-            ->Array.map(((timestampStr, consumption)) => {
-              let person = personsAllById->Js.Dict.unsafeGet(consumption.person.id)
-              let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
-              <tr key={timestampStr}>
-                <td> {React.string(person.name)} </td>
-                <td>
-                  <FormattedVolume milliliters=consumption.milliliters />
-                </td>
-                <td>
-                  <FormattedDateTime value={createdData} />
-                </td>
-                <td>
-                  {keg.depletedAt !== Null.null
-                    ? React.null
-                    : <button
-                        className={`${Styles.button.base} ${Styles.button.sizeExtraSmall}`}
-                        onClick={_ => onDeleteConsumption(timestampStr)}
-                        type_="button">
-                        {React.string("🗑️ Smáznout")}
-                      </button>}
-                </td>
-              </tr>
-            })
-            ->React.array}
-          </tbody>
-        </table>
-        {keg.depletedAt !== Null.null
-          ? React.null
-          : <button
-              className={`${Styles.button.base} ${Styles.button.variantDanger}`}
-              disabled={consumptionsByTimestampDesc->Array.length === 0}
-              onClick={_ => setDialog(_ => ConfirmFinalize)}
-              type_="button">
-              {React.string("Odepsat ze skladu a rozúčtovat")}
-            </button>}
-      </>
-    }}
+    </DialogCycling>
     {switch dialogState {
     | Hidden => React.null
     | ConfirmDelete =>
@@ -250,5 +254,5 @@ let make = (
         </p>
       </DialogConfirmation>
     }}
-  </DialogCycling>
+  </>
 }

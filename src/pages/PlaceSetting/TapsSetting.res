@@ -48,7 +48,7 @@ let make = (
     </button>}
     headerId="taps_setting"
     headerSlot={React.string("Pípy")}>
-    <ul className={`reset ${classes.list}`}>
+    <ul className={classes.list}>
       {
         let tapsCount = sortedTapEntries->Array.length
         sortedTapEntries

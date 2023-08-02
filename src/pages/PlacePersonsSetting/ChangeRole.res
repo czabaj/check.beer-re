@@ -57,7 +57,7 @@ let make = (~currentRole, ~onDismiss, ~onSubmit, ~personName) => {
       </form>
       <section ariaLabelledby="role_description">
         <h3 id="role_description"> {React.string("Popis rolí")} </h3>
-        <ol className="reset">
+        <ol>
           {roleOptions
           ->Array.map(role => {
             let name = role->UserRoles.roleI18n
