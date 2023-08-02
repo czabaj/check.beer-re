@@ -7,6 +7,7 @@ type dialogState = Hidden | ConfirmDelete | ConfirmFinalize
 let make = (
   ~hasNext,
   ~hasPrevious,
+  ~isUserAuthorized,
   ~keg: Db.kegConverted,
   ~place: FirestoreModels.place,
   ~personsAllById: Js.Dict.t<Db.personsAllRecord>,
@@ -188,7 +189,7 @@ let make = (
             </tbody>
           </table>
           <div>
-            {keg.depletedAt !== Null.null
+            {keg.depletedAt !== Null.null && isUserAuthorized(UserRoles.Admin)
               ? React.null
               : <button
                   className={`${Styles.button.base} ${Styles.button.variantDanger}`}

@@ -7,7 +7,7 @@ type dialogState =
   | AddPerson
   | PersonDetail({personId: string, person: Db.personsAllRecord})
 
-let pageDataRx = (firestore, placeId) => {
+let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
@@ -50,20 +50,39 @@ let pageDataRx = (firestore, placeId) => {
     }),
   )
   let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
-  combineLatest4(placeRx, personsAllRx, unfinishedConsumptionsByUserRx, pendingTransactionsByUserRx)
+  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  combineLatest5(
+    placeRx,
+    personsAllRx,
+    unfinishedConsumptionsByUserRx,
+    pendingTransactionsByUserRx,
+    currentUserRx,
+  )
 }
 
 @react.component
 let make = (~placeId) => {
+  let auth = Reactfire.useAuth()
   let firestore = Reactfire.useFirestore()
   let pageDataStatus = Reactfire.useObservable(
     ~observableId=`Page_PlacePersonsSetting_${placeId}`,
-    ~source=pageDataRx(firestore, placeId),
+    ~source=pageDataRx(auth, firestore, placeId),
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
-  | Some((place, personsAll, unfinishedConsumptionsByUser, pendingTransactionsByUser)) =>
+  | Some((
+      place,
+      personsAll,
+      unfinishedConsumptionsByUser,
+      pendingTransactionsByUser,
+      currentUser,
+    )) =>
+    let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
+    if !isUserAuthorized(UserRoles.Admin) {
+      Exn.raiseError(`Insufficient permissions to view this page`)
+    }
     <FormattedCurrency.Provider value={place.currency}>
       <div className=Styles.page.narrow>
         <PlaceHeader

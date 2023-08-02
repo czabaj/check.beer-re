@@ -150,6 +150,7 @@ let make = (~placeId) => {
           <KegDetail
             hasNext
             hasPrevious
+            isUserAuthorized
             keg
             onDeleteConsumption={consumptionId => {
               Db.Keg.deleteConsumption(firestore, ~placeId, ~kegId, ~consumptionId)->ignore
