@@ -15,3 +15,5 @@ firebase-debug.log
 firestore-debug.log
 ui-debug.log
 /.firebase/
+# Sentry Auth Token
+.env.sentry-build-plugin

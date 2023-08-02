@@ -2,15 +2,24 @@
 /// <reference types="vite/client" />
 
 import createReScriptPlugin from "@jihchi/vite-plugin-rescript";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 import createReactPlugin from "@vitejs/plugin-react";
 import { defineConfig, splitVendorChunkPlugin } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  build: {
+    sourcemap: true, // Source map generation must be turned on
+  },
   plugins: [
     createReactPlugin(),
     mode !== `test` && createReScriptPlugin(),
+    sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: "vaclav",
+      project: "check-beer",
+    }),
     splitVendorChunkPlugin(),
     VitePWA({
       manifest: {

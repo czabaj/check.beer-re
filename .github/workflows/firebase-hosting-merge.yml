@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       VITE_FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
       VITE_FIREBASE_APP_CHECK_TOKEN: ${{ vars.FIREBASE_APP_CHECK_TOKEN }}
       VITE_FIREBASE_APP_ID: ${{ vars.FIREBASE_APP_ID }}
