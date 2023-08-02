@@ -264,6 +264,10 @@ module Auth = {
     "signInWithPopup"
 
   @module("firebase/auth")
+  external signInWithRedirect: (. t, FederatedAuthProvider.t) => promise<userCredential> =
+    "signInWithRedirect"
+
+  @module("firebase/auth")
   external connectAuthEmulator: (. t, string) => unit = "connectAuthEmulator"
 }
 

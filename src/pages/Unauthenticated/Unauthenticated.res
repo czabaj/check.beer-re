@@ -150,7 +150,7 @@ let make = () => {
     initialEmail={AppStorage.getRememberEmail()->Option.getWithDefault("")}
     onBackToForm={() => setSignInEmailSent(_ => None)}
     onGoogleAuth={() => {
-      signInWithPopup(. auth, FederatedAuthProvider.googleAuthProvider())
+      signInWithRedirect(. auth, FederatedAuthProvider.googleAuthProvider())
       ->Promise.catch(error => {
         Js.log(error)
         Promise.reject(error)
