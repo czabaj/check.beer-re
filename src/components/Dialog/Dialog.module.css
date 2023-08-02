@@ -1,13 +1,16 @@
 .root {
+  --dialog-background-color: var(--surface-2);
+  --dialog-gap: 1rem;
   --dialog-padding-inline: 1rem;
 
+  background-color: var(--dialog-background-color);
   border-radius: var(--radius-2);
   border: var(--border-size-1) solid var(--surface-4);
   box-shadow: var(--shadow-4);
   display: flex;
   flex-flow: column;
-  gap: 1rem;
-  max-block-size: calc(100vh - 2rem);
+  gap: var(--dialog-gap);
+  max-block-size: calc(100svh - 3rem);
   max-inline-size: min(var(--measure), 100vw - 2rem);
   padding: 0;
 }
@@ -17,7 +20,7 @@
 }
 
 .root > header {
-  padding-block-start: 1rem;
+  padding-block: 1rem;
 }
 
 .root > header > h3 {
@@ -33,6 +36,9 @@
 }
 
 .scrollContent {
+  display: flex;
+  flex-flow: column;
   flex: 1;
+  gap: var(--dialog-gap);
   overflow: auto;
 }
