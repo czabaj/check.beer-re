@@ -19,3 +19,6 @@ let setInD = (dict: Js.Dict.t<'a>, key: string, value: 'a): Js.Dict.t<'a> => {
   result->Dict.set(key, value)
   result
 }
+
+@val @scope("window")
+external structuredClone: 'a => 'a = "structuredClone"

@@ -10,7 +10,7 @@ import { VitePWA } from "vite-plugin-pwa";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   build: {
-    sourcemap: true, // Source map generation must be turned on
+    sourcemap: mode === `production`,
   },
   plugins: [
     createReactPlugin(),

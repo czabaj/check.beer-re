@@ -168,22 +168,31 @@ let placesByUserIdRx = (firestore, userId) => {
   Rxfire.collectionData(query)
 }
 
+let slidingWindowInHours = 12
+let slidingWindowInMillis = slidingWindowInHours->Int.toFloat *. 60. *. 60. *. 1000.
+
 let slidingWindowRx = Rxjs.interval(60 * 60 * 1000)->Rxjs.pipe3(
   Rxjs.startWith(0),
   Rxjs.map((_, _) => {
-    let now = Js.Date.make()
-    let monthAgo = Js.Date.setMonth(now, Js.Date.getMonth(now) -. 1.0)
-    Firebase.Timestamp.fromMillis(monthAgo)
+    let slidingWindow = Date.make()
+    Date.setHoursMSMs(
+      slidingWindow,
+      ~hours=Date.getHours(slidingWindow) - slidingWindowInHours,
+      ~minutes=0,
+      ~seconds=0,
+      ~milliseconds=0,
+    )
+    Firebase.Timestamp.fromDate(slidingWindow)
   }),
   Rxjs.shareReplay(1),
 )
 
 let recentlyFinishedKegsRx = (firestore, placeId) => {
   slidingWindowRx->Rxjs.pipe(
-    Rxjs.switchMap(monthAgo => {
+    Rxjs.switchMap(slidingWindow => {
       let query = Firebase.query(
         placeKegsCollectionConverted(firestore, placeId),
-        [Firebase.where("depletedAt", #">=", monthAgo)],
+        [Firebase.where("depletedAt", #">=", slidingWindow)],
       )
       Rxfire.collectionData(query)
     }),
@@ -660,14 +669,18 @@ module Person = {
 module PersonsIndex = {
   let allEntriesSortedRx = (firestore, ~placeId) => {
     let personsIndexRef = personsIndexConverted(firestore, placeId)
-    Rxfire.docData(personsIndexRef)->Rxjs.pipe2(
-      Rxjs.keepSome,
-      Rxjs.map((personsIndex: personsIndexConverted, _) => {
-        let personsAllEntries = personsIndex.all->Js.Dict.entries
-        personsAllEntries->Array.sort(((_, a), (_, b)) => {
-          a.name->Js.String2.localeCompare(b.name)
-        })
-        personsAllEntries
+    Rxfire.docData(personsIndexRef)->Rxjs.pipe(
+      Rxjs.map((maybePersonsIndex, _) => {
+        switch maybePersonsIndex {
+        | Some(personsIndex) => {
+            let personsAllEntries = personsIndex.all->Js.Dict.entries
+            personsAllEntries->Array.sort(((_, a), (_, b)) => {
+              a.name->Js.String2.localeCompare(b.name)
+            })
+            personsAllEntries
+          }
+        | _ => []
+        }
       }),
     )
   }

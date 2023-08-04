@@ -109,60 +109,43 @@ type userConsumption = {milliliters: int, timestamp: float}
 let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
-  let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
-  let tapsWithKegsRx = placeRx->pipe2(
-    distinctUntilChanged((prev: FirestoreModels.place, curr) => prev.taps == curr.taps),
-    mergeMap((place: FirestoreModels.place) => {
-      let tapsToKegId =
-        place.taps
-        ->Js.Dict.entries
-        ->Array.filterMap(((tapName, maybeKegRef)) =>
-          switch maybeKegRef->Null.toOption {
-          | Some(kegRef) => Some((tapName, kegRef.id))
-          | None => None
-          }
+  let placeRx = Rxfire.docData(placeRef)
+  let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
+  let placeTapsRx = placeRx->pipe2(
+    distinctUntilChanged((prev, curr) =>
+      switch ((prev: option<FirestoreModels.place>), curr) {
+      | (Some(prevPlace), Some(currPlace)) => prevPlace.taps == currPlace.taps
+      | _ => false
+      }
+    ),
+    map((maybePlace: option<FirestoreModels.place>, _) =>
+      maybePlace->Option.map(place => place.taps)
+    ),
+  )
+  let tapsWithKegsRx = combineLatest2(placeTapsRx, chargedKegsRx)->pipe(
+    map((data, _) => {
+      switch data {
+      | (Some(placeTaps), chargedKegs) =>
+        placeTaps
+        ->Dict.toArray
+        ->Array.filterMap(((tap, maybeKegRef)) =>
+          maybeKegRef
+          ->Null.toOption
+          ->Option.flatMap(
+            (kegRef: Firebase.documentReference<FirestoreModels.keg>) =>
+              chargedKegs->Array.find(keg => Db.getUid(keg) === kegRef.id),
+          )
+          ->Option.map(keg => (tap, keg))
         )
-      switch tapsToKegId {
-      | [] => return(Js.Dict.empty())
-      | entries =>
-        let kegIds = entries->Array.map(snd)
-        Rxfire.collectionData(
-          Firebase.query(
-            Db.placeKegsCollectionConverted(firestore, placeId),
-            [
-              Firebase.where(Firebase.documentId(), #"in", kegIds),
-              Firebase.where("depletedAt", #"==", Js.null),
-            ],
-          ),
-        )->pipe(
-          map((kegsOnTap, _) =>
-            tapsToKegId
-            ->Array.filterMap(
-              ((tapName, kegId)) =>
-                kegsOnTap
-                ->Array.find(keg => Db.getUid(keg) === kegId)
-                ->Option.map(keg => (tapName, keg)),
-            )
-            ->Js.Dict.fromArray
-          ),
-        )
+        ->Dict.fromArray
+      | _ => Js.Dict.empty()
       }
     }),
   )
-  let chargedKegsWithConsumptionRx = Rxfire.collectionData(
-    Firebase.query(
-      Db.placeKegsCollectionConverted(firestore, placeId),
-      [
-        Firebase.where("depletedAt", #"==", Js.null),
-        Firebase.where("recentConsumptionAt", #"!=", Js.null),
-        Firebase.limit(30),
-      ],
-    ),
-  )
-  let unfinishedConsumptionsByUserRx = chargedKegsWithConsumptionRx->pipe(
-    map((chargedKegsWithConsumption, _) => {
+  let unfinishedConsumptionsByUserRx = chargedKegsRx->pipe(
+    map((chargedKegs, _) => {
       let consumptionsByUser = Map.make()
-      chargedKegsWithConsumption->Array.forEach(keg =>
+      chargedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=consumptionsByUser, keg)->ignore
       )
       consumptionsByUser->Map.forEach(consumptions => {
@@ -177,20 +160,25 @@ let pageDataRx = (auth, firestore, placeId) => {
     recentlyFinishedKegsRx,
   )->pipe(
     map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
-      let recentConsumptionsByUser =
-        unfinishedConsumptionsByUser
-        ->Map.entries
-        ->Iterator.toArrayWithMapper(((userId, consumptions)) => (userId, consumptions->Array.copy))
-        ->Map.fromArray
-      // TODO: show only past XY hours, filter the older out
+      let recentConsumptionsByUser = ObjectUtils.structuredClone(unfinishedConsumptionsByUser)
       recentlyFinishedKegs->Array.forEach(keg =>
         Db.groupKegConsumptionsByUser(~target=recentConsumptionsByUser, keg)->ignore
       )
-      // sort consumptions ty timestamp ascending
-      recentConsumptionsByUser->Map.forEach(consumptions => {
-        consumptions->Array.sort((a, b) => a.createdAt->DateUtils.compare(b.createdAt))
-      })
+      let twelweHoursAgo = Date.now() -. Db.slidingWindowInMillis
       recentConsumptionsByUser
+      ->Map.entries
+      ->Iterator.toArrayWithMapper(((userId, consumptions)) => {
+        let consumptionsInSlidingWindow =
+          consumptions->Array.filter(
+            consumption => consumption.createdAt->Date.getTime > twelweHoursAgo,
+          )
+        // sort consumptions ty timestamp ascending
+        consumptionsInSlidingWindow->Array.sort(
+          (a, b) => a.createdAt->DateUtils.compare(b.createdAt),
+        )
+        (userId, consumptionsInSlidingWindow)
+      })
+      ->Map.fromArray
     }),
   )
   let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)->pipe(
@@ -226,8 +214,9 @@ let make = (~placeId) => {
     Belt.Map.String.t<bool>,
   > => None)
   switch pageDataStatus.data {
+  | Some(None, _, _, _, _, _) => React.string("Place not found")
   | Some(
-      place,
+      Some(place),
       (allActivePersonsMap, activePersonEntries, inactivePersonEntries),
       tapsWithKegs,
       unfinishedConsumptionsByUser,
