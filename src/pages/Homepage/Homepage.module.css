@@ -30,7 +30,7 @@
 }
 
 .root main {
-  padding-block-start: 7rem;
+  padding-block-start: clamp(1rem, 10vh, 7rem);
   text-align: center;
 }
 .root main > a {
@@ -45,7 +45,7 @@
 
 .root::before {
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: radial-gradient(
       ellipse at 80% 60%,
