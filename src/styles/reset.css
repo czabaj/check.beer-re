@@ -38,7 +38,9 @@ dialog:modal {
   color: var(--text-2);
 }
 
-dl, dl dd, p {
+dl,
+dl dd,
+p {
   margin: 0;
 }
 
@@ -55,13 +57,23 @@ legend:where(.reset) {
   padding: 0;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
 :is(h1, h2, h3, h4, h5, h6):where(.reset) {
   font-size: 100%;
   font-weight: inherit;
   margin: 0;
 }
 
-ol, ul {
+ol,
+ul {
   list-style: none;
   padding: 0;
   margin: 0;

@@ -2,14 +2,17 @@ import { type Meta, type StoryObj } from "@storybook/react";
 
 import { make } from "./Homepage.gen";
 
-const meta: Meta<typeof make> = {
+const Homepage = make;
+
+const meta: Meta<typeof Homepage> = {
   title: "Pages/Homepage",
-  component: make,
+  component: Homepage,
   parameters: {
+    actions: { argTypesRegex: "^on[A-Z].*" },
     layout: "fullscreen",
   },
 };
 
 export default meta;
 
-export const Basic: StoryObj<typeof make> = {};
+export const Basic: StoryObj<typeof Homepage> = {};

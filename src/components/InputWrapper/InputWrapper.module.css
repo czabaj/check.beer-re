@@ -3,10 +3,6 @@
   gap: 1rem;
 }
 
-:global(.inputWrapper) :where(p) {
-  margin: 0;
-}
-
 :global(.inputWrapper) :where(input, select) {
   width: 100%;
 }

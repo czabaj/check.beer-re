@@ -24,11 +24,6 @@
   grid-area: subtitle;
 }
 
-.root > h2,
-.root > p {
-  margin: 0;
-}
-
 .buttonLeft,
 .buttonRight {
   align-items: center;

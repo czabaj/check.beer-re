@@ -1,5 +1,6 @@
 .centered {
   display: grid;
+  row-gap: 1rem;
   max-inline-size: var(--measure);
   margin-inline: auto;
   min-block-size: 100vh;

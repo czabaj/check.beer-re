@@ -6,11 +6,6 @@
   padding: 0;
   padding-block: 0.5rem;
 }
-.popover ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
 .popover li > :where(a, button) {
   color: var(--text-1);
   padding: 0.5rem;

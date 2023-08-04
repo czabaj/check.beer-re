@@ -1,3 +1,7 @@
+type classesType = {root: string}
+
+@module("./ShareLinkResolver.module.css") external classes: classesType = "default"
+
 type acceptInviteState = Ready | Pending | Success | Error(exn)
 
 type acceptInviteAction = Run | Resolved | Rejected(exn)

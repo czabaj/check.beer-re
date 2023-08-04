@@ -2,10 +2,6 @@
   --breakout-hover-overlay: hsl(
     var(--surface-warning-hs) var(--surface-warning-l) / 0.1
   );
-
-  list-style: none;
-  padding: 0;
-  margin: 0;
 }
 .base > li {
   --list-padding-inline: 0.5rem;
