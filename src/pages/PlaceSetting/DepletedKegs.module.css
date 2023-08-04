@@ -56,7 +56,3 @@
 .table :where(th, td):nth-child(11) {
   grid-area: effectivity;
 }
-
-.emptyTableMessage {
-  padding-inline: 0.5rem;
-}

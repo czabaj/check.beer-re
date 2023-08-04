@@ -1,7 +1,3 @@
-type classesType = {empty: string}
-
-@module("./MyPlaces.module.css") external classes: classesType = "default"
-
 type dialogState = Hidden | AddPlace | EditUser
 
 module Pure = {
@@ -39,7 +35,7 @@ module Pure = {
           headerSlot={React.string("Moje místa")}>
           {switch usersPlaces {
           | [] =>
-            <p className=classes.empty>
+            <p className=SectionWithHeader.classes.emptyMessage>
               {React.string(
                 "Seznam vašich míst je prázdný, nechte se někam pozvat 🍻 nebo ",
               )}

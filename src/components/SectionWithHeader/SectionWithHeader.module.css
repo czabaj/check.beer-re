@@ -9,3 +9,8 @@
 .root > div {
   overflow: auto;
 }
+
+.emptyMessage {
+  padding-block: 0.75rem;
+  padding-inline: 0.5rem;
+}

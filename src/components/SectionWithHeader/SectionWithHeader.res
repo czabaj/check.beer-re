@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {emptyMessage: string, root: string}
 @module("./SectionWithHeader.module.css") external classes: classesType = "default"
 
 @react.component

@@ -14,11 +14,6 @@
   font-weight: var(--font-weight-semibold);
 }
 
-.listEmpty {
-  padding-block: 0.5rem;
-  padding-inline: 0.5rem;
-}
-
 .inactiveUsers ol > li time {
   font-size: var(--font-size-16);
   white-space: nowrap;

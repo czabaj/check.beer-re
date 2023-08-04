@@ -6,6 +6,7 @@
 section[aria-labelledby="other_methods"] {
   display: flex;
   flex-direction: column;
+  gap: inherit;
 }
 
 section[aria-labelledby="other_methods"] h3 {

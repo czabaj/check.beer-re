@@ -4,7 +4,6 @@ type classesType = {
   detailButton: string,
   inactiveUsers: string,
   list: string,
-  listEmpty: string,
   root: string,
 }
 
@@ -252,7 +251,7 @@ let make = (~placeId) => {
             headerId="active_persons"
             headerSlot={React.string("Lístek")}>
             {activePersonEntries->Array.length === 0
-              ? <p className=classes.listEmpty>
+              ? <p className=SectionWithHeader.classes.emptyMessage>
                   {React.string("Nikdo tu není, zkontrolujte nepřítomnost ⤵")}
                 </p>
               : <ol className={`${Styles.list.base} ${classes.list}`}>

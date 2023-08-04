@@ -1,4 +1,4 @@
-type classesType = {detailButtonCell: string, emptyTableMessage: string, table: string}
+type classesType = {detailButtonCell: string, table: string}
 @module("./DepletedKegs.module.css") external classes: classesType = "default"
 
 @genType @react.component
@@ -10,12 +10,14 @@ let make = (
     buttonsSlot={React.null} headerId="depleted_kegs" headerSlot={React.string("Dopité sudy")}>
     {switch maybeDepletedKegs {
     | None =>
-      <p className=classes.emptyTableMessage>
+      <p className=SectionWithHeader.classes.emptyMessage>
         <LoadingInline />
       </p>
     | Some([]) =>
-      <p className=classes.emptyTableMessage>
-        {React.string("Zde bude přehled dopitých sudů, zatím jste žádný nedopili 🤷‍♂️")}
+      <p className=SectionWithHeader.classes.emptyMessage>
+        {React.string(
+          "Zde bude přehled dopitých sudů, zatím jste žádný nedopili 🤷‍♂️",
+        )}
       </p>
     | Some(kegs) =>
       <>
