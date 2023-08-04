@@ -318,7 +318,9 @@ let make = (~placeId) => {
               </button>
               <div className={`${Styles.box.base} ${classes.inactiveUsers}`}>
                 {inactivePersonEntries->Array.length === 0
-                  ? <p className=classes.listEmpty> {React.string("Nikdo nechybí 👌")} </p>
+                  ? <p className=SectionWithHeader.classes.emptyMessage>
+                      {React.string("Nikdo nechybí 👌")}
+                    </p>
                   : <ol className={`${Styles.list.base} ${classes.list}`}>
                       {inactivePersonEntries
                       ->Array.map(inactivePerson => {
