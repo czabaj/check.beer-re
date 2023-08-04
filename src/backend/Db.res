@@ -632,15 +632,28 @@ module Person = {
     ->Firebase.WriteBatch.update(personsIndexRef, updatePersonsIndexData)
     ->Firebase.WriteBatch.commit
   }
-  let delete = (firestore, ~placeId, ~personId) => {
+  let delete = async (firestore, ~placeId, ~personId) => {
     let personRef = placePersonDocument(firestore, placeId, personId)
     let personsIndexRef = personsIndexDocument(firestore, placeId)
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personTuple = personsIndex.all->Js.Dict.get(personId)->Option.getExn
+    let personRecord = personsAllTupleToRecord(. personTuple)
     let updatePersonIndexData = Object.empty()
     updatePersonIndexData->Object.set(`all.${personId}`, Firebase.deleteField())
-    Firebase.writeBatch(firestore)
-    ->Firebase.WriteBatch.delete(personRef)
-    ->Firebase.WriteBatch.update(personsIndexRef, updatePersonIndexData)
-    ->Firebase.WriteBatch.commit
+    let writeBatch =
+      Firebase.writeBatch(firestore)
+      ->Firebase.WriteBatch.delete(personRef)
+      ->Firebase.WriteBatch.update(personsIndexRef, updatePersonIndexData)
+    switch personRecord.userId->Null.toOption {
+    | Some(userId) => {
+        let placeRef = placeDocument(firestore, placeId)
+        let updatePlaceData = Object.empty()
+        updatePlaceData->Object.set(`users.${userId}`, Firebase.deleteField())
+        writeBatch->Firebase.WriteBatch.update(placeRef, updatePlaceData)->ignore
+      }
+    | _ => ()
+    }
+    await writeBatch->Firebase.WriteBatch.commit
   }
 }
 
