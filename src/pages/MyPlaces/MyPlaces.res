@@ -10,6 +10,7 @@ module Pure = {
     ~usersPlaces: array<FirestoreModels.place>,
   ) => {
     let userDisplayName = currentUser.displayName->Null.getExn
+    let sinceDate = currentUser.metadata.creationTime->Date.fromString
     <div className=Styles.page.narrow>
       <Header
         buttonLeftSlot={<button
@@ -23,7 +24,15 @@ module Pure = {
           <span> {React.string("Nastavení")} </span>
         </button>}
         headingSlot={React.string(userDisplayName)}
-        subheadingSlot={React.null}
+        subheadingSlot={<ReactIntl.FormattedMessage
+          id="Place.established"
+          defaultMessage={"Již od {time}"}
+          values={{
+            "time": <time dateTime={sinceDate->Date.toISOString}>
+              <ReactIntl.FormattedDate value={sinceDate} />
+            </time>,
+          }}
+        />}
       />
       <main>
         <SectionWithHeader
@@ -127,6 +136,7 @@ let make = () => {
           />
         | EditUser =>
           <EditUser
+            connectedEmail={currentUser.email->Null.getExn}
             initialName={userDisplayName}
             onDismiss={hideDialog}
             onSubmit={async values => {

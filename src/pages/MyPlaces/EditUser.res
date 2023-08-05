@@ -4,7 +4,7 @@ module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @react.component
-let make = (~initialName, ~onDismiss, ~onSubmit) => {
+let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit) => {
   let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
   React.useEffect0(() => {
     let initialThrustDevide = AppStorage.getThrustDevice() !== None
@@ -13,7 +13,8 @@ let make = (~initialName, ~onDismiss, ~onSubmit) => {
         let unmountThrustDevice = AppStorage.getThrustDevice() !== None
         if initialThrustDevide != unmountThrustDevice {
           // we need to reload the page to re-initialize the Firestore SDK
-          Webapi.Dom.location->Webapi.Dom.Location.reload
+          open Webapi.Dom
+          location->Location.reload
         }
       },
     )
@@ -61,6 +62,11 @@ let make = (~initialName, ~onDismiss, ~onSubmit) => {
                 labelSlot={React.string("Přezdívka")}
               />
             }}
+          />
+          <InputWrapper
+            inputName="email"
+            inputSlot={<input disabled=true type_="text" value={connectedEmail} />}
+            labelSlot={React.string("E-mail")}
           />
           {switch isStandaloneModeStatus.data {
           | Some(true) => React.null
