@@ -45,7 +45,7 @@
 
 .root::before {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   background: radial-gradient(
       ellipse at 80% 60%,

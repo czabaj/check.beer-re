@@ -4,7 +4,8 @@
   max-inline-size: var(--measure);
   margin-inline: auto;
   min-block-size: 100vh;
-  padding-block-start: calc((100vh - 20rem) / 3);
+  padding-block-end: 2rem;
+  padding-block-start: max(1rem, (100vh - 20rem) / 3);
   padding-inline: 0.5rem;
   place-content: start center;
 }
