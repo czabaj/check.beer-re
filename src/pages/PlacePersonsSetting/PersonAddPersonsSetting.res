@@ -37,6 +37,7 @@ let make = (~existingNames, ~onDismiss, ~onSubmit) => {
                 inputError=?field.error
                 inputName="name"
                 inputSlot={<input
+                  autoFocus=true
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="text"
                   value={field.value}

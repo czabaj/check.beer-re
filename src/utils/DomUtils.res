@@ -12,7 +12,20 @@ type shareHandler = Clipboard | Share
 external navigatorWriteToClipboard: string => promise<unit> = "writeText"
 
 let share = (data: shareData) => {
-  try {navigatorShare(data)->Promise.then(() => Promise.resolve(Share))} catch {
+  try {
+    navigatorShare(data)
+    ->Promise.catch(err => {
+      switch err {
+      | Js.Exn.Error(obj) =>
+        switch Exn.name(obj) {
+        | Some("AbortError") => Promise.resolve()
+        | _ => Promise.reject(err)
+        }
+      | _ => Promise.reject(err)
+      }
+    })
+    ->Promise.then(() => Promise.resolve(Share))
+  } catch {
   | Js.Exn.Error(_) =>
     navigatorWriteToClipboard(data.url)->Promise.then(() => Promise.resolve(Clipboard))
   }
