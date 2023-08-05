@@ -1,9 +1,21 @@
+.danger {
+  background-color: var(--surface-danger);
+  color: var(--text-on-danger);
+  border-radius: var(--radius-2);
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
+  display: flow-root;
+}
+.danger::before {
+  content: "🚨 ";
+}
+
 .info {
   background-color: var(--surface-info);
   color: var(--text-on-info);
   border-radius: var(--radius-2);
-  padding-block: 0.5rem;
-  padding-inline: 1rem;
+  padding-block: 0.25rem;
+  padding-inline: 0.5rem;
   display: flow-root;
 }
 .info::before {

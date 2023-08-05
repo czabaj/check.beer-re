@@ -8,7 +8,7 @@ let make = () => {
   <div className=classes.root>
     <div>
       <label htmlFor="thrust_device"> {React.string(`Důvěřovat tomuto zařízení`)} </label>
-      <p> {React.string(`Aplikace si bude pamatovat vaše data aby fungovala i bez internetu`)} </p>
+      <p> {React.string(`Umožňuje fungování i bez internetu.`)} </p>
     </div>
     <InputToggle
       checked={maybeThrustDevice !== None}

@@ -35,11 +35,13 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
       }
     }, field)
 
-  let oneOf = (~haystack, ~error, field) => Validation.custom(lensState => {
+  let matchField = (~secondField, ~error, field) => Validation.custom(lensState => {
       let value = Lenses.get(lensState, field)
-      switch haystack->Array.includes(value) {
-      | true => Valid
-      | false => Error(error)
+      let secondFieldValue = Lenses.get(lensState, secondField)
+      if value == secondFieldValue {
+        Valid
+      } else {
+        Error(error)
       }
     }, field)
 
@@ -48,6 +50,23 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
       switch haystack->Array.includes(value) {
       | true => Error(error)
       | false => Valid
+      }
+    }, field)
+
+  let oneOf = (~haystack, ~error, field) => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      switch haystack->Array.includes(value) {
+      | true => Valid
+      | false => Error(error)
+      }
+    }, field)
+
+  let password = field => Validation.custom(lensState => {
+      let value = Lenses.get(lensState, field)
+      if value->String.length < 6 {
+        Error("Heslo musí mít alespoň 6 znaků")
+      } else {
+        Valid
       }
     }, field)
 

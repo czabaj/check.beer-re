@@ -265,6 +265,13 @@ module Auth = {
   }
 
   @module("firebase/auth")
+  external signInWithEmailAndPassword: (
+    . t,
+    ~email: string,
+    ~password: string,
+  ) => promise<userCredential> = "signInWithEmailAndPassword"
+
+  @module("firebase/auth")
   external signInWithPopup: (. t, FederatedAuthProvider.t) => promise<userCredential> =
     "signInWithPopup"
 
