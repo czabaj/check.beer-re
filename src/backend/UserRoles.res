@@ -1,4 +1,4 @@
-@genType.import("./roles") @genType.as("Role") @deriving(jsConverter)
+@genType.import("./UserRoles") @genType.as("UserRole") @deriving(jsConverter)
 type role =
   | @as(10) Viewer
   | @as(20) SelfService

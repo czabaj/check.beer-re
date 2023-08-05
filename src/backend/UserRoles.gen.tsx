@@ -2,7 +2,7 @@
 /* eslint-disable import/first */
 
 
-import type {Role as $$role} from './roles';
+import type {UserRole as $$role} from './UserRoles';
 
 // tslint:disable-next-line:interface-over-type-literal
 export type role = $$role;
