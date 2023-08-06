@@ -15,11 +15,12 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     createReactPlugin(),
     mode !== `test` && createReScriptPlugin(),
-    sentryVitePlugin({
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: "vaclav",
-      project: "check-beer",
-    }),
+    mode === `production` &&
+      sentryVitePlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: "vaclav",
+        project: "check-beer",
+      }),
     splitVendorChunkPlugin(),
     VitePWA({
       manifest: {
