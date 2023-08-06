@@ -138,6 +138,17 @@ let make = () => {
           <EditUser
             connectedEmail={currentUser.email->Null.getExn}
             initialName={userDisplayName}
+            onChangePassword={async values => {
+              let credential = Firebase.Auth.EmailAuthProvider.credential(
+                ~email=currentUser.email->Null.getExn,
+                ~password=values.oldPassword,
+              )
+              let _ = await Firebase.Auth.reauthenticateWithCredential(. currentUser, credential)
+              let _ = await Firebase.Auth.updatePassword(.
+                currentUser,
+                ~newPassword=values.newPassword,
+              )
+            }}
             onDismiss={hideDialog}
             onSubmit={async values => {
               let _ = await Firebase.Auth.updateProfile(currentUser, {displayName: values.name})

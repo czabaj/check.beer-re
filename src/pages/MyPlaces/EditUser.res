@@ -3,8 +3,10 @@ module FormFields = %lenses(type state = {name: string})
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
+type dialogState = Hidden | ChangePassword
+
 @react.component
-let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit) => {
+let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit, ~onChangePassword) => {
   let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
   React.useEffect0(() => {
     let initialThrustDevide = AppStorage.getThrustDevice() !== None
@@ -44,36 +46,58 @@ let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit) => {
     ~validationStrategy=OnDemand,
     (),
   )
-  <DialogForm formId="edit_user" heading="Úprava uživatele" onDismiss visible=true>
-    <Form.Provider value={Some(form)}>
-      <form id="edit_user" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-        <fieldset className={`reset ${Styles.fieldset.grid}`}>
-          <Form.Field
-            field=Name
-            render={field => {
-              <InputWrapper
-                inputError=?field.error
-                inputName="name"
-                inputSlot={<input
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                  type_="text"
-                  value={field.value}
-                />}
-                labelSlot={React.string("Přezdívka")}
-              />
+  let (dialogState, setDialogState) = React.useState(() => Hidden)
+  let hideDialog = _ => setDialogState(_ => Hidden)
+  <>
+    <DialogForm formId="edit_user" heading="Úprava uživatele" onDismiss visible=true>
+      <Form.Provider value={Some(form)}>
+        <form id="edit_user" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+          <fieldset className={`reset ${Styles.fieldset.grid}`}>
+            <Form.Field
+              field=Name
+              render={field => {
+                <InputWrapper
+                  inputError=?field.error
+                  inputName="name"
+                  inputSlot={<input
+                    onChange={ReForm.Helpers.handleChange(field.handleChange)}
+                    type_="text"
+                    value={field.value}
+                  />}
+                  labelSlot={React.string("Přezdívka")}
+                />
+              }}
+            />
+            <InputWrapper
+              inputName="email"
+              inputSlot={<input disabled=true type_="text" value={connectedEmail} />}
+              labelSlot={React.string("E-mail")}
+            />
+            <button
+              className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`}
+              onClick={_ => setDialogState(_ => ChangePassword)}
+              type_="button">
+              {React.string("Změnit heslo")}
+            </button>
+            {switch isStandaloneModeStatus.data {
+            | Some(true) => React.null
+            | _ => <InputThrustDevice />
             }}
-          />
-          <InputWrapper
-            inputName="email"
-            inputSlot={<input disabled=true type_="text" value={connectedEmail} />}
-            labelSlot={React.string("E-mail")}
-          />
-          {switch isStandaloneModeStatus.data {
-          | Some(true) => React.null
-          | _ => <InputThrustDevice />
-          }}
-        </fieldset>
-      </form>
-    </Form.Provider>
-  </DialogForm>
+          </fieldset>
+        </form>
+      </Form.Provider>
+    </DialogForm>
+    {switch dialogState {
+    | Hidden => React.null
+    | ChangePassword =>
+      <ChangePassword
+        onDismiss={hideDialog}
+        onSubmit={values =>
+          onChangePassword(values)->Promise.then(() => {
+            hideDialog()
+            Promise.resolve()
+          })}
+      />
+    }}
+  </>
 }

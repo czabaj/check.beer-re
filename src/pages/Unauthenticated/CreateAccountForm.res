@@ -18,7 +18,7 @@ let make = (~onCreateAccount, ~onGoBack) => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.EmailExists => `Tento e${HtmlEntities.nbhp}mail už je zaregistrovaný.`
         | Js.Exn.Error(e) =>
-          Sentry.captureException(e)
+          LogUtils.captureException(e)
           switch Js.Exn.message(e) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"

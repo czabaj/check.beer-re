@@ -24,7 +24,7 @@ module Pure = {
           let errorMessage = switch FirebaseError.toFirebaseError(error) {
           | FirebaseError.InvalidPassword => `Špatný e${HtmlEntities.nbhp}mail nebo heslo`
           | Js.Exn.Error(e) =>
-            Sentry.captureException(e)
+            LogUtils.captureException(e)
             switch Js.Exn.message(e) {
             | Some(msg) => `Chyba: ${msg}`
             | None => "Neznámá chyba"
@@ -56,7 +56,8 @@ module Pure = {
         : <>
             <h2> {React.string("Přihlášení")} </h2>
             <Form.Provider value=Some(form)>
-              <form onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+              <form
+                className={Styles.stack.base} onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
                 <fieldset className={`reset ${Styles.fieldset.grid}`}>
                   {switch isStandaloneMode {
                   | Some(true) => React.null

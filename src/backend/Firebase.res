@@ -200,6 +200,8 @@ module User = {
 module Auth = {
   type t = {app: FirebaseApp.t, name: string, currentUser: Js.null<User.t>}
 
+  type authCredential
+
   @string
   type operationType = [#link | #reauthenticate | #signIn]
 
@@ -221,6 +223,9 @@ module Auth = {
 
   module EmailAuthProvider = {
     let providerID = "password"
+
+    @val @module("firebase/auth") @scope("EmailAuthProvider")
+    external credential: (~email: string, ~password: string) => authCredential = "credential"
   }
   module GithubAuthProvider = {
     let providerID = "github.com"
@@ -265,6 +270,10 @@ module Auth = {
   }
 
   @module("firebase/auth")
+  external reauthenticateWithCredential: (. User.t, authCredential) => promise<userCredential> =
+    "reauthenticateWithCredential"
+
+  @module("firebase/auth")
   external signInWithEmailAndPassword: (
     . t,
     ~email: string,
@@ -281,6 +290,9 @@ module Auth = {
 
   @module("firebase/auth")
   external connectAuthEmulator: (. t, string) => unit = "connectAuthEmulator"
+
+  @module("firebase/auth")
+  external updatePassword: (. User.t, ~newPassword: string) => promise<unit> = "updatePassword"
 }
 
 type appCheckToken
