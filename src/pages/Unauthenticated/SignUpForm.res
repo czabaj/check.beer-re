@@ -7,13 +7,13 @@ module FormFields = %lenses(
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
-@react.component
-let make = (~onCreateAccount, ~onGoBack) => {
+@genType @react.component
+let make = (~onSubmit, ~onGoBack) => {
   let form = Form.use(
     ~initialState={email: "", password: "", passwordConfirmation: ""},
     ~onSubmit=({state, raiseSubmitFailed}) => {
       let {email, password} = state.values
-      onCreateAccount({email, password})
+      onSubmit({email, password})
       ->Promise.catch(error => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.EmailExists => `Tento e${HtmlEntities.nbhp}mail už je zaregistrovaný.`
@@ -47,10 +47,10 @@ let make = (~onCreateAccount, ~onGoBack) => {
     ~validationStrategy=OnDemand,
     (),
   )
-  <>
+  <UnauthenticatedTemplate>
     <h2> {React.string("Registrace")} </h2>
     <Form.Provider value=Some(form)>
-      <form onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+      <form className={Styles.stack.base} onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className={`reset ${Styles.fieldset.grid}`}>
           <Form.Field
             field=Email
@@ -115,9 +115,9 @@ let make = (~onCreateAccount, ~onGoBack) => {
     </Form.Provider>
     <p>
       {React.string(`Jste tu omylem? `)}
-      <button className={Styles.link.base} onClick={onGoBack} type_="button">
+      <button className={Styles.link.base} onClick={_ => onGoBack()} type_="button">
         {React.string(`Zpět na přihlášení.`)}
       </button>
     </p>
-  </>
+  </UnauthenticatedTemplate>
 }

@@ -1,4 +1,5 @@
 .danger {
+  --link-text: var(--text-on-danger);
   background-color: var(--surface-danger);
   color: var(--text-on-danger);
   border-radius: var(--radius-2);

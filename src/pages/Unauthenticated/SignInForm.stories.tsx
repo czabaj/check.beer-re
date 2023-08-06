@@ -1,37 +1,45 @@
 import { type Meta, type StoryObj } from "@storybook/react";
 import { userEvent, within } from "@storybook/testing-library";
+import { FirebaseError } from "firebase/app";
 
-import { Pure } from "./Unauthenticated.gen";
+import { make } from "./SignInForm.gen";
 
-const Unauthenticated = Pure.make;
+const SignInForm = make;
 
-const meta: Meta<typeof Pure.make> = {
-  title: "Pages/Unauthenticated",
-  component: Unauthenticated,
+const meta: Meta<typeof SignInForm> = {
+  title: "Pages/SignInForm",
+  component: SignInForm,
   parameters: {
     layout: "fullscreen",
   },
   argTypes: {
     initialEmail: { control: `text` },
+    onForgottenPassword: { action: `onForgottenPassword` },
     onGoogleAuth: { action: `onGoogleAuth` },
     onPasswordAuth: { action: `onPasswordAuth` },
+    onSignUp: { action: `onSignUp` },
   },
 };
 
 export default meta;
 
-export const Basic: StoryObj<typeof Unauthenticated> = {};
+export const Basic: StoryObj<typeof SignInForm> = {};
 
-export const WithError: StoryObj<typeof Unauthenticated> = {
+export const WithError: StoryObj<typeof SignInForm> = {
   args: {
-    onPasswordAuth: () => Promise.reject(new Error(`Invalid password`)),
+    onPasswordAuth: () =>
+      Promise.reject(
+        new FirebaseError(`auth/wrong-password`, `Invalid password`)
+      ),
   },
   play: async ({ canvasElement }) => {
     const eMail = await within(canvasElement).findByLabelText(/E.mail/);
     await userEvent.type(eMail, `example@example.com`);
     const password = await within(canvasElement).findByLabelText(`Heslo`);
     await userEvent.type(password, `123456`);
-    const submit = await within(canvasElement).findByText(`Přihlásit se heslem`);
+    const submit = await within(canvasElement).findByText(
+      `Přihlásit se heslem`
+    );
     await userEvent.click(submit);
   },
 };

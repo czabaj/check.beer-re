@@ -1,15 +1,10 @@
-.root {
-  row-gap: 1rem;
-  max-inline-size: 30ch;
-}
-
-section[aria-labelledby="other_methods"] {
+.root section[aria-labelledby="other_methods"] {
   display: flex;
   flex-direction: column;
   gap: inherit;
 }
 
-section[aria-labelledby="other_methods"] h3 {
+.root section[aria-labelledby="other_methods"] h3 {
   font-size: var(--font-size-16);
   font-weight: var(--font-weight-medium);
   margin-block-start: 0;
@@ -17,8 +12,8 @@ section[aria-labelledby="other_methods"] h3 {
   position: relative;
   text-align: center;
 }
-section[aria-labelledby="other_methods"] h3::before,
-section[aria-labelledby="other_methods"] h3::after {
+.root section[aria-labelledby="other_methods"] h3::before,
+.root section[aria-labelledby="other_methods"] h3::after {
   background-color: var(--text-3);
   content: "";
   height: 1px;
@@ -26,9 +21,9 @@ section[aria-labelledby="other_methods"] h3::after {
   position: absolute;
   width: 100%;
 }
-section[aria-labelledby="other_methods"] h3::before {
+.root section[aria-labelledby="other_methods"] h3::before {
   transform: translateX(-100%);
 }
-section[aria-labelledby="other_methods"] h3 > span {
+.root section[aria-labelledby="other_methods"] h3 > span {
   padding-inline: 0.5rem;
 }

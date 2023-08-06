@@ -53,75 +53,73 @@ let make = (~onDismiss, ~onSubmit) => {
     (),
   )
   let submitting = form.state.formState == Submitting
-  <>
-    <DialogForm formId="change_password" heading="Změna hesla" onDismiss visible=true>
-      <Form.Provider value={Some(form)}>
-        <form
-          className={Styles.stack.base}
-          id="change_password"
-          onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
-          <fieldset className={`reset ${Styles.fieldset.grid}`} disabled={submitting}>
-            <Form.Field
-              field=OldPassword
-              render={field => {
-                <InputWrapper
-                  inputError=?field.error
-                  inputName="oldPassword"
-                  inputSlot={<input
-                    onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                    type_="password"
-                    value={field.value}
-                  />}
-                  labelSlot={React.string(`Nynější heslo`)}
-                />
-              }}
-            />
-            <Form.Field
-              field=NewPassword
-              render={field => {
-                <InputWrapper
-                  inputError=?field.error
-                  inputName="newPassword"
-                  inputSlot={<input
-                    onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                    type_="password"
-                    value={field.value}
-                  />}
-                  labelSlot={React.string(`Nové heslo`)}
-                />
-              }}
-            />
-            <Form.Field
-              field=NewPasswordConfirmation
-              render={field => {
-                <InputWrapper
-                  inputError=?field.error
-                  inputName="newPasswordConfirmation"
-                  inputSlot={<input
-                    onChange={ReForm.Helpers.handleChange(field.handleChange)}
-                    type_="password"
-                    value={field.value}
-                  />}
-                  labelSlot={React.string(`Heslo znovu`)}
-                />
-              }}
-            />
-          </fieldset>
-          {switch form.state.formState {
-          | SubmitFailed(maybeErrorMessage) =>
-            <p className={Styles.messageBar.danger}>
-              {
-                let errorMessage = switch maybeErrorMessage {
-                | Some(msg) => msg
-                | None => "Neznámá chyba"
-                }
-                React.string(errorMessage)
+  <DialogForm formId="change_password" heading="Změna hesla" onDismiss visible=true>
+    <Form.Provider value={Some(form)}>
+      <form
+        className={Styles.stack.base}
+        id="change_password"
+        onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+        <fieldset className={`reset ${Styles.fieldset.grid}`} disabled={submitting}>
+          <Form.Field
+            field=OldPassword
+            render={field => {
+              <InputWrapper
+                inputError=?field.error
+                inputName="oldPassword"
+                inputSlot={<input
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
+                  type_="password"
+                  value={field.value}
+                />}
+                labelSlot={React.string(`Nynější heslo`)}
+              />
+            }}
+          />
+          <Form.Field
+            field=NewPassword
+            render={field => {
+              <InputWrapper
+                inputError=?field.error
+                inputName="newPassword"
+                inputSlot={<input
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
+                  type_="password"
+                  value={field.value}
+                />}
+                labelSlot={React.string(`Nové heslo`)}
+              />
+            }}
+          />
+          <Form.Field
+            field=NewPasswordConfirmation
+            render={field => {
+              <InputWrapper
+                inputError=?field.error
+                inputName="newPasswordConfirmation"
+                inputSlot={<input
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)}
+                  type_="password"
+                  value={field.value}
+                />}
+                labelSlot={React.string(`Heslo znovu`)}
+              />
+            }}
+          />
+        </fieldset>
+        {switch form.state.formState {
+        | SubmitFailed(maybeErrorMessage) =>
+          <p className={Styles.messageBar.danger}>
+            {
+              let errorMessage = switch maybeErrorMessage {
+              | Some(msg) => msg
+              | None => "Neznámá chyba"
               }
-            </p>
-          | _ => React.null
-          }}
-        </form>
-      </Form.Provider>
-    </DialogForm>
-  </>
+              React.string(errorMessage)
+            }
+          </p>
+        | _ => React.null
+        }}
+      </form>
+    </Form.Provider>
+  </DialogForm>
 }

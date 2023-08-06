@@ -9,7 +9,7 @@ let make = (~children) => {
     | None => <Unauthenticated />
     | Some(user) =>
       if user.displayName->Null.mapWithDefault("", String.trim) === "" {
-        <CreateAccount user />
+        <Onboarding user />
       } else {
         children
       }

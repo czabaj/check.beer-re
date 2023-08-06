@@ -198,7 +198,14 @@ module User = {
 }
 
 module Auth = {
-  type t = {app: FirebaseApp.t, name: string, currentUser: Js.null<User.t>}
+  type t = {
+    app: FirebaseApp.t,
+    currentUser: Js.null<User.t>,
+    name: string,
+  }
+
+  @set external setLanguageCode: (t, string) => unit = "languageCode"
+  @send external useDeviceLanguage: t => unit = "useDeviceLanguage"
 
   type authCredential
 
@@ -272,6 +279,9 @@ module Auth = {
   @module("firebase/auth")
   external reauthenticateWithCredential: (. User.t, authCredential) => promise<userCredential> =
     "reauthenticateWithCredential"
+
+  @module("firebase/auth")
+  external sendPasswordResetEmail: (. t, ~email: string) => promise<unit> = "sendPasswordResetEmail"
 
   @module("firebase/auth")
   external signInWithEmailAndPassword: (

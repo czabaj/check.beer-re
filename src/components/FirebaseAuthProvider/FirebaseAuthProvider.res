@@ -11,6 +11,7 @@ let make = (~children) => {
     },
   )
   let auth = app->Auth.getAuth
+  Auth.setLanguageCode(auth, "cs")
 
   <AppCheckProvider sdk=appCheck>
     <AuthProvider sdk=auth> {children} </AuthProvider>

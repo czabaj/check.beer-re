@@ -1,5 +1,5 @@
 .base {
-  color: var(--text-3);
+  color: var(--link-text, var(--text-3));
   letter-spacing: 0.02em;
   text-decoration: underline;
 }
