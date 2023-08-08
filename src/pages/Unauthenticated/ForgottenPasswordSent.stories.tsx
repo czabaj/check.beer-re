@@ -5,7 +5,7 @@ import { make } from "./ForgottenPasswordSent.gen";
 const ForgottenPasswordSent = make;
 
 const meta: Meta<typeof ForgottenPasswordSent> = {
-  title: "Pages/ForgottenPasswordSent",
+  title: "Pages/Unauthenticated/ForgottenPasswordSent",
   component: ForgottenPasswordSent,
   parameters: {
     layout: "fullscreen",
