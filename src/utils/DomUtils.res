@@ -45,3 +45,35 @@ let standaloneModeRx = mediaRx("(display-mode: standalone)")
 let useIsStandaloneMode = () => {
   Reactfire.useObservable(~observableId="isStandaloneMode", ~source=standaloneModeRx)
 }
+
+let isOnlineRx = {
+  open Rxjs
+  open! Webapi.Dom
+  merge2(
+    fromEvent(. window, "online")->pipe(map((_, _) => true)),
+    fromEvent(. window, "offline")->pipe(map((_, _) => false)),
+  )->pipe(startWith((window->Webapi.Dom.Window.navigator).onLine))
+}
+
+let useIsOnline = () => {
+  Reactfire.useObservable(~observableId="isOnline", ~source=isOnlineRx)
+}
+
+let supportsPlatformWebAuthnCache = ref(None)
+let supportsPlatformWebAuthn: promise<bool> = %raw(`!window.PublicKeyCredential
+  ? Promise.resolve(false)
+  : window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()`)->Promise.then(
+  result => {
+    supportsPlatformWebAuthnCache := Some(result)
+    Promise.resolve(result)
+  },
+)
+
+let useSuportsPlatformWebauthn = () => {
+  switch supportsPlatformWebAuthnCache.contents {
+  | Some(result) => result
+  | None =>
+    // throw promise which triggers a Suspense
+    raise(supportsPlatformWebAuthn->TypeUtils.any)
+  }
+}

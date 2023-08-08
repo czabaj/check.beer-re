@@ -23,7 +23,7 @@ let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot, ~un
             "aria-describedby": `${errorId} ${unitId}`,
             "aria-invalid": hasError ? "true" : "false",
             "id": inputName,
-            "name": className,
+            "name": inputName,
           },
         )}
         {switch unitSlot {

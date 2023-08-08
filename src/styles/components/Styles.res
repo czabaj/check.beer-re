@@ -30,7 +30,7 @@ type linkClasses = {base: string}
 type listClasses = {base: string}
 @module("./list.module.css") external list: listClasses = "default"
 
-type messageBarClasses = {danger: string, info: string}
+type messageBarClasses = {base: string, variantDanger: string}
 @module("./messageBar.module.css") external messageBar: messageBarClasses = "default"
 
 type pageClasses = {centered: string, narrow: string}

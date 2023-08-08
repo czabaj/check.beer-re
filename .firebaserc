@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "beerbook2-da255"
+  },
+  "targets": {},
+  "etags": {
+    "beerbook2-da255": {
+      "extensionInstances": {
+        "firebase-web-authn": "9de89bf750c1d50297985b67a8a115ac1ae5d455a37ad83cc7a1d175b4c35aaa"
+      }
+    }
   }
 }

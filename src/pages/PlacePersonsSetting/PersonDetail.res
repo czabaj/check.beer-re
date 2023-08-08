@@ -82,7 +82,7 @@ let make = (
       </section>
       {switch personRole {
       | None =>
-        <p className={Styles.messageBar.info}>
+        <p className={Styles.messageBar.base}>
           {React.string(`Nemá propojený účet. `)}
           <button
             className={Styles.link.base}
@@ -92,7 +92,7 @@ let make = (
           </button>
         </p>
       | Some(role) =>
-        <p className={Styles.messageBar.info}>
+        <p className={Styles.messageBar.base}>
           {React.string(`Má propojený účet a oprávnění jako `)}
           <b> {role->UserRoles.roleI18n->React.string} </b>
           {switch role {

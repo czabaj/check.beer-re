@@ -12,6 +12,14 @@ import type {t as Promise_t} from './Promise.gen';
 export type submitValues = { readonly email: string; readonly password: string };
 
 // tslint:disable-next-line:interface-over-type-literal
-export type props<onSubmit,onGoBack> = { readonly onSubmit: onSubmit; readonly onGoBack: onGoBack };
+export type props<isOnline,onSubmit,onGoBack> = {
+  readonly isOnline: isOnline; 
+  readonly onSubmit: onSubmit; 
+  readonly onGoBack: onGoBack
+};
 
-export const make: React.ComponentType<{ readonly onSubmit: (_1:submitValues) => Promise_t<void>; readonly onGoBack: () => void }> = SignUpFormBS.make;
+export const make: React.ComponentType<{
+  readonly isOnline: (undefined | boolean); 
+  readonly onSubmit: (_1:submitValues) => Promise_t<void>; 
+  readonly onGoBack: () => void
+}> = SignUpFormBS.make;

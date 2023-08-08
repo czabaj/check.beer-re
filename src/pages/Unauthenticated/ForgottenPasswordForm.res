@@ -4,7 +4,7 @@ module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @genType @react.component
-let make = (~initialEmail, ~onGoBack, ~onSubmit) => {
+let make = (~initialEmail, ~isOnline, ~onGoBack, ~onSubmit) => {
   let form = Form.use(
     ~initialState={email: initialEmail},
     ~onSubmit=({state, raiseSubmitFailed}) => {
@@ -13,7 +13,7 @@ let make = (~initialEmail, ~onGoBack, ~onSubmit) => {
         switch FirebaseError.toFirebaseError(error) {
         | _ =>
           let exn = Js.Exn.asJsExn(error)->Option.getExn
-          LogUtils.captureException(exn)
+          LogUtils.captureException(error)
           let errorMessage = switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
@@ -31,7 +31,7 @@ let make = (~initialEmail, ~onGoBack, ~onSubmit) => {
     ~validationStrategy=OnDemand,
     (),
   )
-  <UnauthenticatedTemplate>
+  <UnauthenticatedTemplate ?isOnline>
     <h2> {React.string("Zapomenuté heslo")} </h2>
     <Form.Provider value=Some(form)>
       <form className={Styles.stack.base} onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>

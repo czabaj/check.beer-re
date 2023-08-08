@@ -25,7 +25,7 @@ let make = (~onDismiss, ~onSubmit) => {
           }
         | _ =>
           let exn = Js.Exn.asJsExn(error)->Option.getExn
-          LogUtils.captureException(exn)
+          LogUtils.captureException(error)
           let errorMessage = switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
@@ -108,7 +108,7 @@ let make = (~onDismiss, ~onSubmit) => {
         </fieldset>
         {switch form.state.formState {
         | SubmitFailed(maybeErrorMessage) =>
-          <p className={Styles.messageBar.danger}>
+          <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
             {
               let errorMessage = switch maybeErrorMessage {
               | Some(msg) => msg

@@ -6,6 +6,88 @@ module FirebaseApp = {
   type t = {options: FirebaseOptions.t}
 }
 
+module Analytics = {
+  type t
+
+  type eventName = @string
+  [
+    | #add_payment_info
+    | #add_shipping_info
+    | #add_to_cart
+    | #add_to_wishlist
+    | #begin_checkout
+    | #checkout_progress
+    | #"exception"
+    | #generate_lead
+    | #login
+    | #page_view
+    | #purchase
+    | #refund
+    | #remove_from_cart
+    | #screen_view
+    | #search
+    | #select_content
+    | #select_item
+    | #select_promotion
+    | #set_checkout_option
+    | #share
+    | #sign_up
+    | #timing_complete
+    | #view_cart
+    | #view_item
+    | #view_item_list
+    | #view_promotion
+    | #view_search_results
+  ]
+
+  type eventParams = {
+    checkout_option?: string,
+    checkout_step?: int,
+    item_id?: string,
+    content_type?: string,
+    coupon?: string,
+    currency?: string,
+    description?: string,
+    fatal?: bool,
+    // items?: Item[],
+    method?: string,
+    number?: string,
+    // promotions?: Promotion[],
+    screen_name?: string,
+    /**
+     * Firebase-specific. Use to log a `screen_name` to Firebase Analytics.
+     */
+    firebase_screen?: string,
+    /**
+     * Firebase-specific. Use to log a `screen_class` to Firebase Analytics.
+     */
+    firebase_screen_class?: string,
+    search_term?: string,
+    // shipping?: Currency,
+    // tax?: Currency,
+    transaction_id?: string,
+    value?: float,
+    event_label?: string,
+    event_category?: string,
+    shipping_tier?: string,
+    item_list_id?: string,
+    item_list_name?: string,
+    promotion_id?: string,
+    promotion_name?: string,
+    payment_type?: string,
+    affiliation?: string,
+    page_title?: string,
+    page_location?: string,
+    page_path?: string,
+  }
+
+  @module("firebase/analytics")
+  external getAnalytics: FirebaseApp.t => t = "getAnalytics"
+
+  @module("firebase/analytics")
+  external getAnalytics: (. t, eventName, eventParams) => unit = "logEvent"
+}
+
 // @module("firebase/app")
 // external initializeApp: firebaseConfig => firebaseApp = "initializeApp"
 
@@ -375,23 +457,16 @@ module StyledFirebaseAuth = {
   external make: (~uiConfig: 'uiConfig, ~firebaseAuth: 'a) => React.element = "StyledFirebaseAuth"
 }
 
-module FirebaseCompat = {
-  type firebase
+module Functions = {
+  type t
 
-  @module("firebase/compat/app")
-  external firebase: firebase = "default"
+  @module("firebase/functions")
+  external getFunctions: FirebaseApp.t => t = "getFunctions"
 
-  @send
-  external initializeApp: (firebase, FirebaseOptions.t) => FirebaseApp.t = "initializeApp"
+  type callResult<'a> = {data: 'a}
+  @module("firebase/functions")
+  external httpsCallable: (t, string) => (. 'a) => promise<callResult<'b>> = "httpsCallable"
 }
-
-type functions
-@module("firebase/functions")
-external getFunctions: (FirebaseApp.t, @as("asia-northeast3") _) => functions = "getFunctions"
-
-type callResult<'a> = {data: 'a}
-@module("firebase/functions")
-external httpsCallable: (functions, string) => (. 'a) => promise<callResult<'b>> = "httpsCallable"
 
 @module("firebase/firestore")
 external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"

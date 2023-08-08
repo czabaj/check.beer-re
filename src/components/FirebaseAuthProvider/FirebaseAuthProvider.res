@@ -13,7 +13,11 @@ let make = (~children) => {
   let auth = app->Auth.getAuth
   Auth.setLanguageCode(auth, "cs")
 
+  let functions = app->Functions.getFunctions
+
   <AppCheckProvider sdk=appCheck>
-    <AuthProvider sdk=auth> {children} </AuthProvider>
+    <AuthProvider sdk=auth>
+      <FunctionsProvider sdk=functions> {children} </FunctionsProvider>
+    </AuthProvider>
   </AppCheckProvider>
 }

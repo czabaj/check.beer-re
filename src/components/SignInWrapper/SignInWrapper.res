@@ -6,13 +6,11 @@ let make = (~children) => {
   | None => React.null
   | Some({user: maybeUser}) =>
     switch maybeUser->Null.toOption {
-    | None => <Unauthenticated />
-    | Some(user) =>
-      if user.displayName->Null.mapWithDefault("", String.trim) === "" {
-        <Onboarding user />
-      } else {
-        children
-      }
+    | None
+    | // We only use anonymous users for WebAuthn as intermediary step
+    Some({isAnonymous: true}) =>
+      <Unauthenticated />
+    | Some(user) => <Onboarding user> {children} </Onboarding>
     }
   }
 }

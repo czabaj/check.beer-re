@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@firebase-web-authn/browser": "^9.6.5",
     "@nobleai/rescript-rxjs": "https://github.com/czabaj/rescript-rxjs#e9e24c22406f40dcaa70f3c0fd8deb07237d3dca",
     "@oddbird/popover-polyfill": "^0.2.2",
     "@rescript/core": "^0.4.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@csstools/postcss-relative-color-syntax": "^2.0.0",
+    "@firebase-web-authn/extension": "^9.6.5",
     "@firebase/rules-unit-testing": "^3.0.0",
     "@jihchi/vite-plugin-rescript": "^5.3.0",
     "@storybook/addon-essentials": "^7.1.0",

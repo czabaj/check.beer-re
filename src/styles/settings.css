@@ -34,6 +34,7 @@ html {
   --surface-danger: hsl(0deg 63% 54%);
   --surface-danger-hs: 0deg 63%;
   --surface-danger-l: 54%;
+  --surface-danger-1: hsl(0, 63%, 80%);
   --surface-highlighted: hsl(52, 100%, 93%);
   --surface-info: hsl(197 82% 92%);
   --surface-warning: hsl(47deg 100% 62%);

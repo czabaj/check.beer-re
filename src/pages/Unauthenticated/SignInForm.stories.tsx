@@ -7,16 +7,18 @@ import { make } from "./SignInForm.gen";
 const SignInForm = make;
 
 const meta: Meta<typeof SignInForm> = {
-  title: "Pages/SignInForm",
+  title: "Pages/Unauthenticated/SignInForm",
   component: SignInForm,
   parameters: {
     layout: "fullscreen",
   },
   argTypes: {
-    initialEmail: { control: `text` },
+    isOnline: { control: { type: "boolean" } },
+    loadingOverlay: { control: { type: `boolean` } },
     onForgottenPassword: { action: `onForgottenPassword` },
-    onGoogleAuth: { action: `onGoogleAuth` },
-    onPasswordAuth: { action: `onPasswordAuth` },
+    onSignInWithGoogle: { action: `onSignInWithGoogle` },
+    onSignInWithPasskey: { action: `onSignInWithPasskey` },
+    onSignInWithPassword: { action: `onSignInWithPassword` },
     onSignUp: { action: `onSignUp` },
   },
 };
@@ -27,7 +29,7 @@ export const Basic: StoryObj<typeof SignInForm> = {};
 
 export const WithError: StoryObj<typeof SignInForm> = {
   args: {
-    onPasswordAuth: () =>
+    onSignInWithPassword: () =>
       Promise.reject(
         new FirebaseError(`auth/wrong-password`, `Invalid password`)
       ),

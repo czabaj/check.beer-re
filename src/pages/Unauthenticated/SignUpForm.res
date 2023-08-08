@@ -8,7 +8,7 @@ module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
 
 @genType @react.component
-let make = (~onSubmit, ~onGoBack) => {
+let make = (~isOnline, ~onSubmit, ~onGoBack) => {
   let form = Form.use(
     ~initialState={email: "", password: "", passwordConfirmation: ""},
     ~onSubmit=({state, raiseSubmitFailed}) => {
@@ -18,7 +18,7 @@ let make = (~onSubmit, ~onGoBack) => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.EmailExists => `Tento e${HtmlEntities.nbhp}mail už je zaregistrovaný.`
         | Js.Exn.Error(e) =>
-          LogUtils.captureException(e)
+          LogUtils.captureException(error)
           switch Js.Exn.message(e) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
@@ -47,7 +47,7 @@ let make = (~onSubmit, ~onGoBack) => {
     ~validationStrategy=OnDemand,
     (),
   )
-  <UnauthenticatedTemplate>
+  <UnauthenticatedTemplate ?isOnline>
     <h2> {React.string("Registrace")} </h2>
     <Form.Provider value=Some(form)>
       <form className={Styles.stack.base} onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
@@ -59,6 +59,7 @@ let make = (~onSubmit, ~onGoBack) => {
                 inputError=?field.error
                 inputName="email"
                 inputSlot={<input
+                  autoComplete="username email"
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="email"
                   value={field.value}
@@ -74,6 +75,7 @@ let make = (~onSubmit, ~onGoBack) => {
                 inputError=?field.error
                 inputName="password"
                 inputSlot={<input
+                  autoComplete="new-password"
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="password"
                   value={field.value}
@@ -87,8 +89,9 @@ let make = (~onSubmit, ~onGoBack) => {
             render={field => {
               <InputWrapper
                 inputError=?field.error
-                inputName="password"
+                inputName="passwordConfirmation"
                 inputSlot={<input
+                  autoComplete="new-password"
                   onChange={ReForm.Helpers.handleChange(field.handleChange)}
                   type_="password"
                   value={field.value}

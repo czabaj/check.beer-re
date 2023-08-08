@@ -4,6 +4,17 @@ type firebaseConfig
 @module("./firebaseConfig")
 external firebaseConfig: firebaseConfig = "firebaseConfig"
 
+module AnalyticsProvider = {
+  @react.component @module("reactfire")
+  external make: (~sdk: Firebase.Analytics.t, ~children: React.element) => React.element =
+    "AnalyticsProvider"
+}
+
+module AuthProvider = {
+  @react.component @module("reactfire")
+  external make: (~sdk: Auth.t, ~children: React.element) => React.element = "AuthProvider"
+}
+
 module FirebaseAppProvider = {
   @react.component @module("reactfire")
   external make: (
@@ -13,9 +24,10 @@ module FirebaseAppProvider = {
   ) => React.element = "FirebaseAppProvider"
 }
 
-module AuthProvider = {
+module FunctionsProvider = {
   @react.component @module("reactfire")
-  external make: (~sdk: Auth.t, ~children: React.element) => React.element = "AuthProvider"
+  external make: (~sdk: Firebase.Functions.t, ~children: React.element) => React.element =
+    "FunctionsProvider"
 }
 
 type observableStatus<'a> = {
@@ -69,6 +81,9 @@ external useInitFirestore: (FirebaseApp.t => promise<firestore>) => observableSt
 
 @module("reactfire")
 external useFirestore: unit => firestore = "useFirestore"
+
+@module("reactfire")
+external useFunctions: unit => Firebase.Functions.t = "useFunctions"
 
 @module("reactfire")
 external useObservable: (

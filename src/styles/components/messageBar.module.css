@@ -1,24 +1,23 @@
-.danger {
-  --link-text: var(--text-on-danger);
-  background-color: var(--surface-danger);
-  color: var(--text-on-danger);
+.base {
+  background-color: var(--surface-info);
   border-radius: var(--radius-2);
-  padding-block: 0.25rem;
-  padding-inline: 0.5rem;
-  display: flow-root;
+  color: var(--text-on-info);
+  padding-block: 0.5rem;
+  padding-inline-end: 0.75rem;
+  padding-inline-start: calc(0.5rem + 3ch);
+  position: relative;
 }
-.danger::before {
-  content: "🚨 ";
+.base::before {
+  content: "☝️ ";
+  margin-inline-start: -2.5ch;
+  position: absolute;
 }
 
-.info {
-  background-color: var(--surface-info);
-  color: var(--text-on-info);
-  border-radius: var(--radius-2);
-  padding-block: 0.25rem;
-  padding-inline: 0.5rem;
-  display: flow-root;
+.variantDanger {
+  --link-text: var(--text-2);
+  background-color: var(--surface-danger-1);
+  color: var(--text-1);
 }
-.info::before {
-  content: "☝️ ";
+.variantDanger::before {
+  content: "🚨 ";
 }

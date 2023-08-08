@@ -5,12 +5,13 @@ import { make } from "./SignUpForm.gen";
 const SignUpForm = make;
 
 const meta: Meta<typeof SignUpForm> = {
-  title: "Pages/SignUpForm",
+  title: "Pages/Unauthenticated/SignUpForm",
   component: SignUpForm,
   parameters: {
     layout: "fullscreen",
   },
   argTypes: {
+    isOnline: { control: { type: "boolean" } },
     onGoBack: { action: `onGoBack` },
     onSubmit: { action: `onSubmit` },
   },

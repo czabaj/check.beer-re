@@ -5,12 +5,13 @@ import { make } from "./ForgottenPasswordForm.gen";
 const ForgottenPasswordForm = make;
 
 const meta: Meta<typeof ForgottenPasswordForm> = {
-  title: "Pages/ForgottenPasswordForm",
+  title: "Pages/Unauthenticated/ForgottenPasswordForm",
   component: ForgottenPasswordForm,
   parameters: {
     layout: "fullscreen",
   },
   argTypes: {
+    isOnline: { control: { type: "boolean" } },
     onGoBack: { action: `onGoBack` },
     onSubmit: { action: `onSubmit` },
   },

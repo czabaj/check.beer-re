@@ -122,7 +122,7 @@ let make = (
       {switch maybeTapName {
       | None => React.null
       | Some(tapName) =>
-        <p className={Styles.messageBar.info}>
+        <p className={Styles.messageBar.base}>
           {React.string(`Sud je naražen na pípu `)}
           <b> {React.string(tapName)} </b>
         </p>
