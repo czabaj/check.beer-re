@@ -28,7 +28,8 @@ let make = (~children, ~user: Firebase.User.t) => {
       switch error->FirebaseWebAuthn.toFirebaseWebAuthnError {
       | FirebaseWebAuthn.CancelledByUser => ()
       | _ => {
-          LogUtils.captureException(error)
+          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          LogUtils.captureException(exn)
           raise(error)
         }
       }

@@ -13,7 +13,7 @@ let make = (~initialEmail, ~isOnline, ~onGoBack, ~onSubmit) => {
         switch FirebaseError.toFirebaseError(error) {
         | _ =>
           let exn = Js.Exn.asJsExn(error)->Option.getExn
-          LogUtils.captureException(error)
+          LogUtils.captureException(exn)
           let errorMessage = switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"

@@ -25,7 +25,7 @@ let make = (~onDismiss, ~onSubmit) => {
           }
         | _ =>
           let exn = Js.Exn.asJsExn(error)->Option.getExn
-          LogUtils.captureException(error)
+          LogUtils.captureException(exn)
           let errorMessage = switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"

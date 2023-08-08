@@ -9,6 +9,6 @@ let initSentry: unit => unit = %raw(`() => {
   }
 }`)
 
-let captureException: exn => unit = %raw(`import.meta.env.PROD && window.location.host === 'check.beer' ? Sentry.captureException : console.error.bind(console)`)
+let captureException: Js.Exn.t => unit = %raw(`import.meta.env.PROD && window.location.host === 'check.beer' ? Sentry.captureException : console.error.bind(console)`)
 
 let captureMessage: string => unit = %raw(`import.meta.env.PROD && window.location.host === 'check.beer' ? Sentry.captureMessage : console.log.bind(console)`)

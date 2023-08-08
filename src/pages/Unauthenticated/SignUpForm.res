@@ -17,13 +17,13 @@ let make = (~isOnline, ~onSubmit, ~onGoBack) => {
       ->Promise.catch(error => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.EmailExists => `Tento e${HtmlEntities.nbhp}mail už je zaregistrovaný.`
-        | Js.Exn.Error(e) =>
-          LogUtils.captureException(error)
-          switch Js.Exn.message(e) {
+        | _ =>
+          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          LogUtils.captureException(exn)
+          switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }
-        | _ => "Neznámá chyba"
         }
         raiseSubmitFailed(Some(errorMessage))
         Promise.resolve()

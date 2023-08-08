@@ -48,7 +48,8 @@ let make = () => {
       onSignInWithGoogle={() => {
         signInWithRedirect(. auth, FederatedAuthProvider.googleAuthProvider())
         ->Promise.catch(error => {
-          LogUtils.captureException(error)
+          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          LogUtils.captureException(exn)
           Promise.reject(error)
         })
         ->ignore

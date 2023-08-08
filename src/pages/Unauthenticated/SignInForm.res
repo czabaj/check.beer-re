@@ -26,9 +26,10 @@ let make = (
       ->Promise.catch(error => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.InvalidPassword => wrongPasswordMessage
-        | Js.Exn.Error(e) =>
-          LogUtils.captureException(error)
-          switch Js.Exn.message(e) {
+        | _ =>
+          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          LogUtils.captureException(exn)
+          switch Js.Exn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }
