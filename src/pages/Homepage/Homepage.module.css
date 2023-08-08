@@ -1,9 +1,11 @@
 @keyframes flip-page {
   from {
-    transform: rotate3d(0);
+    backface-visibility: hidden;
+    transform: scaleY(0.97);
+    transform-origin: -2rem center;
   }
   to {
-    transform: rotate3d(0, 1, 0, 80deg);
+    transform: rotateY(-100deg);
   }
 }
 
@@ -15,7 +17,7 @@
 ::view-transition-old(hardcover) {
   backface-visibility: hidden;
   transform-origin: left 2rem;
-  animation: 0.3s ease-in flip-page;
+  animation: 0.618s ease-in flip-page;
 }
 
 .root {
