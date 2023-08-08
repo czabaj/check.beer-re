@@ -34,6 +34,7 @@ let code: Exn.t => option<string> = %raw("e => e?.code")
 
 exception CancelledByUser
 exception InvalidFunctionResponse
+exception NoOperationNeeded
 
 let toFirebaseWebAuthnError = exn => {
   switch exn {
@@ -43,6 +44,7 @@ let toFirebaseWebAuthnError = exn => {
       : switch code(obj) {
         | Some("firebaseWebAuthn/cancelled") => CancelledByUser
         | Some("firebaseWebAuthn/invalid") => InvalidFunctionResponse
+        | Some("firebaseWebAuthn/no-op") => NoOperationNeeded
         | _ => exn
         }
   | _ => exn

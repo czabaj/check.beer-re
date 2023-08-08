@@ -27,11 +27,14 @@ let make = (~children, ~user: Firebase.User.t) => {
     | error =>
       switch error->FirebaseWebAuthn.toFirebaseWebAuthnError {
       | FirebaseWebAuthn.CancelledByUser => ()
-      | _ => {
-          let exn = Js.Exn.asJsExn(error)->Option.getExn
+      | FirebaseWebAuthn.NoOperationNeeded =>
+        // Device set-up already, just mark it as done in the storage
+        setWebAuthn(. Some("1"))
+      | Js.Exn.Error(exn) => {
           LogUtils.captureException(exn)
           raise(error)
         }
+      | _ => raise(error)
       }
     }
   })
