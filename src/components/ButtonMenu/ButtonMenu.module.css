@@ -5,6 +5,7 @@
   right: anchor(right);
   padding: 0;
   padding-block: 0.5rem;
+  box-shadow: var(--shadow-3);
 }
 .popover li > :where(a, button) {
   color: var(--text-1);
