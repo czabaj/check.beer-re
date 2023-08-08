@@ -1,4 +1,34 @@
-.root > header {
+@keyframes flip-page {
+  from {
+    transform: rotate3d(0);
+  }
+  to {
+    transform: rotate3d(0, 1, 0, 80deg);
+  }
+}
+
+::view-transition-new(root),
+::view-transition-old(root) {
+  animation: none;
+}
+
+::view-transition-old(hardcover) {
+  backface-visibility: hidden;
+  transform-origin: left 2rem;
+  animation: 0.3s ease-in flip-page;
+}
+
+.root {
+  background: radial-gradient(
+      ellipse at 80% 60%,
+      hsl(99deg 13% 26%) 10%,
+      hsl(99deg 13% 46%) 68%
+    ),
+    url("../../assets/noise.svg");
+  view-transition-name: hardcover;
+}
+
+.root header {
   border-image: url("../../assets/label.png") 55 fill;
   border-width: 55px;
   border-style: solid;
@@ -41,17 +71,4 @@
   letter-spacing: 2px;
   outline: 4px solid var(--_background);
   transform: rotate(-5deg);
-}
-
-.root::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-      ellipse at 80% 60%,
-      hsl(99deg 13% 26%) 10%,
-      hsl(99deg 13% 46%) 68%
-    ),
-    url("../../assets/noise.svg");
-  z-index: -1;
 }

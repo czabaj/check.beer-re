@@ -11,7 +11,6 @@ html {
   color: var(--text-1);
   font-family: var(--font-sans);
   line-height: var(--ratio);
-  position: relative;
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {
