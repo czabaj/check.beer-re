@@ -14,7 +14,6 @@ See for your selves on [check.beer](https://check.beer)
 This app originates from an Android application "BeerBook", which I made _years_ ago and never released publicly. It serves well for its users, although it has a few drawbacks, most notably no cloud backup 🧨
 
 ## Developer facts of interest
-
 - this app is written in [ReScript, a flavor of OCaml programming language](https://rescript-lang.org) which compiles to clean JavaScript,
 - this app is a [progressive-web-app (PWA)](https://web.dev/learn/pwa/), it can be installed as a standalone app and is capable of running offline with almost no limitations,
 - this app **runs on Firebase** and utilizes most of its goodies - offline support, near real-time synchronization, reliability and speed,
