@@ -28,10 +28,6 @@ external verifyUserWithPasskey: (
   Firebase.Functions.t,
 ) => promise<Firebase.Auth.userCredential> = "verifyUserWithPasskey"
 
-let isFirebaseWebAuthnError = exn => Exn.name(exn) === Some("FirebaseWebAuthnError")
-
-let code: Exn.t => option<string> = %raw("e => e?.code")
-
 exception CancelledByUser
 exception InvalidFunctionResponse
 exception NoOperationNeeded
@@ -39,14 +35,12 @@ exception NoOperationNeeded
 let toFirebaseWebAuthnError = exn => {
   switch exn {
   | Exn.Error(obj) =>
-    !isFirebaseWebAuthnError(obj)
-      ? exn
-      : switch code(obj) {
-        | Some("firebaseWebAuthn/cancelled") => CancelledByUser
-        | Some("firebaseWebAuthn/invalid") => InvalidFunctionResponse
-        | Some("firebaseWebAuthn/no-op") => NoOperationNeeded
-        | _ => exn
-        }
+    switch ErrorUtils.code(obj) {
+    | Some("firebaseWebAuthn/firebaseWebAuthn/cancelled") => CancelledByUser
+    | Some("firebaseWebAuthn/firebaseWebAuthn/invalid") => InvalidFunctionResponse
+    | Some("firebaseWebAuthn/firebaseWebAuthn/no-op") => NoOperationNeeded
+    | _ => exn
+    }
   | _ => exn
   }
 }

@@ -1,7 +1,5 @@
 let isFirebaseError = exn => Exn.name(exn) === Some("FirebaseError")
 
-let code: Exn.t => option<string> = %raw("e => e?.code")
-
 exception EmailChangeNeedsVerification
 exception EmailExists
 exception InvalidPassword
@@ -16,7 +14,7 @@ let toFirebaseError = exn => {
       ? exn
         // This is just a very small subset of all possible errors
         //@see https://firebase.google.com/docs/reference/js/auth#autherrorcodes
-      : switch code(obj) {
+      : switch ErrorUtils.code(obj) {
         | Some("auth/email-change-needs-verification") => EmailChangeNeedsVerification
         | Some("auth/email-already-in-use") => EmailExists
         | Some("auth/wrong-password") => InvalidPassword
