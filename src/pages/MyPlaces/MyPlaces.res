@@ -88,6 +88,7 @@ let pageDataRx = (auth, firestore) => {
 
 @react.component
 let make = () => {
+  LogUtils.usePageView("MyPlaces")
   let firestore = Reactfire.useFirestore()
   let auth = Reactfire.useAuth()
   let pageDataStatus = Reactfire.useObservable(

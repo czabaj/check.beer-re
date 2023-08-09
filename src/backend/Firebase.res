@@ -85,7 +85,7 @@ module Analytics = {
   external getAnalytics: FirebaseApp.t => t = "getAnalytics"
 
   @module("firebase/analytics")
-  external getAnalytics: (. t, eventName, eventParams) => unit = "logEvent"
+  external logEvent: (. t, eventName, eventParams) => unit = "logEvent"
 }
 
 // @module("firebase/app")

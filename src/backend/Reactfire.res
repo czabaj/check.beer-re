@@ -40,6 +40,9 @@ type observableStatus<'a> = {
 }
 
 @module("reactfire")
+external useAnalytics: unit => Analytics.t = "useAnalytics"
+
+@module("reactfire")
 external useAuth: unit => Auth.t = "useAuth"
 
 @module("reactfire")
