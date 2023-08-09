@@ -3,10 +3,28 @@ type view = NickName | ThrustDevice | BiometricAuthn
 @react.component
 let make = (~children, ~user: Firebase.User.t) => {
   let auth = Reactfire.useAuth()
+  let firestore = Reactfire.useFirestore()
   let functions = Reactfire.useFunctions()
   let supportsWebAuthn = DomUtils.useSuportsPlatformWebauthn()
   let (webAuthn, setWebAuthn) = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)
   let (thrustDevice, setThrustDevice) = AppStorage.useLocalStorage(AppStorage.keyThrustDevice)
+  let webAuthnUserStatus = Reactfire.useFirestoreDocDataWithOptions(
+    Db.webAuthnUsersDocument(firestore, user.uid),
+    ~options=Some({idField: #uid, suspense: false}),
+  )
+  let webAuthnSkipIfEnabledOnServerDeps = (
+    supportsWebAuthn,
+    thrustDevice,
+    webAuthn,
+    webAuthnUserStatus.data,
+  )
+  React.useEffect4(() => {
+    switch webAuthnSkipIfEnabledOnServerDeps {
+    | (true, Some("1"), None, Some(_)) => setWebAuthn(. Some("1"))
+    | _ => ()
+    }
+    None
+  }, webAuthnSkipIfEnabledOnServerDeps)
   let view = React.useMemo4(() => {
     if thrustDevice === None {
       Some(ThrustDevice)
