@@ -36,6 +36,10 @@ let placeKegDocument = (firestore, placeId, kegId): Firebase.documentReference<k
   Firebase.doc(firestore, ~path=`places/${placeId}/kegs/${kegId}`)
 }
 
+let webAuthnUsersDocument = (firestore, userId): Firebase.documentReference<webAuthnUser> => {
+  Firebase.doc(firestore, ~path=`webAuthnUsers/${userId}`)
+}
+
 // Converters
 
 type personsAllRecord = {

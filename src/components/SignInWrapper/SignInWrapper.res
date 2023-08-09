@@ -10,7 +10,10 @@ let make = (~children) => {
     | // We only use anonymous users for WebAuthn as intermediary step
     Some({isAnonymous: true}) =>
       <Unauthenticated />
-    | Some(user) => <Onboarding user> {children} </Onboarding>
+    | Some(user) =>
+      <FirebaseFirestoreProvider>
+        <Onboarding user> {children} </Onboarding>
+      </FirebaseFirestoreProvider>
     }
   }
 }

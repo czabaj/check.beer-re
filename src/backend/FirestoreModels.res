@@ -59,3 +59,8 @@ type shareLink = {
   place: string,
   role: int,
 }
+
+type webAuthnUser = {
+  lastPresent: Firebase.Timestamp.t,
+  lastVerified: Firebase.Timestamp.t,
+}

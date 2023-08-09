@@ -13,7 +13,7 @@ let make = () => {
     | list{"misto", ..._} =>
       <FirebaseAuthProvider>
         <SignInWrapper>
-          <FirebaseFirestoreProvider>
+          
             {switch List.tail(url.path) {
             | Some(list{}) => <MyPlaces />
             | Some(list{placeId}) => <Place placeId />
@@ -21,15 +21,14 @@ let make = () => {
             | Some(list{placeId, "nastaveni", "osob"}) => <PlacePersonsSetting placeId />
             | _ => <PageNotFound />
             }}
-          </FirebaseFirestoreProvider>
         </SignInWrapper>
       </FirebaseAuthProvider>
     | list{"s", linkId} =>
       <FirebaseAuthProvider>
         <SignInWrapper>
-          <FirebaseFirestoreProvider>
+          
             <ShareLinkResolver linkId />
-          </FirebaseFirestoreProvider>
+
         </SignInWrapper>
       </FirebaseAuthProvider>
     | _ => <PageNotFound />
