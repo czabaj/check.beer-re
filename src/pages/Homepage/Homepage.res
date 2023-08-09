@@ -19,7 +19,7 @@ let make = () => {
       </header>
       <main>
         <a
-          className={`${Styles.button.base} ${Styles.button.sizeLarge}`}
+          className={Styles.button.sizeLarge}
           href="/misto"
           onClick={RouterUtils.handleLinkClick((. ()) => {
             let navigate = () => RescriptReactRouter.push("/misto")

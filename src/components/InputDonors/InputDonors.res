@@ -52,7 +52,7 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~va
             </td>
             <td>
               <button
-                className={`${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.sizeExtraSmall}`}
+                className={`${Styles.button.iconOnly} ${Styles.button.sizeExtraSmall}`}
                 onClick={_ => {
                   let newValue = value->Dict.copy
                   newValue->Dict.delete(personId)

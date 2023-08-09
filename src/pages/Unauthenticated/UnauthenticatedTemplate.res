@@ -10,7 +10,7 @@ let make = (~children, ~className=?, ~isOnline=?, ~loadingOverlay=?) => {
     <h1 className=Styles.utility.srOnly> {React.string("Check.beer")} </h1>
     {isOnline !== Some(false)
       ? React.null
-      : <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
+      : <p className={Styles.messageBar.variantDanger}>
           {React.string(
             "Vypadá to že jsme bez internetu. Přihlášení ani registrace asi nepůjde.",
           )}

@@ -49,6 +49,7 @@
 }
 
 .variantPrimary {
+  composes: base;
   --_background: var(--surface-brand);
   --_border: var(--_background);
   --_text: var(--text-brand-1);
@@ -67,6 +68,7 @@
 }
 
 .variantDanger {
+  composes: base;
   --_background: var(--surface-danger);
   --_border: hsl(var(--surface-danger) / 20%);
   --_text: var(--text-on-danger);
@@ -90,6 +92,7 @@
 }
 
 .variantStealth {
+  composes: base;
   --_background: transparent;
   --_border: transparent;
   --_text: var(--text-1);
@@ -106,16 +109,19 @@
 }
 
 .sizeLarge {
+  composes: base;
   --_padding-inline: 1rem;
   --_block-size: 2.5rem;
 }
 
 .sizeSmall {
+  composes: base;
   --_padding-inline: 0.5rem;
   --_block-size: 1.5rem;
 }
 
 .sizeExtraSmall {
+  composes: base;
   --_padding-inline: 0.5rem;
   --_block-size: 1rem;
   --_font-weight: var(--font-weight-1);
@@ -123,11 +129,13 @@
 }
 
 .flat {
+  composes: base;
   border-radius: 0;
   min-inline-size: unset;
 }
 
 .iconOnly {
+  composes: base;
   min-inline-size: unset;
   flex-direction: column;
 }

@@ -4,7 +4,7 @@ let make = (~loadingOverlay, ~onSetupAuthn, ~onSkip, ~setupError=?) => {
     <h2> {React.string("Přihlášení bez hesla")} </h2>
     <p> {React.string(`Tvoje zařízení umožňuje přihlásit se bez hesla.`)} </p>
     {setupError->Option.mapWithDefault(React.null, _ => {
-      <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
+      <p className={Styles.messageBar.variantDanger}>
         {React.string("Nastavení se nezdařilo. Zkus to znovu nebo tento krok přeskoč.")}
       </p>
     })}

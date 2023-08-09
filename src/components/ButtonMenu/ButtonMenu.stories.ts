@@ -16,7 +16,7 @@ export default meta;
 export const Base: StoryObj = {
   args: {
     children: "More",
-    className: `${Styles.button.base} ${Styles.button.rounded}`,
+    className: Styles.button.base,
     menuItems: [
       { label: "One", onClick: action("One") },
       { label: "Two", onClick: action("Two") },
@@ -28,7 +28,7 @@ export const Base: StoryObj = {
 export const Opened: StoryObj = {
   args: {
     children: "More",
-    className: `${Styles.button.base} ${Styles.button.rounded}`,
+    className: Styles.button.base,
     menuItems: [
       { label: "One", onClick: action("One") },
       { label: "Two", onClick: action("Two") },

@@ -4,8 +4,3 @@
   box-shadow: var(--shadow-2);
   padding: var(--border-size-2);
 }
-
-.variantError {
-  background-color: var(--surface-danger);
-  color: var(--text-danger);
-}

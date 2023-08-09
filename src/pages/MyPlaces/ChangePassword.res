@@ -108,7 +108,7 @@ let make = (~onDismiss, ~onSubmit) => {
         </fieldset>
         {switch form.state.formState {
         | SubmitFailed(maybeErrorMessage) =>
-          <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
+          <p className={Styles.messageBar.variantDanger}>
             {
               let errorMessage = switch maybeErrorMessage {
               | Some(msg) => msg

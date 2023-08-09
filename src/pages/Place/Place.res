@@ -294,7 +294,7 @@ let make = (~placeId) => {
           | Some(changes) =>
             <>
               <button
-                className={`${Styles.button.base} ${Styles.button.variantPrimary}`}
+                className={Styles.button.variantPrimary}
                 onClick={_ => {
                   if changes->Belt.Map.String.size > 0 {
                     let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)

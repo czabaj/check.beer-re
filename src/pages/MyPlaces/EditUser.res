@@ -79,10 +79,7 @@ let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit, ~onChangePassw
               type_="button">
               {React.string("Změnit heslo")}
             </button>
-            {switch isStandaloneModeStatus.data {
-            | Some(true) => React.null
-            | _ => <InputThrustDevice />
-            }}
+            <InputThrustDevice />
           </fieldset>
         </form>
       </Form.Provider>

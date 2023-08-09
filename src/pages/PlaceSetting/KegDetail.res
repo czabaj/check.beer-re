@@ -177,7 +177,7 @@ let make = (
                     {keg.depletedAt !== Null.null
                       ? React.null
                       : <button
-                          className={`${Styles.button.base} ${Styles.button.sizeExtraSmall}`}
+                          className={Styles.button.sizeExtraSmall}
                           onClick={_ => onDeleteConsumption(timestampStr)}
                           type_="button">
                           {React.string("🗑️ Smáznout")}
@@ -192,7 +192,7 @@ let make = (
             {keg.depletedAt !== Null.null && isUserAuthorized(UserRoles.Admin)
               ? React.null
               : <button
-                  className={`${Styles.button.base} ${Styles.button.variantDanger}`}
+                  className={Styles.button.variantDanger}
                   disabled={consumptionsByTimestampDesc->Array.length === 0}
                   onClick={_ => setDialog(_ => ConfirmFinalize)}
                   type_="button">

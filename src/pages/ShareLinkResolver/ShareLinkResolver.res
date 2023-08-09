@@ -28,7 +28,7 @@ module Pure = {
           </p>
           <div>
             <button
-              className={`${Styles.button.base} ${Styles.button.variantPrimary}`}
+              className={Styles.button.variantPrimary}
               disabled=?loading
               onClick={_ => handleAccept()}
               type_="button">
@@ -48,7 +48,7 @@ module Pure = {
             tam místo nenajdete, požádejte správce místa aby vám poslal novou pozvánku.`)}
           </p>
           <div>
-            <a className={`${Styles.button.base} ${Styles.button.variantPrimary}`} href="/misto">
+            <a className={Styles.button.variantPrimary} href="/misto">
               {React.string("Můj seznam míst")}
             </a>
           </div>

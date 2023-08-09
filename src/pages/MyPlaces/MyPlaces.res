@@ -37,7 +37,7 @@ module Pure = {
       <main>
         <SectionWithHeader
           buttonsSlot={<button
-            className={`${Styles.button.base} `} onClick={_ => onPlaceAdd()} type_="button">
+            className={Styles.button.base} onClick={_ => onPlaceAdd()} type_="button">
             {React.string("Nové místo")}
           </button>}
           headerId="my_places"

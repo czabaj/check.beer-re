@@ -93,7 +93,7 @@ let make = (
         {switch form.state.formState {
         | SubmitFailed(maybeErrorMessage) =>
           <p
-            className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`} role="alert">
+            className={Styles.messageBar.variantDanger} role="alert">
             {switch maybeErrorMessage {
             | None => React.string("Neznámá chyba")
             | Some(message) =>

@@ -73,21 +73,21 @@ let make = (
             | None =>
               <button
                 disabled={!hasKegsToTap}
-                className={`${Styles.button.base} ${Styles.button.variantPrimary}`}
+                className={Styles.button.variantPrimary}
                 onClick={_ => setDialog(_ => TapKegOn(tapName))}
                 type_="button">
                 {React.string("Narazit")}
               </button>
             | Some(_) =>
               <button
-                className={`${Styles.button.base} ${Styles.button.variantDanger}`}
+                className={Styles.button.variantDanger}
                 onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
                 type_="button">
                 {React.string("Odrazit")}
               </button>
             }}
             <ButtonMenu
-              className={`${Styles.button.base} ${Styles.button.iconOnly}`}
+              className={Styles.button.iconOnly}
               title="další akce"
               menuItems={[
                 {

@@ -15,6 +15,7 @@
 }
 
 .variantDanger {
+  composes: base;
   --link-text: var(--text-2);
   background-color: var(--surface-danger-1);
   color: var(--text-1);
