@@ -2,8 +2,10 @@ import { Timestamp } from "firebase/firestore";
 
 import { make } from "./ChargedKegs.bs.js";
 
+let uid = 0;
 const getKegMock = (consumptionLevel) => {
   let volume = 30000;
+  let serial = uid++;
   return {
     beer: "Pilsner Urquell",
     consumptionsSum: consumptionLevel * volume,
@@ -12,9 +14,9 @@ const getKegMock = (consumptionLevel) => {
     milliliters: volume,
     price: 120000,
     recentConsumptionAt: null,
-    serial: 3,
-    serialFormatted: "#003",
-    uid: "wL3VORb19wAd3A0kc6sQ",
+    serial,
+    serialFormatted: `#${String(serial).padStart(3, "0")}`,
+    uid: String(serial),
   };
 };
 

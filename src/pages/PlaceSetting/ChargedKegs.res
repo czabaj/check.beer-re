@@ -24,9 +24,6 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
             <th scope="col"> {React.string("Naskladněno")} </th>
             <th scope="col"> {React.string("Cena")} </th>
             <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
-            <th scope="col">
-              <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -35,7 +32,15 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
             let kegId = Db.getUid(keg)
             let volume = keg.milliliters
             <tr key={kegId}>
-              <th scope="row"> {React.string(keg.serialFormatted)} </th>
+              <th scope="row">
+                {React.string(keg.serialFormatted)}
+                <button
+                  className={Styles.utility.breakout}
+                  onClick={_ => onKegDetail(kegId)}
+                  title="Karta sudu"
+                  type_="button"
+                />
+              </th>
               <td> {React.string(keg.beer)} </td>
               <td>
                 <FormattedVolume milliliters=volume />
@@ -48,9 +53,6 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
               </td>
               <td>
                 <MeterKeg ariaLabelledby="remaining_th" keg />
-              </td>
-              <td>
-                <button className={Styles.utility.breakout} onClick={_ => onKegDetail(kegId)} title="Karta sudu" type_="button" />
               </td>
             </tr>
           })

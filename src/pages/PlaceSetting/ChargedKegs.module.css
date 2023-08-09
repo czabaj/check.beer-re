@@ -4,8 +4,10 @@
     var(--surface-warning-hs) var(--surface-warning-l) / 0.1
   );
 
-  border-collapse: collapse;
-  width: 100%;
+  display: block;
+}
+.table > * {
+  display: contents;
 }
 .table tr {
   position: relative;
@@ -13,13 +15,84 @@
      @see https://github.com/w3c/csswg-drafts/issues/1899
   */
   clip-path: inset(0);
+  display: grid;
+  grid-template-areas: "serial beer volume created price remains";
 }
 .table :where(th, td) {
   padding-inline: var(--_cell-inline-padding);
   text-align: right;
 }
-.table :where(th, td):where(:nth-child(1), :nth-child(2)) {
+.table :where(th, td):nth-child(1) {
+  grid-area: serial;
   text-align: left;
+}
+.table :where(th, td):nth-child(2) {
+  grid-area: beer;
+  text-align: left;
+}
+.table :where(th, td):nth-child(3) {
+  grid-area: volume;
+}
+.table :where(th, td):nth-child(4) {
+  grid-area: created;
+}
+.table :where(th, td):nth-child(5) {
+  grid-area: price;
+}
+.table :where(th, td):nth-child(6) {
+  grid-area: remains;
+}
+
+@supports (grid-template-columns: subgrid) {
+  .table {
+    display: grid;
+    grid-template-columns: repeat(5, auto) 1fr;
+  }
+  .table tr {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid !important;
+  }
+}
+
+@media screen and (min-width: 25rem) and (max-width: 45rem) {
+  .table tr {
+    grid-template-areas:
+      "serial beer beer beer volume"
+      "serial created price remains remains";
+  }
+  .table :is(th, td) {
+    text-align: left;
+  }
+  .table :is(th, td):is(:nth-child(3), :nth-child(6)) {
+    text-align: right;
+  }
+  /* Applies only when subgrid is supported */
+  .table {
+    grid-template-columns: repeat(5, auto);
+  }
+}
+
+@media screen and (max-width: 25rem) {
+  .table tr {
+    grid-template-areas:
+      "serial beer   beer    beer    beer"
+      "serial price  price   created created"
+      "serial volume remains remains remains";
+  }
+  .table :is(th, td) {
+    text-align: left;
+  }
+  .table :is(th, td):is(:nth-child(4), :nth-child(6)) {
+    text-align: right;
+  }
+  /* Applies only when subgrid is supported */
+  .table {
+    grid-template-columns: repeat(4, auto);
+  }
+}
+
+.table meter {
+  width: 100%;
 }
 
 .emptyTableMessage {
