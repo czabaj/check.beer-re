@@ -36,9 +36,9 @@ let toFirebaseWebAuthnError = exn => {
   switch exn {
   | Exn.Error(obj) =>
     switch ErrorUtils.code(obj) {
-    | Some("firebaseWebAuthn/firebaseWebAuthn/cancelled") => CancelledByUser
-    | Some("firebaseWebAuthn/firebaseWebAuthn/invalid") => InvalidFunctionResponse
-    | Some("firebaseWebAuthn/firebaseWebAuthn/no-op") => NoOperationNeeded
+    | Some("firebaseWebAuthn/cancelled") => CancelledByUser
+    | Some("firebaseWebAuthn/invalid") => InvalidFunctionResponse
+    | Some("firebaseWebAuthn/no-op") => NoOperationNeeded
     | _ => exn
     }
   | _ => exn
