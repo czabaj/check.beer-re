@@ -1,23 +1,21 @@
 .table {
-  --_cell-inline-padding: 0.5rem;
+  --cell-inline-padding: 0.5rem;
 
-  display: grid;
-  grid-template-columns: repeat(4, auto);
+  display: block;
 }
-.table :where(tbody, thead) {
+.table > * {
   display: contents;
 }
 .table tr {
   display: grid;
-  grid-column: 1 / -1;
   grid-template-areas:
-    "serial volume created price"
-    "name consumed firstTap largeBeer"
-    "name wasted depleted effectivity";
-  grid-template-columns: subgrid;
+    "serial volume   created  price"
+    "name   consumed firstTap largeBeer"
+    "name   wasted   depleted effectivity";
+  grid-template-columns: 1fr 7ch 13ch 13ch;
 }
 .table :where(th, td) {
-  padding-inline: var(--_cell-inline-padding);
+  padding-inline: var(--cell-inline-padding);
   text-align: right;
 }
 .table :where(th, td):nth-child(1) {
@@ -27,7 +25,6 @@
 .table :where(th, td):nth-child(2) {
   grid-area: name;
   text-align: left;
-  grid-row: span 2;
 }
 .table :where(th, td):nth-child(3) {
   grid-area: volume;
@@ -55,4 +52,46 @@
 }
 .table :where(th, td):nth-child(11) {
   grid-area: effectivity;
+}
+
+@supports (grid-template-columns: subgrid) {
+  .table {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+  }
+  .table tr {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid !important;
+  }
+}
+
+
+@media screen and (max-width: 33rem) {
+  .table {
+    grid-template-columns: auto repeat(2, 1fr);
+  }
+  .table tr {
+    grid-template-areas:
+      "serial   name     name"
+      "volume   created  price"
+      "consumed firstTap largeBeer"
+      "wasted   depleted effectivity";
+    grid-template-columns: 7ch minmax(12ch, 1fr) 12ch;
+  }
+  /* Hide the top-most table headers, it look ugly and is understandable for sighted user */
+  .table thead th:is(:nth-child(1), :nth-child(2)) {
+    block-size: 1px;
+    clip-path: inset(50%);
+    clip: rect(0 0 0 0);
+    inline-size: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+  }
+  .table.table :is(th, td) {
+    text-align: right;
+  }
+  .table.table :is(th, td):nth-child(2) {
+    text-align: left;
+  }
 }

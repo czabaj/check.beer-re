@@ -1,5 +1,5 @@
 .table {
-  --_cell-inline-padding: 0.5rem;
+  --cell-inline-padding: 0.5rem;
   --breakout-hover-overlay: hsl(
     var(--surface-warning-hs) var(--surface-warning-l) / 0.1
   );
@@ -17,9 +17,10 @@
   clip-path: inset(0);
   display: grid;
   grid-template-areas: "serial beer volume created price remains";
+  grid-template-columns: 5ch 22ch 7ch 12ch 12ch 1fr;
 }
 .table :where(th, td) {
-  padding-inline: var(--_cell-inline-padding);
+  padding-inline: var(--cell-inline-padding);
   text-align: right;
 }
 .table :where(th, td):nth-child(1) {
@@ -55,10 +56,15 @@
 }
 
 @media screen and (min-width: 25rem) and (max-width: 45rem) {
+  /* Applies only when subgrid is supported */
+  .table {
+    grid-template-columns: repeat(5, auto);
+  }
   .table tr {
     grid-template-areas:
-      "serial beer beer beer volume"
+      "serial beer    beer  beer    volume"
       "serial created price remains remains";
+    grid-template-columns: 5ch 12ch 12ch 1fr 7ch;
   }
   .table :is(th, td) {
     text-align: left;
@@ -66,28 +72,25 @@
   .table :is(th, td):is(:nth-child(3), :nth-child(6)) {
     text-align: right;
   }
-  /* Applies only when subgrid is supported */
-  .table {
-    grid-template-columns: repeat(5, auto);
-  }
 }
 
 @media screen and (max-width: 25rem) {
+  /* Applies only when subgrid is supported */
+  .table {
+    grid-template-columns: repeat(4, auto);
+  }
   .table tr {
     grid-template-areas:
       "serial beer   beer    beer    beer"
       "serial price  price   created created"
       "serial volume remains remains remains";
+    grid-template-columns: 5ch 6ch 6ch 6fr 6ch;
   }
   .table :is(th, td) {
     text-align: left;
   }
   .table :is(th, td):is(:nth-child(4), :nth-child(6)) {
     text-align: right;
-  }
-  /* Applies only when subgrid is supported */
-  .table {
-    grid-template-columns: repeat(4, auto);
   }
 }
 

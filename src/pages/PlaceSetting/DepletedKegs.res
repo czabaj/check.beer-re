@@ -33,7 +33,7 @@ let make = (
               <th scope="col"> {React.string("Naraženo")} </th>
               <th scope="col"> {React.string("Dopito")} </th>
               <th scope="col"> {React.string("Cena sudu")} </th>
-              <th scope="col"> {React.string("Cena velkého piva")} </th>
+              <th scope="col"> {React.string("Velké pivo")} </th>
               <th scope="col"> {React.string("Efektivita")} </th>
             </tr>
           </thead>
