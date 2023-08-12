@@ -70,6 +70,12 @@ external useFirestoreCollectionData: (
   @as(json`{ "idField": "uid" }`) _,
 ) => observableStatus<array<'a>> = "useFirestoreCollectionData"
 
+@module("reactfire")
+external useFirestoreCollectionDataWithOptions: (
+  query<'a>,
+  ~options: option<reactfireOptions<'a>>,
+) => observableStatus<array<'a>> = "useFirestoreCollectionData"
+
 module FirestoreProvider = {
   @react.component @module("reactfire")
   external make: (~sdk: firestore, ~children: React.element) => React.element = "FirestoreProvider"

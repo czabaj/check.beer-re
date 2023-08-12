@@ -9,20 +9,6 @@
           "order": "ASCENDING"
         },
         {
-          "fieldPath": "recentConsumptionAt",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
-      "collectionGroup": "kegs",
-      "queryScope": "COLLECTION",
-      "fields": [
-        {
-          "fieldPath": "depletedAt",
-          "order": "ASCENDING"
-        },
-        {
           "fieldPath": "serial",
           "order": "DESCENDING"
         }
