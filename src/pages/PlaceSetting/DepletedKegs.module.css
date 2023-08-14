@@ -1,5 +1,5 @@
 .table {
-  --cell-inline-padding: 0.5rem;
+  --cell-inline-padding: var(--padding-inline, 8px);
 
   display: block;
 }
@@ -64,7 +64,6 @@
     grid-template-columns: subgrid !important;
   }
 }
-
 
 @media screen and (max-width: 33rem) {
   .table {

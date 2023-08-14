@@ -1,102 +1,10 @@
 type classesType = {
-  activeCheckbox: string,
-  consumption: string,
-  detailButton: string,
   inactiveUsers: string,
   list: string,
   root: string,
 }
 
 @module("./Place.module.css") external classes: classesType = "default"
-
-module ActiveCheckbox = {
-  @react.component
-  let make = (~changes: Belt.Map.String.t<bool>, ~initialActive, ~personId, ~setChanges) => {
-    let checked = changes->Belt.Map.String.getWithDefault(personId, initialActive)
-    <label className={`${classes.activeCheckbox} ${Styles.utility.breakout}`}>
-      {React.string("Zde")}
-      <input
-        checked={checked}
-        type_="checkbox"
-        onChange={_ => {
-          let newChecked = !checked
-          let newChanges =
-            initialActive === newChecked
-              ? changes->Belt.Map.String.remove(personId)
-              : changes->Belt.Map.String.set(personId, newChecked)
-          setChanges(_ => Some(newChanges))
-        }}
-      />
-    </label>
-  }
-}
-
-module ActivePersonListItem = {
-  @react.component
-  let make = (
-    ~activeCheckbox: option<React.element>,
-    ~consumptions: array<Db.userConsumption>,
-    ~isCurrent,
-    ~isUserAuthorized,
-    ~onAddConsumption,
-    ~personName,
-  ) => {
-    let listItemEl = React.useRef(Js.Nullable.null)
-    let consumptionsStr =
-      consumptions
-      ->Array.map(consumption => {
-        React.string(consumption.milliliters > 400 ? "X" : "I")
-      })
-      ->Array.joinWith("")
-    let lastConsumptionsStr = React.useRef(consumptionsStr)
-    let changeActive = React.useRef(false)
-    changeActive.current = activeCheckbox !== None
-    React.useEffect1(() => {
-      switch (
-        consumptionsStr === lastConsumptionsStr.current,
-        changeActive.current,
-        Js.Nullable.toOption(listItemEl.current),
-      ) {
-      | (false, false, Some(el)) =>
-        lastConsumptionsStr.current = consumptionsStr
-        el
-        ->Webapi.Dom.Element.animate(
-          {
-            "backgroundColor": "var(--surface-warning)",
-          },
-          {
-            "duration": 500,
-            "iterations": 3,
-            "direction": "reverse",
-          },
-        )
-        ->ignore
-      | _ => ()
-      }
-      None
-    }, [consumptionsStr])
-
-    <li ariaCurrent={isCurrent ? #"true" : #"false"} ref={ReactDOM.Ref.domRef(listItemEl)}>
-      <div> {React.string(personName)} </div>
-      {switch activeCheckbox {
-      | Some(node) => node
-      | None =>
-        <div className={classes.consumption}>
-          {isUserAuthorized(UserRoles.Staff) ||
-          (isCurrent && isUserAuthorized(UserRoles.SelfService))
-            ? <button
-                className={Styles.utility.breakout}
-                onClick={_ => onAddConsumption()}
-                title="Detail konzumace"
-                type_="button"
-              />
-            : React.null}
-          {React.string(consumptionsStr)}
-        </div>
-      }}
-    </li>
-  }
-}
 
 type dialogState =
   | Hidden
@@ -239,48 +147,17 @@ let make = (~placeId) => {
           placeName={place.name}
         />
         <main>
-          <SectionWithHeader
-            buttonsSlot={isUserAuthorized(UserRoles.Staff)
-              ? <button
-                  className={Styles.button.base}
-                  type_="button"
-                  onClick={_ => setDialog(_ => AddPerson)}>
-                  {React.string("Přidat hosta")}
-                </button>
-              : React.null}
-            headerId="active_persons"
-            headerSlot={React.string("Lístek")}>
-            {activePersonEntries->Array.length === 0
-              ? <p className=SectionWithHeader.classes.emptyMessage>
-                  {React.string("Nikdo tu není, zkontrolujte nepřítomnost ⤵")}
-                </p>
-              : <ol className={`${Styles.list.base} ${classes.list}`}>
-                  {activePersonEntries
-                  ->Array.map(activePerson => {
-                    let (personId, person) = activePerson
-                    let consumptions =
-                      recentConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
-                    <ActivePersonListItem
-                      activeCheckbox={activePersonsChanges->Option.map(changes =>
-                        <ActiveCheckbox
-                          changes initialActive=true personId setChanges=setActivePersonsChanges
-                        />
-                      )}
-                      consumptions={consumptions}
-                      isCurrent={person.userId->Null.mapWithDefault(false, userId =>
-                        userId === currentUser.uid
-                      )}
-                      isUserAuthorized
-                      key={personId}
-                      onAddConsumption={() => {
-                        setDialog(_ => AddConsumption({personId, person}))
-                      }}
-                      personName={person.name}
-                    />
-                  })
-                  ->React.array}
-                </ol>}
-          </SectionWithHeader>
+          <BeerList
+            activePersonsChanges
+            activePersonEntries
+            currentUserUid={currentUser.uid}
+            isUserAuthorized
+            onAddPerson={() => setDialog(_ => AddPerson)}
+            onAddConsumption={((personId, person)) =>
+              setDialog(_ => AddConsumption({personId, person}))}
+            recentConsumptionsByUser
+            setActivePersonsChanges
+          />
           {switch activePersonsChanges {
           | None =>
             isUserAuthorized(UserRoles.SelfService)

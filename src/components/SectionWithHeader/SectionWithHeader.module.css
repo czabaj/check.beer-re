@@ -1,3 +1,7 @@
+.root {
+  --padding-inline: 8px;
+}
+
 .root > header {
   align-items: center;
   display: flex;
@@ -12,5 +16,5 @@
 
 .emptyMessage {
   padding-block: 0.75rem;
-  padding-inline: 0.5rem;
+  padding-inline: var(--padding-inline, 8px);
 }

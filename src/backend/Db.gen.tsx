@@ -55,6 +55,15 @@ export type kegConverted = {
   readonly serialFormatted: string
 };
 
+// tslint:disable-next-line:interface-over-type-literal
+export type userConsumption = {
+  readonly consumptionId: string; 
+  readonly kegId: string; 
+  readonly beer: string; 
+  readonly milliliters: number; 
+  readonly createdAt: Date
+};
+
 export const placeCollection: (firestore:Firebase_firestore) => Firebase_collectionReference<FirestoreModels_place> = DbBS.placeCollection;
 
 export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Firebase_documentReference<FirestoreModels_place> = function (Arg1: any, Arg2: any) {

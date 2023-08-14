@@ -55,7 +55,6 @@ let make = (~placeId) => {
             chargedKegsValue={chargedKegs->Array.reduce(0, (sum, keg) => sum + keg.price)}
             isUserAuthorized
             personsCount={personsAll->Array.length}
-            totalBalance={personsAll->Array.reduce(0, (sum, (_, person)) => sum + person.balance)}
           />
           <TapsSetting place placeId tappedChargedKegs untappedChargedKegs />
           <ChargedKegs

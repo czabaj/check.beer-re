@@ -4,14 +4,12 @@
   );
 }
 .base > li {
-  --list-padding-inline: 0.5rem;
-
   font-size: 150%;
   display: flex;
   flex-flow: row wrap;
   gap: 1rem;
   position: relative;
-  padding-inline: var(--list-padding-inline);
+  padding-inline: var(--padding-inline, 8px);
 }
 .base li + li {
   border-block-start: var(--border-size-2) solid var(--border-ink);

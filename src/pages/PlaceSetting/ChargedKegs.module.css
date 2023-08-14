@@ -1,8 +1,8 @@
 .table {
-  --cell-inline-padding: 0.5rem;
   --breakout-hover-overlay: hsl(
     var(--surface-warning-hs) var(--surface-warning-l) / 0.1
   );
+  --cell-inline-padding: var(--padding-inline, 8px);
 
   display: block;
 }
@@ -101,6 +101,6 @@
 .emptyTableMessage {
   font-family: var(--font-cursive);
   text-align: end;
-  padding-inline-end: 4rem;
+  padding-inline-end: 64px;
   padding-block: 1rem;
 }

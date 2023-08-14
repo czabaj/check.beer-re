@@ -3,11 +3,13 @@
   grid-template-columns: auto 1fr;
   font-size: 120%;
 }
-
 .descriptionList :where(dd, dt):nth-of-type(n + 2) {
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
-
+.descriptionList dt {
+  padding-inline-start: var(--padding-inline);
+}
 .descriptionList dd {
   text-align: end;
+  padding-inline-end: var(--padding-inline);
 }

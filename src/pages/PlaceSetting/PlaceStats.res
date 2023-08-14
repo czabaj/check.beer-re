@@ -2,7 +2,7 @@ type classesType = {descriptionList: string}
 @module("./PlaceStats.module.css") external classes: classesType = "default"
 
 @react.component
-let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount, ~totalBalance) => {
+let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount) => {
   <SectionWithHeader
     buttonsSlot={isUserAuthorized(UserRoles.Admin)
       ? <a
@@ -22,10 +22,6 @@ let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount, ~totalBalance) 
       <dt> {React.string("Hodnota sudů na skladě")} </dt>
       <dd>
         <FormattedCurrency value={chargedKegsValue} />
-      </dd>
-      <dt> {React.string("Celková bilance")} </dt>
-      <dd>
-        <FormattedCurrency format={FormattedCurrency.formatAccounting} value={totalBalance} />
       </dd>
     </dl>
   </SectionWithHeader>

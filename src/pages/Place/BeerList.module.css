@@ -1,0 +1,6 @@
+.consumption {
+  font-style: italic;
+  font-family: var(--font-cursive);
+  margin-inline-start: auto;
+  max-width: 100%;
+}

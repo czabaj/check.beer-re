@@ -19,25 +19,9 @@
   white-space: nowrap;
 }
 
-.consumption {
-  font-style: italic;
-  font-family: var(--font-cursive);
-}
-
-.detailButton {
-  margin-inline-end: calc(-1 * var(--place-list-padding-inline));
-  padding-inline: var(--place-list-padding-inline);
-  z-index: 1;
-}
 li:first-child .detailButton {
   border-start-end-radius: var(--radius-2);
 }
 li:last-child .detailButton {
   border-end-end-radius: var(--radius-2);
-}
-
-.activeCheckbox {
-  align-items: center;
-  display: flex;
-  font-size: 1rem;
 }

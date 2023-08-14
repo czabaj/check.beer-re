@@ -215,6 +215,7 @@ let kegFirstConsumptionTimestamp = (keg: kegConverted) =>
   )
   ->Option.flatMap(timestampStr => timestampStr->Float.fromString)
 
+@genType
 type userConsumption = {
   consumptionId: string,
   kegId: string,
