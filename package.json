@@ -50,6 +50,9 @@
     "vite-plugin-pwa": "^0.16.4",
     "vitest": "^0.34.1"
   },
+  "resolutions": {
+    "firebase": "^10.1.0"
+  },
   "private": true,
   "scripts": {
     "analyze": "source-map-explorer 'dist/assets/*.js'",
