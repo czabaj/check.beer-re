@@ -10428,6 +10428,13 @@ vite-node@0.34.1:
     picocolors "^1.0.0"
     vite "^3.0.0 || ^4.0.0"
 
+vite-plugin-ejs@^1.6.4:
+  version "1.6.4"
+  resolved "https://registry.yarnpkg.com/vite-plugin-ejs/-/vite-plugin-ejs-1.6.4.tgz#aa30820d8235774e717d902754a552480cf7758b"
+  integrity sha512-23p1RS4PiA0veXY5/gHZ60pl3pPvd8NEqdBsDgxNK8nM1rjFFDcVb0paNmuipzCgNP/Y0f/Id22M7Il4kvZ2jA==
+  dependencies:
+    ejs "^3.1.8"
+
 vite-plugin-pwa@^0.16.4:
   version "0.16.4"
   resolved "https://registry.yarnpkg.com/vite-plugin-pwa/-/vite-plugin-pwa-0.16.4.tgz#cd2618c8b4f83eac1493f2ed7b05f72552a2b735"

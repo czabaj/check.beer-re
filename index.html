@@ -4,11 +4,14 @@
     <meta charset="UTF-8" />
     <title>Check Beer</title>
     <meta name="description" content="Kamarádské pivní účetnictví" />
-    <meta name="theme-color" content="#708465">
+    <meta name="theme-color" content="#708465" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="192x192" />
     <link rel="mask-icon" href="/mask-icon.svg" />
+    <% if (env.mode === 'production') { %>
+    <link rel="preload" as="image" href="/assets/label-da1160a3.png" />
+    <% } %>
   </head>
   <body>
     <div id="root"></div>

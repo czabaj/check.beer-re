@@ -47,6 +47,7 @@
     "source-map-explorer": "^2.5.3",
     "storybook": "^7.2.1",
     "vite": "^4.4.9",
+    "vite-plugin-ejs": "^1.6.4",
     "vite-plugin-pwa": "^0.16.4",
     "vitest": "^0.34.1"
   },
