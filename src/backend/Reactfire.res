@@ -39,6 +39,13 @@ type observableStatus<'a> = {
   status: @string [#error | #loading | #success],
 }
 
+type reactfireOptions<'a> = {
+  // force usage of fieldId
+  idField: @string [#uid],
+  initialData?: 'a,
+  suspense?: bool,
+}
+
 @module("reactfire")
 external useAnalytics: unit => Analytics.t = "useAnalytics"
 
@@ -51,18 +58,23 @@ external useFirestoreDocData: (
   @as(json`{ "idField": "uid" }`) _,
 ) => observableStatus<'a> = "useFirestoreDocData"
 
-type reactfireOptions<'a> = {
-  // force usage of fieldId
-  idField: @string [#uid],
-  initialData?: 'a,
-  suspense?: bool,
-}
-
 @module("reactfire")
 external useFirestoreDocDataWithOptions: (
   documentReference<'a>,
   ~options: option<reactfireOptions<'a>>,
 ) => observableStatus<'a> = "useFirestoreDocData"
+
+@module("reactfire")
+external useFirestoreDocDataOnce: (
+  documentReference<'a>,
+  @as(json`{ "idField": "uid" }`) _,
+) => observableStatus<'a> = "useFirestoreDocDataOnce"
+
+@module("reactfire")
+external useFirestoreDocDataOnceWithOptions: (
+  documentReference<'a>,
+  ~options: option<reactfireOptions<'a>>,
+) => observableStatus<'a> = "useFirestoreDocDataOnce"
 
 @module("reactfire")
 external useFirestoreCollectionData: (
