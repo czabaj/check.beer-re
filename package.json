@@ -44,6 +44,7 @@
     "prop-types": "^15.8.1",
     "rescript": "^10.1.4",
     "rescript-vitest": "^1.2.0",
+    "source-map-explorer": "^2.5.3",
     "storybook": "^7.2.1",
     "vite": "^4.4.9",
     "vite-plugin-pwa": "^0.16.4",
@@ -51,15 +52,16 @@
   },
   "private": true,
   "scripts": {
+    "analyze": "source-map-explorer 'dist/assets/*.js'",
     "build": "vite build",
     "clean": "rescript clean -with-deps",
     "format": "rescript format -all",
     "serve": "vite preview",
     "start": "vite",
-    "test": "vitest",
-    "test:securityRules": "vitest --config vite.config.firestore.rules.mts",
     "storybook": "storybook dev --no-open --port 6006",
-    "build-storybook": "storybook build"
+    "storybook:build": "storybook build",
+    "test": "vitest",
+    "test:securityRules": "vitest --config vite.config.firestore.rules.mts"
   },
   "version": "0.0.0"
 }
