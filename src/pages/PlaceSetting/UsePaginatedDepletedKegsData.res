@@ -27,6 +27,14 @@ let getConstraints = (limit, startAfter) => {
   }
 }
 
+let compareKegs = (keg1: Db.kegConverted, keg2: Db.kegConverted) => {
+  keg1.serial === keg2.serial &&
+    keg1.depletedAt->Null.map(Firebase.Timestamp.toMillis) ===
+      keg2.depletedAt->Null.map(Firebase.Timestamp.toMillis)
+}
+
+let concatenateResponse = ArrayUtils.unionByPreferringLast(~comparator=compareKegs)
+
 let kegQuerySnapshotToKegs = (kegsSnapshot: Firebase.querySnapshot<Db.kegConverted>) =>
   kegsSnapshot.docs->Array.map(Rxfire.snapToData)
 
@@ -63,8 +71,7 @@ let use = (~limit=20, placeId) => {
     | (FetchMoreSuccess(newData), {data: Some(previousData)}) =>
       ReactUpdate.Update({
         continueWith: newData->Array.get(limit),
-        // TODO: use set of kegs or union funtion for arrays
-        data: Some(previousData->Array.concat(newData)),
+        data: Some(concatenateResponse(previousData, newData)),
         error: None,
         pending: false,
       })
