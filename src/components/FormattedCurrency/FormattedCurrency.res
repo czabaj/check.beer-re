@@ -12,7 +12,7 @@ type currencyInfo = {
 }
 
 let getMinorUnit = currency => {
-  minorUnits->Dict.get(currency)->Option.getWithDefault(100.0)
+  minorUnits->Dict.get(currency)->Option.getOr(100.0)
 }
 
 let useCurrency = () => {

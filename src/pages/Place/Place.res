@@ -258,7 +258,7 @@ let make = (~placeId) => {
             tapsWithKegs
             unfinishedConsumptions={unfinishedConsumptionsByUser
             ->Map.get(personId)
-            ->Option.getWithDefault([])}
+            ->Option.getOr([])}
           />
         | AddPerson =>
           let existingActive = activePersonEntries->Array.map(((_, {name})) => name)

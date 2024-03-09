@@ -8,7 +8,7 @@ dist-ssr
 .bsb.lock
 .merlin
 /lib/
-*.bs.js
+*.res.js
 
 # Firebase
 firebase-debug.log

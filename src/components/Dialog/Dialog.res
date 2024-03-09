@@ -51,7 +51,7 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   }, lightDismissibleDeps)
 
   <dialog
-    className={`${classes.root} ${Js.Option.getWithDefault("", className)}`}
+    className={`${classes.root} ${Js.Option.getOr("", className)}`}
     ref={ReactDOM.Ref.callbackDomRef(node => {
       setDialogNode(_ =>
         switch node->Js.Nullable.toOption {

@@ -46,7 +46,7 @@ let make = (
       {
         tap: preferredTapHasKeg
           ? preferredTap
-          : tapsOptions->Array.get(0)->Option.map(({value}) => value)->Option.getWithDefault(""),
+          : tapsOptions->Array.get(0)->Option.map(({value}) => value)->Option.getOr(""),
         consumption: -1,
       }
     },

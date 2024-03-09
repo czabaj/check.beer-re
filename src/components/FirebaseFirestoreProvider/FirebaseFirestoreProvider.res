@@ -10,7 +10,7 @@ let make = (~children) => {
     switch initializedFirestore.contents {
     | Some(firestore) => firestore
     | None => {
-        let isStandaloneMode = isStandaloneModeStatus.data->Option.getWithDefault(false)
+        let isStandaloneMode = isStandaloneModeStatus.data->Option.getOr(false)
         let firestore = initializeFirestore(
           app,
           !isStandaloneMode && AppStorage.getThrustDevice() === None

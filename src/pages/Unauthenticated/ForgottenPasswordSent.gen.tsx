@@ -1,12 +1,10 @@
 /* TypeScript file generated from ForgottenPasswordSent.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as ForgottenPasswordSentBS__Es6Import from './ForgottenPasswordSent.bs';
-const ForgottenPasswordSentBS: any = ForgottenPasswordSentBS__Es6Import;
+import * as ForgottenPasswordSentJS from './ForgottenPasswordSent.res.js';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<email,onGoBack> = { readonly email: email; readonly onGoBack: onGoBack };
 
-export const make: React.ComponentType<{ readonly email: string; readonly onGoBack: () => void }> = ForgottenPasswordSentBS.make;
+export const make: React.ComponentType<{ readonly email: string; readonly onGoBack: () => void }> = ForgottenPasswordSentJS.make as any;

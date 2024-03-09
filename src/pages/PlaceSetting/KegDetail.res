@@ -36,7 +36,7 @@ let make = (
       maybeKegRef
       ->Null.toOption
       ->Option.map(kegRef => kegRef.id === kegId)
-      ->Option.getWithDefault(false)
+      ->Option.getOr(false)
     )
     ->Option.map(((tapName, _)) => tapName)
   let (dialogState, setDialog) = React.useState(() => Hidden)

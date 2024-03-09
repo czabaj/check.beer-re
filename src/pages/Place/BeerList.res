@@ -107,7 +107,7 @@ let make = (
           ->Array.map(activePerson => {
             let (personId, person) = activePerson
             let consumptions =
-              recentConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
+              recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
             <ActivePersonListItem
               activeCheckbox={activePersonsChanges->Option.map(changes =>
                 <ActiveCheckbox

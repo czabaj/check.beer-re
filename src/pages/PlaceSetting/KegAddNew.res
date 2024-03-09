@@ -43,7 +43,7 @@ module FormComponent = {
         let recentKegState =
           mostResentKegs
           ->Array.at(0)
-          ->Option.mapWithDefault(emptyState, keg => {
+          ->Option.mapOr(emptyState, keg => {
             let {beer, donors, milliliters, price, serial} = keg
             {
               beer,
@@ -154,7 +154,7 @@ module FormComponent = {
                         formattedNumberParts
                         ->Array.find(p => p.type_ === `currency`)
                         ->Option.map(p => React.string(p.value))
-                        ->Option.getWithDefault(React.null)}
+                        ->Option.getOr(React.null)}
                     </ReactIntl.FormattedNumberParts>}
                   />
                 }}

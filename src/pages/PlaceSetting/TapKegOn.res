@@ -18,7 +18,7 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
     }
   })
   let form = Form.use(
-    ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getWithDefault("")},
+    ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getOr("")},
     ~onSubmit=({state}) => {
       onSubmit(state.values)->ignore
       None

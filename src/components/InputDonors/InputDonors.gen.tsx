@@ -1,18 +1,16 @@
 /* TypeScript file generated from InputDonors.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as InputDonorsBS__Es6Import from './InputDonors.bs';
-const InputDonorsBS: any = InputDonorsBS__Es6Import;
+import * as InputDonorsJS from './InputDonors.res.js';
 
-import type {element as Jsx_element} from './Jsx.gen';
+import type {Jsx_element as PervasivesU_Jsx_element} from './PervasivesU.gen';
 
 import type {t as Dict_t} from './Dict.gen';
 
 import type {t as Map_t} from './Map.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly errorMessage?: errorMessage; 
   readonly legendSlot?: legendSlot; 
@@ -21,4 +19,4 @@ export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly onChange: onChange
 };
 
-export const make: (_1:props<string,JSX.Element,Map_t<string,string>,Dict_t<number>,((_1:Dict_t<number>) => void)>) => Jsx_element = InputDonorsBS.make;
+export const make: (_1:props<string,JSX.Element,Map_t<string,string>,Dict_t<number>,((_1:Dict_t<number>) => void)>) => PervasivesU_Jsx_element = InputDonorsJS.make as any;

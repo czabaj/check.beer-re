@@ -6,7 +6,7 @@ type classesType = {root: string}
 let make = (~children, ~className=?, ~isOnline=?, ~loadingOverlay=?) => {
   <div
     ariaHidden=?loadingOverlay
-    className={`${Styles.page.centered} ${classes.root} ${className->Option.getWithDefault("")}`}>
+    className={`${Styles.page.centered} ${classes.root} ${className->Option.getOr("")}`}>
     <h1 className=Styles.utility.srOnly> {React.string("Check.beer")} </h1>
     {isOnline !== Some(false)
       ? React.null

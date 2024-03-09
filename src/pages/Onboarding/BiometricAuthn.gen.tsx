@@ -1,12 +1,10 @@
 /* TypeScript file generated from BiometricAuthn.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as BiometricAuthnBS__Es6Import from './BiometricAuthn.bs';
-const BiometricAuthnBS: any = BiometricAuthnBS__Es6Import;
+import * as BiometricAuthnJS from './BiometricAuthn.res.js';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<loadingOverlay,onSetupAuthn,onSkip,setupError> = {
   readonly loadingOverlay: loadingOverlay; 
   readonly onSetupAuthn: onSetupAuthn; 
@@ -19,4 +17,4 @@ export const make: React.ComponentType<{
   readonly onSetupAuthn: () => void; 
   readonly onSkip: () => void; 
   readonly setupError?: any
-}> = BiometricAuthnBS.make;
+}> = BiometricAuthnJS.make as any;

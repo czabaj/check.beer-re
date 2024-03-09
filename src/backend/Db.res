@@ -346,7 +346,7 @@ module Keg = {
         maybeKegRef
         ->Null.toOption
         ->Option.map(kegRef => kegRef.id === kegId)
-        ->Option.getWithDefault(false)
+        ->Option.getOr(false)
       )
     switch kegOnTap {
     | Some((tapName, _)) => placeUpdateObject->Object.set(`taps.${tapName}`, Null.null)

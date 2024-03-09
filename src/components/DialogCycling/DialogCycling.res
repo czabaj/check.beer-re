@@ -14,7 +14,7 @@ let make = (
   ~onPrevious,
   ~visible,
 ) => {
-  <Dialog className={`${classes.root} ${className->Option.getWithDefault("")}`} visible>
+  <Dialog className={`${classes.root} ${className->Option.getOr("")}`} visible>
     <header>
       <h3> {React.string(header)} </h3>
       <button

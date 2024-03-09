@@ -1,12 +1,10 @@
 /* TypeScript file generated from OnboardingThrustDevice.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as OnboardingThrustDeviceBS__Es6Import from './OnboardingThrustDevice.bs';
-const OnboardingThrustDeviceBS: any = OnboardingThrustDeviceBS__Es6Import;
+import * as OnboardingThrustDeviceJS from './OnboardingThrustDevice.res.js';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<onSkip,onThrust,mentionWebAuthn> = {
   readonly onSkip: onSkip; 
   readonly onThrust: onThrust; 
@@ -17,4 +15,4 @@ export const make: React.ComponentType<{
   readonly onSkip: () => void; 
   readonly onThrust: () => void; 
   readonly mentionWebAuthn: boolean
-}> = OnboardingThrustDeviceBS.make;
+}> = OnboardingThrustDeviceJS.make as any;
