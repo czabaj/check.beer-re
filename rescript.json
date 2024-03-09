@@ -9,7 +9,6 @@
     "rescript-react-update",
     "rescript-webapi"
   ],
-  "bs-dev-dependencies": ["rescript-vitest"],
   "bsc-flags": ["-open RescriptCore"],
   "gentypeconfig": {
     "language": "typescript",
@@ -36,11 +35,6 @@
   "sources": [
     {
       "dir": "src",
-      "subdirs": true
-    },
-    {
-      "dir": "tests",
-      "type": "dev",
       "subdirs": true
     }
   ],
