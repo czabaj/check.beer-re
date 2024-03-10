@@ -4,7 +4,7 @@ type classesType = {form: string}
 module FormFields = %lenses(
   type state = {
     beer: string,
-    donors: Js.Dict.t<int>,
+    donors: Dict.t<int>,
     milliliters: int,
     ownerIsDonor: bool,
     price: int,

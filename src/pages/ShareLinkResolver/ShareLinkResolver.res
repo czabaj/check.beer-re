@@ -15,8 +15,7 @@ module Pure = {
       {switch (data, onAccept) {
       | (Some(shareLink, place), Some(handleAccept)) =>
         let role =
-          shareLink.role
-          ->UserRoles.roleFromJs
+          (UserRoles.roleFromInt(shareLink.role))
           ->Option.map(UserRoles.roleI18n)
           ->Option.getExn
         <>

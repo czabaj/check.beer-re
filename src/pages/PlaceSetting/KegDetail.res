@@ -10,7 +10,7 @@ let make = (
   ~isUserAuthorized,
   ~keg: Db.kegConverted,
   ~place: FirestoreModels.place,
-  ~personsAllById: Js.Dict.t<Db.personsAllRecord>,
+  ~personsAllById: Dict.t<Db.personsAllRecord>,
   ~onDeleteConsumption,
   ~onDeleteKeg,
   ~onDismiss,
@@ -82,7 +82,7 @@ let make = (
           <div>
             <dt> {React.string("první výtoč")} </dt>
             <dd>
-              <FormattedDateTime value={timestamp->Js.Date.fromFloat} />
+              <FormattedDateTime value={timestamp->Date.fromTime} />
             </dd>
           </div>
         }}
@@ -163,8 +163,8 @@ let make = (
             <tbody>
               {consumptionsByTimestampDesc
               ->Array.map(((timestampStr, consumption)) => {
-                let person = personsAllById->Js.Dict.unsafeGet(consumption.person.id)
-                let createdData = timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat
+                let person = personsAllById->Dict.getUnsafe(consumption.person.id)
+                let createdData = timestampStr->Float.fromString->Option.getExn->Date.fromTime
                 <tr key={timestampStr}>
                   <td> {React.string(person.name)} </td>
                   <td>

@@ -12,7 +12,7 @@ let make = (~children, ~user: Firebase.User.t) => {
       Some(ThrustDevice)
     } else if thrustDevice === Some("1") && supportsWebAuthn && webAuthn === None {
       Some(BiometricAuthn)
-    } else if user.displayName->Null.mapWithDefault("", String.trim) === "" {
+    } else if user.displayName->Null.mapOr("", String.trim) === "" {
       Some(NickName)
     } else {
       None

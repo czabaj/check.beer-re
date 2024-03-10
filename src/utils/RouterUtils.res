@@ -26,7 +26,7 @@ let resolveRelativePath = pathname => {
   }
 }
 
-let handleLinkClick = (handler, event) => {
+let handleLinkClick = (handler) => event => {
   if (
     ReactEvent.Mouse.isDefaultPrevented(event) ||
     ReactEvent.Mouse.button(event) != 0 ||
@@ -43,7 +43,7 @@ let handleLinkClick = (handler, event) => {
 }
 
 let createLinkClickHandler = (~replace=false, pathname) => {
-  handleLinkClick((. ()) =>
+  handleLinkClick(() =>
     replace ? RescriptReactRouter.replace(pathname) : RescriptReactRouter.push(pathname)
   )
 }

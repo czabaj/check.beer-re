@@ -204,7 +204,7 @@ let make = (~placeId) => {
                         let (personId, person) = inactivePerson
                         let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
                         let isCurrent =
-                          person.userId->Null.mapWithDefault(false, userId =>
+                          person.userId->Null.mapOr(false, userId =>
                             userId === currentUser.uid
                           )
                         <li ariaCurrent={isCurrent ? #"true" : #"false"} key={personId}>
@@ -240,7 +240,7 @@ let make = (~placeId) => {
             }}
             onDismiss={hideDialog}
             onSubmit={values => {
-              let kegRef = place.taps->Js.Dict.unsafeGet(values.tap)->Null.getExn
+              let kegRef = place.taps->Dict.getUnsafe(values.tap)->Null.getExn
               Db.Keg.addConsumption(
                 firestore,
                 ~consumption={

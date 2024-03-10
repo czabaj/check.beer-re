@@ -146,7 +146,7 @@ let make = (
             </button>,
             personsAll->Array.length < 2
               ? {"disabled": true, "title": "Přidejte další osoby"}
-              : Object.empty(),
+              : Object.make(),
           )}
         </header>
         {switch (pendingTransactions, maybePersonDoc) {
@@ -209,11 +209,11 @@ let make = (
                       React.string(`Vklad sudu ${kegSerial->Db.formatKegSerial}`)
                     | (_, _, Some(counterparty), false) =>
                       React.string(
-                        `Převod od ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                        `Převod od ${(personsAllDict->Dict.getUnsafe(counterparty)).name}`,
                       )
                     | (_, _, Some(counterparty), true) =>
                       React.string(
-                        `Převod pro ${(personsAllDict->Js.Dict.unsafeGet(counterparty)).name}`,
+                        `Převod pro ${(personsAllDict->Dict.getUnsafe(counterparty)).name}`,
                       )
                     | _ => React.null
                     }}

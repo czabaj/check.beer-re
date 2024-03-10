@@ -1,14 +1,12 @@
 /* TypeScript file generated from Homepage.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as HomepageBS__Es6Import from './Homepage.bs';
-const HomepageBS: any = HomepageBS__Es6Import;
+import * as HomepageJS from './Homepage.res.js';
 
-import type {element as Jsx_element} from './Jsx.gen';
+import type {Jsx_element as PervasivesU_Jsx_element} from './PervasivesU.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props = {};
 
-export const make: (_1:props) => Jsx_element = HomepageBS.make;
+export const make: (_1:props) => PervasivesU_Jsx_element = HomepageJS.make as any;

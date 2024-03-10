@@ -10,6 +10,7 @@ type financialTransaction = {
   person: Js.null<string>,
 }
 
+@@warning("-30")
 type rec consumption = {
   milliliters: int,
   person: Firebase.documentReference<person>,
@@ -31,6 +32,7 @@ and person = {
   createdAt: Firebase.Timestamp.t,
   transactions: array<financialTransaction>,
 }
+@@warning("+30")
 
 @genType
 type place = {

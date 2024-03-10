@@ -26,7 +26,7 @@ module ActivePersonListItem = {
     let consumptionsStr =
       consumptions
       ->Array.map(consumption => {
-        React.string(consumption.milliliters > 400 ? "X" : "I")
+        consumption.milliliters > 400 ? "X" : "I"
       })
       ->Array.joinWith("")
     let lastConsumptionsStr = React.useRef(consumptionsStr)
@@ -36,7 +36,7 @@ module ActivePersonListItem = {
       switch (
         consumptionsStr === lastConsumptionsStr.current,
         changeActive.current,
-        Js.Nullable.toOption(listItemEl.current),
+        Nullable.toOption(listItemEl.current),
       ) {
       | (false, false, Some(el)) =>
         lastConsumptionsStr.current = consumptionsStr
@@ -106,8 +106,7 @@ let make = (
           {activePersonEntries
           ->Array.map(activePerson => {
             let (personId, person) = activePerson
-            let consumptions =
-              recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
+            let consumptions = recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
             <ActivePersonListItem
               activeCheckbox={activePersonsChanges->Option.map(changes =>
                 <ActiveCheckbox
@@ -115,9 +114,7 @@ let make = (
                 />
               )}
               consumptions={consumptions}
-              isCurrent={person.userId->Null.mapWithDefault(false, userId =>
-                userId === currentUserUid
-              )}
+              isCurrent={person.userId->Null.mapOr(false, userId => userId === currentUserUid)}
               isUserAuthorized
               key={personId}
               onAddConsumption={() => onAddConsumption(activePerson)}
