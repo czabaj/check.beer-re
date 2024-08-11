@@ -1,7 +1,7 @@
 type classesType = {form: string}
 @module("./KegAddNew.module.css") external classes: classesType = "default"
 
-module FormFields = %lenses(
+module FormFields = {
   type state = {
     beer: string,
     donors: Dict.t<int>,
@@ -10,7 +10,36 @@ module FormFields = %lenses(
     price: int,
     serial: int,
   }
-)
+  type rec field<_> =
+    | Beer: field<string>
+    | Donors: field<Dict.t<int>>
+    | Milliliters: field<int>
+    | OwnerIsDonor: field<bool>
+    | Price: field<int>
+    | Serial: field<int>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Beer => state.beer
+      | Donors => state.donors
+      | Milliliters => state.milliliters
+      | OwnerIsDonor => state.ownerIsDonor
+      | Price => state.price
+      | Serial => state.serial
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Beer => {...state, beer: value}
+      | Donors => {...state, donors: value}
+      | Milliliters => {...state, milliliters: value}
+      | OwnerIsDonor => {...state, ownerIsDonor: value}
+      | Price => {...state, price: value}
+      | Serial => {...state, serial: value}
+      }
+}
 
 let emptyState: FormFields.state = {
   beer: "",

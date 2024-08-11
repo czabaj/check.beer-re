@@ -79,7 +79,7 @@ let make = (~placeId) => {
       currentUser,
     )) =>
     let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
-    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     if !isUserAuthorized(UserRoles.Admin) {
       Exn.raiseError(`Insufficient permissions to view this page`)
     }
@@ -126,7 +126,7 @@ let make = (~placeId) => {
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
-                      ->Option.flatMap(UserRoles.roleFromJs)
+                      ->Option.flatMap(UserRoles.roleFromInt)
                       ->Option.map(UserRoles.roleI18n)
                       ->Option.mapOr(React.null, React.string)}
                     </td>

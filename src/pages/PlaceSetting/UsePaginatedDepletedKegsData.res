@@ -33,7 +33,7 @@ let compareKegs = (keg1: Db.kegConverted, keg2: Db.kegConverted) => {
       keg2.depletedAt->Null.map(Firebase.Timestamp.toMillis)
 }
 
-let concatenateResponse = ArrayUtils.unionByPreferringLast(~comparator=compareKegs)
+let concatenateResponse = ArrayUtils.unionByPreferringLast(~comparator=compareKegs, ...)
 
 let kegQuerySnapshotToKegs = (kegsSnapshot: Firebase.querySnapshot<Db.kegConverted>) =>
   kegsSnapshot.docs->Array.map(Rxfire.snapToData)
@@ -41,10 +41,7 @@ let kegQuerySnapshotToKegs = (kegsSnapshot: Firebase.querySnapshot<Db.kegConvert
 let use = (~limit=20, placeId) => {
   let firestore = Reactfire.useFirestore()
   let kegsCollectionRef = Db.placeKegsCollectionConverted(firestore, placeId)
-  let (paginatedDataState, paginatedDataSend) = ReactUpdate.useReducer(initialState, (
-    action,
-    state,
-  ) => {
+  let (paginatedDataState, paginatedDataSend) = ReactUpdate.useReducer((state, action) => {
     switch (action, state) {
     | (FetchMore, {data: Some(_), continueWith: Some(lastKeg), pending: false}) =>
       ReactUpdate.UpdateWithSideEffects(
@@ -121,7 +118,7 @@ let use = (~limit=20, placeId) => {
         ReactUpdate.NoUpdate
       }
     }
-  })
+  }, initialState)
   React.useEffect0(() => {
     paginatedDataSend(InitialLoad)
     None

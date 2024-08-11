@@ -1,4 +1,19 @@
-module FormFields = %lenses(type state = {untapOption: string})
+module FormFields = {
+  type state = {untapOption: string}
+  type rec field<_> = UntapOption: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | UntapOption => state.untapOption
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | UntapOption => { untapOption: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

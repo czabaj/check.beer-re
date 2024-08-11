@@ -25,7 +25,7 @@ let make = (~placeId) => {
   switch pageDataStatus.data {
   | Some((place, personsAll, chargedKegs, currentUser)) =>
     let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
-    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let kegsOnTapUids =
       place.taps
       ->Js.Dict.values
@@ -74,7 +74,7 @@ let make = (~placeId) => {
             let resolvedDonors = if !ownerIsDonor {
               donors
             } else {
-              let ownerRoleInt = UserRoles.roleToJs(UserRoles.Owner)
+              let ownerRoleInt = (UserRoles.Owner :> int)
               let placeOwnerUid =
                 place.users
                 ->Dict.toArray

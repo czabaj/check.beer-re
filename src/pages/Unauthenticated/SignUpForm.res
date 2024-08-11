@@ -1,8 +1,28 @@
 type submitValues = {email: string, password: string}
 
-module FormFields = %lenses(
+module FormFields = {
   type state = {email: string, password: string, passwordConfirmation: string}
-)
+  type rec field<_> =
+    | Email: field<string>
+    | Password: field<string>
+    | PasswordConfirmation: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Email => state.email
+      | Password => state.password
+      | PasswordConfirmation => state.passwordConfirmation
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Email => {...state, email: value}
+      | Password => {...state, password: value}
+      | PasswordConfirmation => {...state, passwordConfirmation: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

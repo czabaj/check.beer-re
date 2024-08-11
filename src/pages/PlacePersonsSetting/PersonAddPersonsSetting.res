@@ -2,7 +2,22 @@ type classesType = {root: string}
 
 @module("./PersonAddPersonsSetting.module.css") external classes: classesType = "default"
 
-module FormFields = %lenses(type state = {name: string})
+module FormFields = {
+  type state = {name: string}
+  type rec field<_> = Name: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Name => state.name
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | Name => {name: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

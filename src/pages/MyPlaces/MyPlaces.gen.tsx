@@ -1,20 +1,16 @@
 /* TypeScript file generated from MyPlaces.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as MyPlacesBS__Es6Import from './MyPlaces.bs';
-const MyPlacesBS: any = MyPlacesBS__Es6Import;
+import * as MyPlacesJS from './MyPlaces.res.js';
 
-import type {Mouse_t as JsxEvent_Mouse_t} from './JsxEvent.gen';
+import type {Mouse_t as JsxEventU_Mouse_t} from './JsxEventU.gen';
 
 import type {User_t as Firebase_User_t} from '../../../src/backend/Firebase.gen';
 
-import type {element as Jsx_element} from './Jsx.gen';
-
 import type {place as FirestoreModels_place} from '../../../src/backend/FirestoreModels.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type Pure_props<currentUser,onPlaceAdd,onSignOut,onSettingsClick,usersPlaces> = {
   readonly currentUser: currentUser; 
   readonly onPlaceAdd: onPlaceAdd; 
@@ -23,6 +19,18 @@ export type Pure_props<currentUser,onPlaceAdd,onSignOut,onSettingsClick,usersPla
   readonly usersPlaces: usersPlaces
 };
 
-export const Pure_make: (_1:Pure_props<Firebase_User_t,(() => void),(() => void),((_1:JsxEvent_Mouse_t) => void),FirestoreModels_place[]>) => Jsx_element = MyPlacesBS.Pure.make;
+export const Pure_make: React.ComponentType<{
+  readonly currentUser: Firebase_User_t; 
+  readonly onPlaceAdd: () => void; 
+  readonly onSignOut: () => void; 
+  readonly onSettingsClick: (_1:JsxEventU_Mouse_t) => void; 
+  readonly usersPlaces: FirestoreModels_place[]
+}> = MyPlacesJS.Pure.make as any;
 
-export const Pure: { make: (_1:Pure_props<Firebase_User_t,(() => void),(() => void),((_1:JsxEvent_Mouse_t) => void),FirestoreModels_place[]>) => Jsx_element } = MyPlacesBS.Pure
+export const Pure: { make: React.ComponentType<{
+  readonly currentUser: Firebase_User_t; 
+  readonly onPlaceAdd: () => void; 
+  readonly onSignOut: () => void; 
+  readonly onSettingsClick: (_1:JsxEventU_Mouse_t) => void; 
+  readonly usersPlaces: FirestoreModels_place[]
+}> } = MyPlacesJS.Pure as any;

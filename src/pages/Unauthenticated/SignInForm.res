@@ -2,7 +2,26 @@ type classesType = {root: string}
 
 @module("./SignInForm.module.css") external classes: classesType = "default"
 
-module FormFields = %lenses(type state = {email: string, password: string})
+module FormFields = {
+  type state = {email: string, password: string}
+  type rec field<_> =
+    | Email: field<string>
+    | Password: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Email => state.email
+      | Password => state.password
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Email => {...state, email: value}
+      | Password => {...state, password: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
@@ -33,7 +52,6 @@ let make = (
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }
-        | _ => "Neznámá chyba"
         }
         raiseSubmitFailed(Some(errorMessage))
         Promise.resolve()
@@ -92,8 +110,7 @@ let make = (
         </fieldset>
         {switch form.state.formState {
         | SubmitFailed(maybeErrorMessage) =>
-          <p
-            className={Styles.messageBar.variantDanger} role="alert">
+          <p className={Styles.messageBar.variantDanger} role="alert">
             {switch maybeErrorMessage {
             | None => React.string("Neznámá chyba")
             | Some(message) =>

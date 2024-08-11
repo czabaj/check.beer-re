@@ -131,7 +131,7 @@ let make = (~placeId) => {
       currentUser,
     ) =>
     let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
-    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
@@ -204,9 +204,7 @@ let make = (~placeId) => {
                         let (personId, person) = inactivePerson
                         let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
                         let isCurrent =
-                          person.userId->Null.mapOr(false, userId =>
-                            userId === currentUser.uid
-                          )
+                          person.userId->Null.mapOr(false, userId => userId === currentUser.uid)
                         <li ariaCurrent={isCurrent ? #"true" : #"false"} key={personId}>
                           <div>
                             {React.string(`${person.name} `)}

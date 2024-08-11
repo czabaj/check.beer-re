@@ -28,7 +28,7 @@ module ActivePersonListItem = {
       ->Array.map(consumption => {
         consumption.milliliters > 400 ? "X" : "I"
       })
-      ->Array.joinWith("")
+      ->Array.join("")
     let lastConsumptionsStr = React.useRef(consumptionsStr)
     let changeActive = React.useRef(false)
     changeActive.current = activeCheckbox !== None

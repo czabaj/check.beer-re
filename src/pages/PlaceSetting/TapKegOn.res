@@ -1,4 +1,19 @@
-module FormFields = %lenses(type state = {keg: string})
+module FormFields = {
+  type state = {keg: string}
+  type rec field<_> = Keg: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Keg => state.keg
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | Keg => {keg: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

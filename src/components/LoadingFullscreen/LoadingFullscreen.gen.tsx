@@ -5,8 +5,6 @@
 
 import * as LoadingFullscreenJS from './LoadingFullscreen.res.js';
 
-import type {Jsx_element as PervasivesU_Jsx_element} from './PervasivesU.gen';
-
 export type props = {};
 
-export const make: (_1:props) => PervasivesU_Jsx_element = LoadingFullscreenJS.make as any;
+export const make: React.ComponentType<{}> = LoadingFullscreenJS.make as any;

@@ -3,8 +3,6 @@
     "@nobleai/rescript-rxjs",
     "@rescript/core",
     "@rescript/react",
-    "@rescriptbr/reform",
-    "@rescriptbr/reschema",
     "rescript-react-intl",
     "rescript-react-update",
     "rescript-webapi"
@@ -14,7 +12,7 @@
     "language": "typescript",
     "shims": {},
     "generatedFileExtension": ".gen.tsx",
-    "module": "es6",
+    "module": "esmodule",
     "debug": {
       "all": false,
       "basic": false
@@ -27,11 +25,10 @@
   "name": "check.beer",
   "package-specs": [
     {
-      "module": "es6",
+      "module": "esmodule",
       "in-source": true
     }
   ],
-  "ppx-flags": ["lenses-ppx/ppx"],
   "sources": [
     {
       "dir": "src",
