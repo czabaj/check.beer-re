@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@firebase-web-authn/browser": "^10.0.0",
-    "@nobleai/rescript-rxjs": "file:../rescript-rxjs/",
     "@oddbird/popover-polyfill": "^0.2.3",
     "@rescript/core": "^1.5.2",
     "@rescript/react": "^0.13.0",
