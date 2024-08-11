@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as OnboardingNickNameJS from './OnboardingNickName.res.js';
+import * as OnboardingNickNameJS from './OnboardingNickName.bs.js';
 
 import type {t as Promise_t} from './Promise.gen';
 

@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as BiometricAuthnJS from './BiometricAuthn.res.js';
+import * as BiometricAuthnJS from './BiometricAuthn.bs.js';
 
 export type props<loadingOverlay,onSetupAuthn,onSkip,setupError> = {
   readonly loadingOverlay: loadingOverlay; 

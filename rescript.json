@@ -35,5 +35,5 @@
       "subdirs": true
     }
   ],
-  "suffix": ".res.js"
+  "suffix": ".bs.js"
 }

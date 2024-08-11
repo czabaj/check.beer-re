@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as BeerListJS from './BeerList.res.js';
+import * as BeerListJS from './BeerList.bs.js';
 
 import type {Map_String_key as Belt_Map_String_key} from './Belt.gen';
 

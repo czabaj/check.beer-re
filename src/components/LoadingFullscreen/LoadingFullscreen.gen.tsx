@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as LoadingFullscreenJS from './LoadingFullscreen.res.js';
+import * as LoadingFullscreenJS from './LoadingFullscreen.bs.js';
 
 export type props = {};
 

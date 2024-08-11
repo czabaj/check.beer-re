@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as OnboardingThrustDeviceJS from './OnboardingThrustDevice.res.js';
+import * as OnboardingThrustDeviceJS from './OnboardingThrustDevice.bs.js';
 
 export type props<onSkip,onThrust,mentionWebAuthn> = {
   readonly onSkip: onSkip; 

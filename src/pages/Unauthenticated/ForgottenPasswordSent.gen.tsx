@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ForgottenPasswordSentJS from './ForgottenPasswordSent.res.js';
+import * as ForgottenPasswordSentJS from './ForgottenPasswordSent.bs.js';
 
 export type props<email,onGoBack> = { readonly email: email; readonly onGoBack: onGoBack };
 

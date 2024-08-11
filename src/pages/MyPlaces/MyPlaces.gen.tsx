@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as MyPlacesJS from './MyPlaces.res.js';
+import * as MyPlacesJS from './MyPlaces.bs.js';
 
 import type {Mouse_t as JsxEventU_Mouse_t} from './JsxEventU.gen';
 

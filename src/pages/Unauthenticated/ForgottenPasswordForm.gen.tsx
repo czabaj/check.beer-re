@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.res.js';
+import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.bs.js';
 
 import type {t as Promise_t} from './Promise.gen';
 

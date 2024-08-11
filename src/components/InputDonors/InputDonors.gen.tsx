@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as InputDonorsJS from './InputDonors.res.js';
+import * as InputDonorsJS from './InputDonors.bs.js';
 
 import type {t as Dict_t} from './Dict.gen';
 

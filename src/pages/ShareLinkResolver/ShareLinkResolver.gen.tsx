@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ShareLinkResolverJS from './ShareLinkResolver.res.js';
+import * as ShareLinkResolverJS from './ShareLinkResolver.bs.js';
 
 import type {place as FirestoreModels_place} from '../../../src/backend/FirestoreModels.gen';
 

@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ButtonMenuJS from './ButtonMenu.res.js';
+import * as ButtonMenuJS from './ButtonMenu.bs.js';
 
 export type menuItem = {
   readonly disabled?: boolean; 

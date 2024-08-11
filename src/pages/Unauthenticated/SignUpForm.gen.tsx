@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as SignUpFormJS from './SignUpForm.res.js';
+import * as SignUpFormJS from './SignUpForm.bs.js';
 
 import type {t as Promise_t} from './Promise.gen';
 

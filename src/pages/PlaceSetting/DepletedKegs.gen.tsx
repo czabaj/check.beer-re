@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DepletedKegsJS from './DepletedKegs.res.js';
+import * as DepletedKegsJS from './DepletedKegs.bs.js';
 
 import type {kegConverted as Db_kegConverted} from '../../../src/backend/Db.gen';
 

@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DbJS from './Db.res.js';
+import * as DbJS from './Db.bs.js';
 
 import type {Dict_key as Js_Dict_key} from './Js.gen';
 
