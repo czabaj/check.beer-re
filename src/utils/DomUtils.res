@@ -50,9 +50,9 @@ let isOnlineRx = {
   open Rxjs
   open! Webapi.Dom
   merge2(
-    fromEvent(. window, "online")->pipe(map((_, _) => true)),
-    fromEvent(. window, "offline")->pipe(map((_, _) => false)),
-  )->pipe(startWith((window->Webapi.Dom.Window.navigator).onLine))
+    fromEvent(window, "online")->pipe(map((_, _) => true)),
+    fromEvent(window, "offline")->pipe(map((_, _) => false)),
+  )->op(startWith((window->Webapi.Dom.Window.navigator).onLine))
 }
 
 let useIsOnline = () => {

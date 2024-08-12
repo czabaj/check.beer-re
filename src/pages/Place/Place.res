@@ -18,18 +18,22 @@ let pageDataRx = (auth, firestore, placeId) => {
   let placeRef = Db.placeDocument(firestore, placeId)
   let placeRx = Rxfire.docData(placeRef)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  let placeTapsRx = placeRx->pipe2(
-    distinctUntilChanged((prev, curr) =>
-      switch ((prev: option<FirestoreModels.place>), curr) {
-      | (Some(prevPlace), Some(currPlace)) => prevPlace.taps == currPlace.taps
-      | _ => false
-      }
-    ),
-    map((maybePlace: option<FirestoreModels.place>, _) =>
-      maybePlace->Option.map(place => place.taps)
-    ),
-  )
-  let tapsWithKegsRx = combineLatest2(placeTapsRx, chargedKegsRx)->pipe(
+  let placeTapsRx =
+    placeRx
+    ->op(
+      distinctUntilChanged((prev, curr) =>
+        switch ((prev: option<FirestoreModels.place>), curr) {
+        | (Some(prevPlace), Some(currPlace)) => prevPlace.taps == currPlace.taps
+        | _ => false
+        }
+      ),
+    )
+    ->op(
+      map((maybePlace: option<FirestoreModels.place>, _) =>
+        maybePlace->Option.map(place => place.taps)
+      ),
+    )
+  let tapsWithKegsRx = combineLatest2(placeTapsRx, chargedKegsRx)->op(
     map((data, _) => {
       switch data {
       | (Some(placeTaps), chargedKegs) =>
@@ -49,7 +53,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       }
     }),
   )
-  let unfinishedConsumptionsByUserRx = chargedKegsRx->pipe(
+  let unfinishedConsumptionsByUserRx = chargedKegsRx->op(
     map((chargedKegs, _) => {
       let consumptionsByUser = Map.make()
       chargedKegs->Array.forEach(keg =>
@@ -65,7 +69,7 @@ let pageDataRx = (auth, firestore, placeId) => {
   let recentConsumptionsByUserRx = combineLatest2(
     unfinishedConsumptionsByUserRx,
     recentlyFinishedKegsRx,
-  )->pipe(
+  )->op(
     map(((unfinishedConsumptionsByUser, recentlyFinishedKegs), _) => {
       let recentConsumptionsByUser = ObjectUtils.structuredClone(unfinishedConsumptionsByUser)
       recentlyFinishedKegs->Array.forEach(keg =>
@@ -88,7 +92,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       ->Map.fromArray
     }),
   )
-  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)->pipe(
+  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)->op(
     map((personsAllEntries: array<(string, Db.personsAllRecord)>, _) => {
       let (active, inactive) =
         personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
@@ -96,7 +100,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       (all, active, inactive)
     }),
   )
-  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
   combineLatest6(
     placeRx,
     personsAllRx,

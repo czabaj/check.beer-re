@@ -74,8 +74,8 @@ let pageDataRx = (auth, firestore, ~linkId) => {
     }),
   )
   combineLatest2(currentUserRx, shareLinkPlaceRx)
-  ->pipe2(
-    first(),
+  ->op(first())
+  ->op(
     tap(((currentUser, maybeShareLinkPlace): (Firebase.User.t, option<FirestoreModels.place>)) => {
       switch maybeShareLinkPlace {
       | None => ()

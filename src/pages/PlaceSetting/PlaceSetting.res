@@ -1,10 +1,10 @@
 let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
-  let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
+  let placeRx = Rxfire.docData(placeRef)->op(keepSome)
   let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
   let chargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
   combineLatest4(placeRx, personsAllRx, chargedKegsRx, currentUserRx)
 }
 

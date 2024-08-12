@@ -165,7 +165,7 @@ type timeinterval<'a> = { interval: int, value: 'a }
 @module("rxjs") external withLatestFrom7: (t<'ca, 'sa, 'a>, t<'cb, 'sb, 'b>, t<'cc, 'sc, 'c>, t<'cd, 'sd, 'd>, t<'ce, 'se, 'e>, t<'cf, 'sf, 'f>, t<'cg, 'sg, 'g>) => operatorFunction<'cz, 'sz, 'z, ('z, 'a, 'b, 'c, 'd, 'e, 'f, 'g)> = "withLatestFrom"
 
 /**
- * This is a helper function which allows use ReScript built-in pipe operator
+ * This is a helper function that allows use ReScript built-in pipe operator
  * instead of `pipeN`. The ReScript compiler then "evaporates" this `op`
  * function so it compiles to simple nested chain of function calls.
  * See `keepMap` below for an example of how to use it.

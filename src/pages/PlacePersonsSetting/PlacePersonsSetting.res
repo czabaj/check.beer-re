@@ -10,9 +10,9 @@ type dialogState =
 let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
   let placeRef = Db.placeDocument(firestore, placeId)
-  let placeRx = Rxfire.docData(placeRef)->pipe(keepSome)
+  let placeRx = Rxfire.docData(placeRef)->op(keepSome)
   let allChargedKegsRx = Db.allChargedKegsRx(firestore, placeId)
-  let unfinishedConsumptionsByUserRx = allChargedKegsRx->pipe(
+  let unfinishedConsumptionsByUserRx = allChargedKegsRx->op(
     map((chargedKegs, _) => {
       let consumptionsByUser = Map.make()
       chargedKegs->Array.forEach(keg =>
@@ -24,7 +24,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       consumptionsByUser
     }),
   )
-  let pendingTransactionsByUserRx = allChargedKegsRx->pipe(
+  let pendingTransactionsByUserRx = allChargedKegsRx->op(
     map((chargedKegs: array<Db.kegConverted>, _) => {
       let kegByDonor = Map.make()
       chargedKegs->Array.forEach(keg => {
@@ -50,7 +50,7 @@ let pageDataRx = (auth, firestore, placeId) => {
     }),
   )
   let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
-  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
   combineLatest5(
     placeRx,
     personsAllRx,

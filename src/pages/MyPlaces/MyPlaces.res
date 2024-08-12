@@ -78,9 +78,9 @@ module Pure = {
 
 let pageDataRx = (auth, firestore) => {
   open Rxjs
-  let currentUserRx = Rxfire.user(auth)->pipe(keepMap(Null.toOption))
+  let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
   let userPlacesRx =
-    currentUserRx->pipe(
+    currentUserRx->op(
       switchMap((user: Firebase.User.t) => Db.placesByUserIdRx(firestore, user.uid)),
     )
   combineLatest2(currentUserRx, userPlacesRx)
@@ -144,8 +144,8 @@ let make = () => {
                 ~email=currentUser.email->Null.getExn,
                 ~password=values.oldPassword,
               )
-              let _ = await Firebase.Auth.reauthenticateWithCredential(. currentUser, credential)
-              let _ = await Firebase.Auth.updatePassword(.
+              let _ = await Firebase.Auth.reauthenticateWithCredential(currentUser, credential)
+              let _ = await Firebase.Auth.updatePassword(
                 currentUser,
                 ~newPassword=values.newPassword,
               )
