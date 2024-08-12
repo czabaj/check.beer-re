@@ -63,9 +63,7 @@ let make = (
                 </td>
                 <td>
                   <ReactIntl.FormattedDate
-                    value={Db.kegFirstConsumptionTimestamp(keg)
-                    ->Option.map(Js.Date.fromFloat)
-                    ->Option.getExn}
+                    value={Db.kegFirstConsumptionTimestamp(keg)->Option.getExn->Date.fromTime}
                   />
                 </td>
                 <td>

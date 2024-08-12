@@ -15,8 +15,7 @@ module Pure = {
       {switch (data, onAccept) {
       | (Some(shareLink, place), Some(handleAccept)) =>
         let role =
-          shareLink.role
-          ->UserRoles.roleFromJs
+          UserRoles.roleFromInt(shareLink.role)
           ->Option.map(UserRoles.roleI18n)
           ->Option.getExn
         <>
@@ -106,7 +105,7 @@ let make = (~linkId) => {
 
   switch pageDataStatus.data {
   | Some((currentUser, Some(shareLink), Some(shareLinkPlace))) =>
-    let (acceptInviteState, acceptInviteSend) = ReactUpdate.useReducer(Ready, (action, state) => {
+    let (acceptInviteState, acceptInviteSend) = ReactUpdate.useReducer((state, action) => {
       switch (action, state) {
       | (Run, Error(_)) // allow retry
       | (Run, Ready) =>
@@ -137,7 +136,7 @@ let make = (~linkId) => {
       | (Rejected(error), Pending) => ReactUpdate.Update(Error(error))
       | _ => ReactUpdate.NoUpdate
       }
-    })
+    }, Ready)
     <Pure
       data=Some(shareLink, shareLinkPlace)
       loading={acceptInviteState == Pending}

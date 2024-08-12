@@ -13,7 +13,7 @@ let make = (~className=?, ~inputError=?, ~inputName, ~inputSlot, ~labelSlot, ~un
   let unitId = unitSlot !== None ? `${inputName}_unit` : ""
   let hasError = inputError != None
   let errorId = hasError ? `${inputName}_error` : ""
-  <div className={`inputWrapper ${className->Option.getWithDefault("")}`}>
+  <div className={`inputWrapper ${className->Option.getOr("")}`}>
     <label htmlFor=inputName> {labelSlot} </label>
     <div>
       <div>

@@ -1,4 +1,19 @@
-module FormFields = %lenses(type state = {keg: string})
+module FormFields = {
+  type state = {keg: string}
+  type rec field<_> = Keg: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Keg => state.keg
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | Keg => {keg: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
@@ -18,7 +33,7 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
     }
   })
   let form = Form.use(
-    ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getWithDefault("")},
+    ~initialState={keg: options->Array.get(0)->Option.map(o => o.value)->Option.getOr("")},
     ~onSubmit=({state}) => {
       onSubmit(state.values)->ignore
       None

@@ -27,7 +27,7 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
             ->Array.mapWithIndex((item, idx) =>
               <li key={idx->Int.toString}>
                 <button
-                  disabled={item.disabled->Option.getWithDefault(false)}
+                  disabled={item.disabled->Option.getOr(false)}
                   onClick=item.onClick
                   type_="button">
                   {React.string(item.label)}

@@ -1,16 +1,45 @@
 type classesType = {form: string}
 @module("./KegAddNew.module.css") external classes: classesType = "default"
 
-module FormFields = %lenses(
+module FormFields = {
   type state = {
     beer: string,
-    donors: Js.Dict.t<int>,
+    donors: Dict.t<int>,
     milliliters: int,
     ownerIsDonor: bool,
     price: int,
     serial: int,
   }
-)
+  type rec field<_> =
+    | Beer: field<string>
+    | Donors: field<Dict.t<int>>
+    | Milliliters: field<int>
+    | OwnerIsDonor: field<bool>
+    | Price: field<int>
+    | Serial: field<int>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Beer => state.beer
+      | Donors => state.donors
+      | Milliliters => state.milliliters
+      | OwnerIsDonor => state.ownerIsDonor
+      | Price => state.price
+      | Serial => state.serial
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Beer => {...state, beer: value}
+      | Donors => {...state, donors: value}
+      | Milliliters => {...state, milliliters: value}
+      | OwnerIsDonor => {...state, ownerIsDonor: value}
+      | Price => {...state, price: value}
+      | Serial => {...state, serial: value}
+      }
+}
 
 let emptyState: FormFields.state = {
   beer: "",
@@ -43,7 +72,7 @@ module FormComponent = {
         let recentKegState =
           mostResentKegs
           ->Array.at(0)
-          ->Option.mapWithDefault(emptyState, keg => {
+          ->Option.mapOr(emptyState, keg => {
             let {beer, donors, milliliters, price, serial} = keg
             {
               beer,
@@ -154,7 +183,7 @@ module FormComponent = {
                         formattedNumberParts
                         ->Array.find(p => p.type_ === `currency`)
                         ->Option.map(p => React.string(p.value))
-                        ->Option.getWithDefault(React.null)}
+                        ->Option.getOr(React.null)}
                     </ReactIntl.FormattedNumberParts>}
                   />
                 }}

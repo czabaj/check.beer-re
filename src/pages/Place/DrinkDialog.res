@@ -7,7 +7,26 @@ type classesType = {
 
 @module("./DrinkDialog.module.css") external classes: classesType = "default"
 
-module FormFields = %lenses(type state = {tap: string, consumption: int})
+module FormFields = {
+  type state = {tap: string, consumption: int}
+  type rec field<_> =
+    | Tap: field<string>
+    | Consumption: field<int>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Tap => state.tap
+      | Consumption => state.consumption
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Tap => {...state, tap: value}
+      | Consumption => {...state, consumption: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
@@ -46,7 +65,7 @@ let make = (
       {
         tap: preferredTapHasKeg
           ? preferredTap
-          : tapsOptions->Array.get(0)->Option.map(({value}) => value)->Option.getWithDefault(""),
+          : tapsOptions->Array.get(0)->Option.map(({value}) => value)->Option.getOr(""),
         consumption: -1,
       }
     },

@@ -1,4 +1,19 @@
-module FormFields = %lenses(type state = {email: string})
+module FormFields = {
+  type state = {email: string}
+  type rec field<_> = Email: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Email => state.email
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | Email => { email: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

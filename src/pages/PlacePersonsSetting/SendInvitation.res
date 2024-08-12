@@ -1,4 +1,19 @@
-module FormFields = %lenses(type state = {role: UserRoles.role})
+module FormFields = {
+  type state = {role: UserRoles.role}
+  type rec field<_> = Role: field<UserRoles.role>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Role => state.role
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (_state, field, value) =>
+      switch field {
+      | Role => {role: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)
@@ -32,14 +47,15 @@ let make = (~onDismiss, ~onSubmit) => {
                 inputSlot={<select
                   onChange={event => {
                     let roleString = ReactEvent.Form.target(event)["value"]
-                    let role = roleString->Int.fromString->Option.flatMap(roleFromJs)->Option.getExn
+                    let role =
+                      roleString->Int.fromString->Option.flatMap(roleFromInt)->Option.getExn
                     field.handleChange(role)
                   }}
-                  value={field.value->roleToJs->Int.toString}>
+                  value={(field.value :> int)->Int.toString}>
                   {roleOptions
                   ->Array.map(role => {
                     let label = role->roleI18n
-                    let value = role->roleToJs->Int.toString
+                    let value = (role :> int)->Int.toString
                     <option key={value} value={value}> {React.string(label)} </option>
                   })
                   ->React.array}

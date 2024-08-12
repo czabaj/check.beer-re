@@ -4,7 +4,7 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
 
   let custom = Validation.custom
 
-  let email = Validation.email(~error="Neplatný email")
+  let email = Validation.email(~error="Neplatný email", ...)
 
   let equals = (~expected, ~error, field) => Validation.custom(lensState => {
       let value = Lenses.get(lensState, field)
@@ -71,7 +71,7 @@ module CustomValidators = (Lenses: ReSchema.Lenses) => {
     }, field)
 
   // requires the string to contain at least one non-whitespace character
-  let required = Validation.regExp(~error="Bez tohoto to nepůjde", ~matches="[^\s]")
+  let required = Validation.regExp(~error="Bez tohoto to nepůjde", ~matches="[^\s]", ...)
 
   let schema = Validation.schema
 }

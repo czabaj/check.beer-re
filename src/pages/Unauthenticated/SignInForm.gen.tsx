@@ -1,17 +1,14 @@
 /* TypeScript file generated from SignInForm.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as SignInFormBS__Es6Import from './SignInForm.bs';
-const SignInFormBS: any = SignInFormBS__Es6Import;
+import * as SignInFormJS from './SignInForm.bs.js';
 
 import type {t as Promise_t} from './Promise.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type FormFields_state = { readonly email: string; readonly password: string };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<isOnline,loadingOverlay,onForgottenPassword,onSignInWithGoogle,onSignInWithPasskey,onSignInWithPassword,onSignUp> = {
   readonly isOnline: isOnline; 
   readonly loadingOverlay: loadingOverlay; 
@@ -30,4 +27,4 @@ export const make: React.ComponentType<{
   readonly onSignInWithPasskey: (undefined | (() => void)); 
   readonly onSignInWithPassword: (_1:FormFields_state) => Promise_t<void>; 
   readonly onSignUp: () => void
-}> = SignInFormBS.make;
+}> = SignInFormJS.make as any;

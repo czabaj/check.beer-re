@@ -19,7 +19,7 @@ let unionByPreferringLast = (~comparator, ~overlap=3, arr1, arr2) => {
   let stopCheck = overlap === 0 ? 0 : arr1LastIdx - overlap
   for i in arr1LastIdx downto 0 {
     let a1 = arr1->Array.get(i)->Option.getExn
-    let duplicate = i > stopCheck && arr2->Array.some(comparator(a1))
+    let duplicate = i > stopCheck && arr2->Array.some(i => comparator(a1, i))
     if !duplicate {
       result->Array.unshift(a1)
     }

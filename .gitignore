@@ -8,6 +8,7 @@ dist-ssr
 .bsb.lock
 .merlin
 /lib/
+*.res.js
 *.bs.js
 
 # Firebase

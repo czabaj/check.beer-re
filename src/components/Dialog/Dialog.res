@@ -51,10 +51,10 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   }, lightDismissibleDeps)
 
   <dialog
-    className={`${classes.root} ${Js.Option.getWithDefault("", className)}`}
+    className={`${classes.root} ${Option.getOr(className, "")}`}
     ref={ReactDOM.Ref.callbackDomRef(node => {
       setDialogNode(_ =>
-        switch node->Js.Nullable.toOption {
+        switch node->Nullable.toOption {
         | None => None
         | Some(dialogNode) => {
             dialogPolyfill.registerDialog(. dialogNode)

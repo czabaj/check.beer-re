@@ -54,7 +54,7 @@ let removeLastUndefined: FirestoreModels.personsAllItem => FirestoreModels.perso
   "tuple => tuple.at(-1) === undefined ? tuple.slice(0, -1) : tuple"
 )
 @genType
-let personsAllRecordToTuple = (. {
+let personsAllRecordToTuple = ({
   balance,
   name,
   preferredTap,
@@ -63,7 +63,7 @@ let personsAllRecordToTuple = (. {
 }): FirestoreModels.personsAllItem =>
   removeLastUndefined((name, recentActivityAt, balance, userId, preferredTap))
 
-let personsAllTupleToRecord = (. (name, recentActivityAt, balance, userId, preferredTap)) => {
+let personsAllTupleToRecord = ((name, recentActivityAt, balance, userId, preferredTap)) => {
   balance,
   name,
   preferredTap,
@@ -75,14 +75,14 @@ let personsAllTupleToRecord = (. (name, recentActivityAt, balance, userId, prefe
 type personsIndexConverted = {all: Js.Dict.t<personsAllRecord>}
 
 let personsIndexConverter: Firebase.dataConverter<personsIndex, personsIndexConverted> = {
-  fromFirestore: (. snapshot, options) => {
-    let {all} = snapshot.data(. options)
-    let allWithRecord = all->Js.Dict.map(personsAllTupleToRecord, _)
+  fromFirestore: (snapshot, options) => {
+    let {all} = snapshot.data(options)
+    let allWithRecord = all->(Js.Dict.map(personsAllTupleToRecord, _))
     {all: allWithRecord}
   },
-  toFirestore: (. place, _) => {
+  toFirestore: (place, _) => {
     let {all} = place
-    let allWithTuple = all->Js.Dict.map(personsAllRecordToTuple, _)
+    let allWithTuple = all->(Js.Dict.map(personsAllRecordToTuple, _))
     {all: allWithTuple}
   },
 }
@@ -109,8 +109,8 @@ type kegConverted = {
 let formatKegSerial = (serial: int) => "#" ++ serial->Int.toString->String.padStart(3, "0")
 
 let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
-  fromFirestore: (. snapshot, options) => {
-    let keg = snapshot.data(. options)
+  fromFirestore: (snapshot, options) => {
+    let keg = snapshot.data(options)
     let consumptionsSum =
       keg.consumptions
       ->Js.Dict.values
@@ -130,7 +130,7 @@ let kegConverter: Firebase.dataConverter<keg, kegConverted> = {
       serialFormatted,
     }
   },
-  toFirestore: (. keg, _) => {
+  toFirestore: (keg, _) => {
     let {
       beer,
       consumptions,
@@ -233,7 +233,7 @@ let groupKegConsumptionsByUser = (~target=Map.make(), keg: kegConverted) => {
       kegId: getUid(keg),
       beer: keg.beer,
       milliliters: consumption.milliliters,
-      createdAt: timestampStr->Float.fromString->Option.getExn->Js.Date.fromFloat,
+      createdAt: timestampStr->Float.fromString->Option.getExn->Date.fromTime,
     }
     switch Map.get(target, consumption.person.id) {
     | Some(consumptions) => consumptions->Array.push(userCons)
@@ -298,12 +298,12 @@ module Keg = {
       consumption,
     )
     let personsIndexRef = personsIndexDocument(firestore, placeId)
-    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
-    let personRecord = personsIndex.all->Js.Dict.unsafeGet(personId)->personsAllTupleToRecord(. _)
-    let personsIndexUpdateData = Object.empty()
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
+    let personRecord = personsIndex.all->Dict.getUnsafe(personId)->(personsAllTupleToRecord(_))
+    let personsIndexUpdateData = Object.make()
     personsIndexUpdateData->Object.set(
       `all.${personId}`,
-      personsAllRecordToTuple(. {
+      personsAllRecordToTuple({
         ...personRecord,
         recentActivityAt: Firebase.Timestamp.now(),
       }),
@@ -320,7 +320,7 @@ module Keg = {
   let deleteConsumption = (firestore, ~placeId, ~kegId, ~consumptionId) => {
     let kegRef = kegDoc(firestore, placeId, kegId)
     let updateData = ObjectUtils.setIn(
-      Object.empty(),
+      Object.make(),
       `consumptions.${consumptionId}`,
       Firebase.deleteField(),
     )
@@ -336,8 +336,8 @@ module Keg = {
     let nowTimestamp = Firebase.Timestamp.now()
     let kegUpdataObject = {"depletedAt": nowTimestamp}
     let personsUpdateObjects = Map.make()
-    let personsIndexUpdateObject = Object.empty()
-    let placeUpdateObject = Object.empty()
+    let personsIndexUpdateObject = Object.make()
+    let placeUpdateObject = Object.make()
     // untap keg if on tap
     let kegOnTap =
       place.taps
@@ -346,7 +346,7 @@ module Keg = {
         maybeKegRef
         ->Null.toOption
         ->Option.map(kegRef => kegRef.id === kegId)
-        ->Option.getWithDefault(false)
+        ->Option.getOr(false)
       )
     switch kegOnTap {
     | Some((tapName, _)) => placeUpdateObject->Object.set(`taps.${tapName}`, Null.null)
@@ -403,22 +403,22 @@ module Keg = {
       }
       personsIndexUpdateObject->Object.set(
         `all.${personId}`,
-        personsAllRecordToTuple(. newPersonsAllRecord),
+        personsAllRecordToTuple(newPersonsAllRecord),
       )
     })
     (kegUpdataObject, personsUpdateObjects, placeUpdateObject, personsIndexUpdateObject)
   }
   let finalize = async (firestore, placeId, kegId) => {
     let kegRef = kegDoc(firestore, placeId, kegId)->Firebase.withConterterDoc(kegConverter)
-    let keg = (await Firebase.getDocFromCache(kegRef)).data(. {})
+    let keg = (await Firebase.getDocFromCache(kegRef)).data({})
     let placeRef = placeDocument(firestore, placeId)
-    let place = (await Firebase.getDocFromCache(placeRef)).data(. {})
+    let place = (await Firebase.getDocFromCache(placeRef)).data({})
     let personsIndexRef = personsIndexDocument(firestore, placeId)
     let personsIndex = (
       await Firebase.getDocFromCache(
         personsIndexRef->Firebase.withConterterDoc(personsIndexConverter),
       )
-    ).data(. {})
+    ).data({})
     let (
       kegUpdataObject,
       personsUpdateObjects,
@@ -449,7 +449,7 @@ module Place = {
     let personsIndexDoc = personsIndexDocument(firestore, placeDoc.id)
     let defaultTapName = "Pípa"
     let now = Firebase.Timestamp.now()
-    let personTuple = personsAllRecordToTuple(. {
+    let personTuple = personsAllRecordToTuple({
       balance: 0,
       name: personName,
       preferredTap: Some(defaultTapName),
@@ -464,7 +464,7 @@ module Place = {
         currency: "CZK",
         name: placeName,
         taps: Dict.fromArray([(defaultTapName, Null.null)]),
-        users: Dict.fromArray([(userId, UserRoles.roleToJs(UserRoles.Owner))]),
+        users: Dict.fromArray([(userId, (UserRoles.Owner :> int))]),
       },
       {},
     )
@@ -492,35 +492,35 @@ module Place = {
   }
   let changePersonRole = async (firestore, ~placeId, ~personId, ~role) => {
     let personsIndexRef = personsIndexDocument(firestore, placeId)
-    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
     let personTuple = personsIndex.all->Js.Dict.get(personId)->Option.getExn
-    let personRecord = personsAllTupleToRecord(. personTuple)
+    let personRecord = personsAllTupleToRecord(personTuple)
     let personUserId = personRecord.userId->Null.toOption->Option.getExn
     let placeRef = placeDocument(firestore, placeId)
-    let updateObject = Object.empty()
-    updateObject->Object.set(`users.${personUserId}`, UserRoles.roleToJs(role))
+    let updateObject = Object.make()
+    updateObject->Object.set(`users.${personUserId}`, role)
     await Firebase.updateDoc(placeRef, updateObject)
   }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)
-    let updateObject = Object.empty()
+    let updateObject = Object.make()
     updateObject->Object.set(`taps.${tapName}`, Null.null)
     Firebase.updateDoc(placeRef, updateObject)
   }
   let tapDelete = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)
-    let updateObject = Object.empty()
+    let updateObject = Object.make()
     updateObject->Object.set(`taps.${tapName}`, Firebase.deleteField())
     Firebase.updateDoc(placeRef, updateObject)
   }
   let tapRename = async (firestore, ~placeId, ~currentName, ~newName) => {
     let personsIndexRef = personsIndexConverted(firestore, placeId)
-    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
     let placeRef = placeDocument(firestore, placeId)
-    let place = (await Firebase.getDocFromCache(placeRef)).data(. {})
-    let currentValue = place.taps->Js.Dict.unsafeGet(currentName)
-    let placeUpdateObject = Object.empty()
-    let personsIndexUpdateObject = Object.empty()
+    let place = (await Firebase.getDocFromCache(placeRef)).data({})
+    let currentValue = place.taps->Dict.getUnsafe(currentName)
+    let placeUpdateObject = Object.make()
+    let personsIndexUpdateObject = Object.make()
     let newTaps = place.taps->Dict.copy
     newTaps->Dict.delete(currentName)
     newTaps->Dict.set(newName, currentValue)
@@ -534,7 +534,7 @@ module Place = {
         if preferredTap === currentName {
           personsIndexUpdateObject->Object.set(
             `all.${personId}`,
-            personsAllRecordToTuple(. {
+            personsAllRecordToTuple({
               ...person,
               preferredTap: Some(newName),
             }),
@@ -549,14 +549,14 @@ module Place = {
   }
   let tapKegOff = (firestore, ~placeId, ~tapName) => {
     let placeRef = placeDocument(firestore, placeId)
-    let updateObject = Object.empty()
+    let updateObject = Object.make()
     updateObject->Object.set(`taps.${tapName}`, Null.null)
     Firebase.updateDoc(placeRef, updateObject)
   }
   let tapKegOn = (firestore, ~placeId, ~tapName, ~kegId) => {
     let placeRef = placeDocument(firestore, placeId)
     let kegRef = kegDoc(firestore, placeId, kegId)
-    let updateObject = Object.empty()
+    let updateObject = Object.make()
     updateObject->Object.set(`taps.${tapName}`, kegRef)
     Firebase.updateDoc(placeRef, updateObject)
   }
@@ -569,7 +569,7 @@ module Place = {
 module Person = {
   let add = async (firestore, ~placeId, ~personName) => {
     let placeSnapshot = await Firebase.getDocFromCache(placeDocument(firestore, placeId))
-    let place = placeSnapshot.data(. {})
+    let place = placeSnapshot.data({})
     let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
     let now = Firebase.Timestamp.now()
     let personDoc = Firebase.seedDoc(placePersonsCollection(firestore, placeId))
@@ -585,9 +585,9 @@ module Person = {
       userId: Null.null,
     }
     let updatePersonsIndexData = ObjectUtils.setIn(
-      Object.empty(),
+      Object.make(),
       `all.${personDoc.id}`,
-      personsAllRecordToTuple(. newPersonsAllRecord),
+      personsAllRecordToTuple(newPersonsAllRecord),
     )
     await Firebase.writeBatch(firestore)
     ->Firebase.WriteBatch.set(personDoc, newPerson, {})
@@ -602,27 +602,27 @@ module Person = {
     ~transaction: FirestoreModels.financialTransaction,
   ) => {
     let personsIndexRef = personsIndexDocument(firestore, placeId)
-    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
     let personsAllTuple = personsIndex.all->Js.Dict.get(personId)->Option.getExn
-    let personsAllRecord = personsAllTupleToRecord(. personsAllTuple)
+    let personsAllRecord = personsAllTupleToRecord(personsAllTuple)
     let newPersonsAllRecord = {
       ...personsAllRecord,
       balance: personsAllRecord.balance + transaction.amount,
     }
-    let updatePersonsIndexData = Object.empty()
+    let updatePersonsIndexData = Object.make()
     updatePersonsIndexData->Object.set(
       `all.${personId}`,
-      personsAllRecordToTuple(. newPersonsAllRecord),
+      personsAllRecordToTuple(newPersonsAllRecord),
     )
     let counterPartyTuple = personsIndex.all->Js.Dict.get(counterPartyId)->Option.getExn
-    let counterPartyRecord = personsAllTupleToRecord(. counterPartyTuple)
+    let counterPartyRecord = personsAllTupleToRecord(counterPartyTuple)
     let newCounterPartyRecord = {
       ...counterPartyRecord,
       balance: counterPartyRecord.balance - transaction.amount,
     }
     updatePersonsIndexData->Object.set(
       `all.${counterPartyId}`,
-      personsAllRecordToTuple(. newCounterPartyRecord),
+      personsAllRecordToTuple(newCounterPartyRecord),
     )
     let counterPartyTransaction: FirestoreModels.financialTransaction = {
       ...transaction,
@@ -649,10 +649,10 @@ module Person = {
   let delete = async (firestore, ~placeId, ~personId) => {
     let personRef = placePersonDocument(firestore, placeId, personId)
     let personsIndexRef = personsIndexDocument(firestore, placeId)
-    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data(. {})
+    let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
     let personTuple = personsIndex.all->Js.Dict.get(personId)->Option.getExn
-    let personRecord = personsAllTupleToRecord(. personTuple)
-    let updatePersonIndexData = Object.empty()
+    let personRecord = personsAllTupleToRecord(personTuple)
+    let updatePersonIndexData = Object.make()
     updatePersonIndexData->Object.set(`all.${personId}`, Firebase.deleteField())
     let writeBatch =
       Firebase.writeBatch(firestore)
@@ -661,7 +661,7 @@ module Person = {
     switch personRecord.userId->Null.toOption {
     | Some(userId) => {
         let placeRef = placeDocument(firestore, placeId)
-        let updatePlaceData = Object.empty()
+        let updatePlaceData = Object.make()
         updatePlaceData->Object.set(`users.${userId}`, Firebase.deleteField())
         writeBatch->Firebase.WriteBatch.update(placeRef, updatePlaceData)->ignore
       }
@@ -691,9 +691,9 @@ module PersonsIndex = {
   }
   let update = (firestore, ~placeId, ~personsChanges: array<(string, personsAllRecord)>) => {
     let personsIndexRef = personsIndexDocument(firestore, placeId)
-    let updateObject = Object.empty()
+    let updateObject = Object.make()
     personsChanges->Array.forEach(((personId, person)) => {
-      updateObject->Object.set(`all.${personId}`, personsAllRecordToTuple(. person))
+      updateObject->Object.set(`all.${personId}`, personsAllRecordToTuple(person))
     })
     Firebase.updateDoc(personsIndexRef, updateObject)
   }
@@ -725,10 +725,7 @@ module ShareLink = {
     let shareLinks = await getDocs(shareLinkQuery)
     switch shareLinks.docs {
     | [shareLinkSnapshot] => {
-        await updateDoc(
-          shareLinkSnapshot.ref,
-          {"createdAt": Timestamp.now(), "role": role->UserRoles.roleToJs},
-        )
+        await updateDoc(shareLinkSnapshot.ref, {"createdAt": Timestamp.now(), "role": role})
         shareLinkSnapshot.id
       }
     | _ =>
@@ -738,7 +735,7 @@ module ShareLink = {
           createdAt: Timestamp.now(),
           person: personId,
           place: placeId,
-          role: role->UserRoles.roleToJs,
+          role: (role :> int),
         },
       )
       newDoc.id
@@ -749,18 +746,18 @@ module ShareLink = {
   let acceptInvitation = (firestore, ~linkId, ~userId) => {
     let shareLinkDocument = document(firestore, linkId)
     open Firebase
-    runTransaction(.firestore, async transaction => {
+    runTransaction(firestore, async transaction => {
       let shareLinkSnapshot = await transaction->Transaction.get(shareLinkDocument)
-      if !shareLinkSnapshot.exists(.) {
+      if !shareLinkSnapshot.exists() {
         Exn.raiseError("Share link does not exist")
       }
-      let {place, person, role} = shareLinkSnapshot.data(. {})
+      let {place, person, role} = shareLinkSnapshot.data({})
       let placeIndexDocument = personsIndexConverted(firestore, place)
-      let placeIndex = (await transaction->Transaction.get(placeIndexDocument)).data(. {})
+      let placeIndex = (await transaction->Transaction.get(placeIndexDocument)).data({})
       let userAlreadyInPlace =
         placeIndex.all
         ->Dict.valuesToArray
-        ->Array.some(p => p.userId->Null.mapWithDefault(false, id => id === userId))
+        ->Array.some(p => p.userId->Null.mapOr(false, id => id === userId))
       if userAlreadyInPlace {
         Exn.raiseError("User already in place")
       }
@@ -773,13 +770,10 @@ module ShareLink = {
         ...personRecord,
         userId: Null.make(userId),
       }
-      let personsIndexUpdateData = Object.empty()
-      personsIndexUpdateData->Object.set(
-        `all.${person}`,
-        personsAllRecordToTuple(. newPersonRecord),
-      )
+      let personsIndexUpdateData = Object.make()
+      personsIndexUpdateData->Object.set(`all.${person}`, personsAllRecordToTuple(newPersonRecord))
       // update place - add userId to users dict
-      let placeUpdateData = Object.empty()
+      let placeUpdateData = Object.make()
       placeUpdateData->Object.set(`users.${userId}`, role)
 
       transaction->Transaction.update(placeDocument(firestore, place), placeUpdateData)

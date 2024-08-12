@@ -1,6 +1,25 @@
 type submitValues = {amount: int, note: string, person: string}
 
-module FormFields = %lenses(type state = {amount: string, note: string, person: string})
+module FormFields = {
+  type state = {amount: string, note: string, person: string}
+  type rec field<_> = Amount: field<string> | Note: field<string> | Person: field<string>
+  let get:
+    type value. (state, field<value>) => value =
+    (state, field) =>
+      switch field {
+      | Amount => state.amount
+      | Note => state.note
+      | Person => state.person
+      }
+  let set:
+    type value. (state, field<value>, value) => state =
+    (state, field, value) =>
+      switch field {
+      | Amount => {...state, amount: value}
+      | Note => {...state, note: value}
+      | Person => {...state, person: value}
+      }
+}
 
 module Form = ReForm.Make(FormFields)
 module Validators = Validators.CustomValidators(FormFields)

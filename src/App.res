@@ -13,22 +13,19 @@ let make = () => {
     | list{"misto", ..._} =>
       <FirebaseAuthProvider>
         <SignInWrapper>
-          
-            {switch List.tail(url.path) {
-            | Some(list{}) => <MyPlaces />
-            | Some(list{placeId}) => <Place placeId />
-            | Some(list{placeId, "nastaveni"}) => <PlaceSetting placeId />
-            | Some(list{placeId, "nastaveni", "osob"}) => <PlacePersonsSetting placeId />
-            | _ => <PageNotFound />
-            }}
+          {switch List.tail(url.path) {
+          | Some(list{}) => <MyPlaces />
+          | Some(list{placeId}) => <Place placeId />
+          | Some(list{placeId, "nastaveni"}) => <PlaceSetting placeId />
+          | Some(list{placeId, "nastaveni", "osob"}) => <PlacePersonsSetting placeId />
+          | _ => <PageNotFound />
+          }}
         </SignInWrapper>
       </FirebaseAuthProvider>
     | list{"s", linkId} =>
       <FirebaseAuthProvider>
         <SignInWrapper>
-          
-            <ShareLinkResolver linkId />
-
+          <ShareLinkResolver linkId />
         </SignInWrapper>
       </FirebaseAuthProvider>
     | _ => <PageNotFound />

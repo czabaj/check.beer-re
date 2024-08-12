@@ -79,7 +79,7 @@ let make = (~placeId) => {
       currentUser,
     )) =>
     let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
-    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole)
+    let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     if !isUserAuthorized(UserRoles.Admin) {
       Exn.raiseError(`Insufficient permissions to view this page`)
     }
@@ -126,9 +126,9 @@ let make = (~placeId) => {
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
-                      ->Option.flatMap(UserRoles.roleFromJs)
+                      ->Option.flatMap(UserRoles.roleFromInt)
                       ->Option.map(UserRoles.roleI18n)
-                      ->Option.mapWithDefault(React.null, React.string)}
+                      ->Option.mapOr(React.null, React.string)}
                     </td>
                     <td>
                       <FormattedRelativeTime
@@ -170,7 +170,7 @@ let make = (~placeId) => {
               }
             }
             let unfinishedConsumptions =
-              unfinishedConsumptionsByUser->Map.get(personId)->Option.getWithDefault([])
+              unfinishedConsumptionsByUser->Map.get(personId)->Option.getOr([])
             <PersonDetail
               hasNext
               hasPrevious
@@ -190,7 +190,7 @@ let make = (~placeId) => {
               onPreviousPerson={_ => handleCycle(false)}
               pendingTransactions={pendingTransactionsByUser
               ->Map.get(personId)
-              ->Option.getWithDefault([])}
+              ->Option.getOr([])}
               person
               personId
               personsAll

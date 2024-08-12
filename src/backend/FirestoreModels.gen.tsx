@@ -1,18 +1,16 @@
 /* TypeScript file generated from FirestoreModels.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 
 import type {documentReference as Firebase_documentReference} from './Firebase.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type personName = string;
 
-// tslint:disable-next-line:interface-over-type-literal
 export type tapName = string;
 
-// tslint:disable-next-line:interface-over-type-literal
 export type financialTransaction = {
   readonly amount: number; 
   readonly createdAt: Firebase_Timestamp_t; 
@@ -21,10 +19,8 @@ export type financialTransaction = {
   readonly person: (null | string)
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type consumption = { readonly milliliters: number; readonly person: Firebase_documentReference<person> };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type keg = {
   readonly beer: string; 
   readonly consumptions: {[id: string]: consumption}; 
@@ -37,10 +33,8 @@ export type keg = {
   readonly serial: number
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type person = { readonly createdAt: Firebase_Timestamp_t; readonly transactions: financialTransaction[] };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type place = {
   readonly createdAt: Firebase_Timestamp_t; 
   readonly currency: string; 
@@ -49,13 +43,10 @@ export type place = {
   readonly users: {[id: string]: number}
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type personsAllItem = [personName, Firebase_Timestamp_t, number, (null | string), (undefined | tapName)];
 
-// tslint:disable-next-line:interface-over-type-literal
 export type personsIndex = { readonly all: {[id: string]: personsAllItem} };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type shareLink = {
   readonly createdAt: Firebase_Timestamp_t; 
   readonly person: string; 

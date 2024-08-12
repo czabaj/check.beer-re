@@ -1,10 +1,20 @@
-@genType.import("./UserRoles") @genType.as("UserRole") @deriving(jsConverter)
 type role =
   | @as(10) Viewer
   | @as(20) SelfService
   | @as(50) Staff
   | @as(80) Admin
   | @as(100) Owner
+@module("./UserRoles.ts") external userRole: role = "UserRole"
+
+let roleFromInt = (role: int) =>
+  switch role {
+  | 10 => Some(Viewer)
+  | 20 => Some(SelfService)
+  | 50 => Some(Staff)
+  | 80 => Some(Admin)
+  | 100 => Some(Owner)
+  | _ => None
+  }
 
 let roleI18n = (role: role) =>
   switch role {
@@ -28,5 +38,5 @@ let roleDescription = (role: role) => {
 }
 
 let isAuthorized = (userRole: int, requiredRole: role) => {
-  userRole >= requiredRole->roleToJs
+  userRole >= (requiredRole :> int)
 }

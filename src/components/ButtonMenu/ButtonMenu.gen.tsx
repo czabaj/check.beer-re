@@ -1,19 +1,16 @@
 /* TypeScript file generated from ButtonMenu.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as ButtonMenuBS__Es6Import from './ButtonMenu.bs';
-const ButtonMenuBS: any = ButtonMenuBS__Es6Import;
+import * as ButtonMenuJS from './ButtonMenu.bs.js';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type menuItem = {
   readonly disabled?: boolean; 
   readonly label: string; 
   readonly onClick: (_1:MouseEvent) => void
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<children,className,menuItems,title> = {
   readonly children: children; 
   readonly className?: className; 
@@ -26,4 +23,4 @@ export const make: React.ComponentType<{
   readonly className?: string; 
   readonly menuItems: menuItem[]; 
   readonly title?: string
-}> = ButtonMenuBS.make;
+}> = ButtonMenuJS.make as any;

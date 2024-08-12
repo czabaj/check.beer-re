@@ -1,14 +1,9 @@
 /* TypeScript file generated from Db.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as Curry__Es6Import from 'rescript/lib/es6/curry.js';
-const Curry: any = Curry__Es6Import;
-
-// @ts-ignore: Implicit any on import
-import * as DbBS__Es6Import from './Db.bs';
-const DbBS: any = DbBS__Es6Import;
+import * as DbJS from './Db.bs.js';
 
 import type {Dict_key as Js_Dict_key} from './Js.gen';
 
@@ -28,7 +23,6 @@ import type {place as FirestoreModels_place} from './FirestoreModels.gen';
 
 import type {t as Map_t} from './Map.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type personsAllRecord = {
   readonly balance: number; 
   readonly name: string; 
@@ -37,10 +31,8 @@ export type personsAllRecord = {
   readonly userId: (null | string)
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type personsIndexConverted = { readonly all: {[id: string]: personsAllRecord} };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type kegConverted = {
   readonly beer: string; 
   readonly consumptions: {[id: string]: FirestoreModels_consumption}; 
@@ -55,7 +47,6 @@ export type kegConverted = {
   readonly serialFormatted: string
 };
 
-// tslint:disable-next-line:interface-over-type-literal
 export type userConsumption = {
   readonly consumptionId: string; 
   readonly kegId: string; 
@@ -64,16 +55,12 @@ export type userConsumption = {
   readonly createdAt: Date
 };
 
-export const placeCollection: (firestore:Firebase_firestore) => Firebase_collectionReference<FirestoreModels_place> = DbBS.placeCollection;
+export const placeCollection: (firestore:Firebase_firestore) => Firebase_collectionReference<FirestoreModels_place> = DbJS.placeCollection as any;
 
-export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Firebase_documentReference<FirestoreModels_place> = function (Arg1: any, Arg2: any) {
-  const result = Curry._2(DbBS.placeDocument, Arg1, Arg2);
-  return result
-};
+export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Firebase_documentReference<FirestoreModels_place> = DbJS.placeDocument as any;
 
-export const personsAllRecordToTuple: (_1:personsAllRecord) => FirestoreModels_personsAllItem = DbBS.personsAllRecordToTuple;
+export const personsAllRecordToTuple: (param:personsAllRecord) => FirestoreModels_personsAllItem = DbJS.personsAllRecordToTuple as any;
 
-export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] = function (Arg1: any, Arg2: any, Arg3: any) {
-  const result = Curry._3(DbBS.Keg.finalizeGetUpdateObjects, Arg1, Arg2, Arg3);
-  return result
-};
+export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] = DbJS.Keg.finalizeGetUpdateObjects as any;
+
+export const Keg: { finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] } = DbJS.Keg as any;

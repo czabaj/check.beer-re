@@ -12,7 +12,7 @@ type currencyInfo = {
 }
 
 let getMinorUnit = currency => {
-  minorUnits->Dict.get(currency)->Option.getWithDefault(100.0)
+  minorUnits->Dict.get(currency)->Option.getOr(100.0)
 }
 
 let useCurrency = () => {
@@ -34,7 +34,7 @@ module Provider = {
   let make = context->React.Context.provider
 }
 
-let formatAccounting = (value, ~formattedNumber: string) => {
+let formatAccounting = value => (~formattedNumber: string) => {
   let negative = value < 0
   React.cloneElement(
     <span />,

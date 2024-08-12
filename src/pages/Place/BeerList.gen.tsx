@@ -1,10 +1,9 @@
 /* TypeScript file generated from BeerList.res by genType. */
-/* eslint-disable import/first */
 
+/* eslint-disable */
+/* tslint:disable */
 
-// @ts-ignore: Implicit any on import
-import * as BeerListBS__Es6Import from './BeerList.bs';
-const BeerListBS: any = BeerListBS__Es6Import;
+import * as BeerListJS from './BeerList.bs.js';
 
 import type {Map_String_key as Belt_Map_String_key} from './Belt.gen';
 
@@ -18,7 +17,6 @@ import type {t as Map_t} from './Map.gen';
 
 import type {userConsumption as Db_userConsumption} from '../../../src/backend/Db.gen';
 
-// tslint:disable-next-line:interface-over-type-literal
 export type props<activePersonsChanges,activePersonEntries,currentUserUid,isUserAuthorized,onAddConsumption,onAddPerson,recentConsumptionsByUser,setActivePersonsChanges> = {
   readonly activePersonsChanges: activePersonsChanges; 
   readonly activePersonEntries: activePersonEntries; 
@@ -39,4 +37,4 @@ export const make: React.ComponentType<{
   readonly onAddPerson: () => void; 
   readonly recentConsumptionsByUser: Map_t<Belt_Map_String_key,Db_userConsumption[]>; 
   readonly setActivePersonsChanges: (_1:((_1:any) => (undefined | Belt_Map_String_t<boolean>))) => void
-}> = BeerListBS.make;
+}> = BeerListJS.make as any;

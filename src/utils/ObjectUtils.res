@@ -14,7 +14,7 @@ let setIn = (obj: {..}, key: string, value: 'a): {..} => {
   result
 }
 
-let setInD = (dict: Js.Dict.t<'a>, key: string, value: 'a): Js.Dict.t<'a> => {
+let setInD = (dict: Dict.t<'a>, key: string, value: 'a): Dict.t<'a> => {
   let result = dict->Dict.copy
   result->Dict.set(key, value)
   result

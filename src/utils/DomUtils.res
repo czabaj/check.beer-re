@@ -37,7 +37,7 @@ let mediaRx = query => {
   open Rxjs
   open! Webapi.Dom
   let mediaQuery = window->Window.matchMedia(query)
-  fromEvent(. mediaQuery, "change")->pipe2(startWith(mediaQuery), map((list, _) => list->matches))
+  fromEvent(mediaQuery, "change")->pipe2(startWith(mediaQuery), map((list, _) => list->matches))
 }
 
 let standaloneModeRx = mediaRx("(display-mode: standalone)")
