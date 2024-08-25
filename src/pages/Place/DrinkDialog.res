@@ -125,17 +125,6 @@ let make = (
                   }
                   <fieldset className={classes.consumptions}>
                     <label>
-                      <img alt="" src=Assets.beerGlassLarge />
-                      <input
-                        checked={field.value === 500}
-                        name="consumption"
-                        onChange=handleChange
-                        type_="radio"
-                        value="500"
-                      />
-                      <span> {React.string("Velké")} </span>
-                    </label>
-                    <label>
                       <img alt="" src=Assets.beerGlassSmall />
                       <input
                         checked={field.value === 300}
@@ -145,6 +134,17 @@ let make = (
                         value="300"
                       />
                       <span> {React.string("Malé")} </span>
+                    </label>
+                    <label>
+                      <img alt="" src=Assets.beerGlassLarge />
+                      <input
+                        checked={field.value === 500}
+                        name="consumption"
+                        onChange=handleChange
+                        type_="radio"
+                        value="500"
+                      />
+                      <span> {React.string("Velké")} </span>
                     </label>
                   </fieldset>
                 }}
