@@ -98,22 +98,23 @@ let make = (~placeId) => {
             </button>}
             headerId="persons_accounts"
             headerSlot={React.string("Účetnictví")}>
-            <table
+            <div
               ariaLabelledby="persons_accounts"
-              className={`${Styles.table.stretch} ${classes.table}`}>
-              <thead>
-                <tr>
-                  <th scope="col"> {React.string("Návštěvník")} </th>
-                  <th scope="col"> {React.string("Role")} </th>
-                  <th scope="col"> {React.string("Poslední aktivita")} </th>
-                  <th scope="col"> {React.string("Bilance")} </th>
-                </tr>
-              </thead>
-              <tbody>
+              className={`${Styles.table.stretch} ${classes.table}`}
+              role="table">
+              <div role="rowgroup">
+                <div role="row">
+                  <div role="columnheader"> {React.string("Návštěvník")} </div>
+                  <div role="columnheader"> {React.string("Role")} </div>
+                  <div role="columnheader"> {React.string("Poslední aktivita")} </div>
+                  <div role="columnheader"> {React.string("Bilance")} </div>
+                </div>
+              </div>
+              <div role="rowgroup">
                 {personsAll
                 ->Array.map(((personId, person)) => {
-                  <tr key=personId>
-                    <th scope="row">
+                  <div key=personId role="row">
+                    <div role="rowheader">
                       {React.string(person.name)}
                       <button
                         className={Styles.utility.breakout}
@@ -121,30 +122,30 @@ let make = (~placeId) => {
                         title="Detail konzumace"
                         type_="button"
                       />
-                    </th>
-                    <td>
+                    </div>
+                    <div role="cell">
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
                       ->Option.flatMap(UserRoles.roleFromInt)
                       ->Option.map(UserRoles.roleI18n)
                       ->Option.mapOr(React.null, React.string)}
-                    </td>
-                    <td>
+                    </div>
+                    <div role="cell">
                       <FormattedRelativeTime
                         dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
                       />
-                    </td>
-                    <td>
+                    </div>
+                    <div role="cell">
                       <FormattedCurrency
                         format={FormattedCurrency.formatAccounting} value=person.balance
                       />
-                    </td>
-                  </tr>
+                    </div>
+                  </div>
                 })
                 ->React.array}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </SectionWithHeader>
         </main>
         {switch dialogState {

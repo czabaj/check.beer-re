@@ -62,3 +62,21 @@ textarea {
 body:has(dialog[open]) {
   overflow: hidden;
 }
+
+:where([role="table"]) {
+  display: grid;
+  column-gap: 0.5rem;
+}
+
+:where([role="rowgroup"], [role="row"]) {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: subgrid !important;
+}
+
+:where([role="columnheader"], [role="rowheader"]) {
+  color: var(--text-2);
+  font-weight: var(--font-weight-semibold);
+}
+
+
