@@ -1,8 +1,12 @@
 .table {
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
 }
-.table [role="row"] {
+.table tr {
   position: relative;
+  /* FIX: Safari does not support positioning of <tr> 
+     @see https://github.com/w3c/csswg-drafts/issues/1899
+  */
+  clip-path: inset(0);
 }
 .table :where(td, th) {
   text-align: left;
