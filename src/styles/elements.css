@@ -5,7 +5,6 @@
 }
 
 html {
-  accent-color: var(--text-brand-2);
   background-color: var(--surface-1);
   background-image: url("../assets/noise.svg");
   color: var(--text-1);
