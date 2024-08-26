@@ -1,13 +1,12 @@
 .table {
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
-  grid-template-columns: 1fr 1fr 2fr 1fr;
 }
 .table [role="row"] {
   position: relative;
 }
-.table :where([role="rowheader"], [role="columnheader"], [role="cell"]) {
+.table :where(td, th) {
   text-align: left;
 }
-.table :where([role="rowheader"], [role="columnheader"], [role="cell"]):last-child {
+.table :where(td, th):last-child {
   text-align: right;
 }

@@ -31,7 +31,9 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
           ->Array.map(keg => {
             let kegId = Db.getUid(keg)
             let volume = keg.milliliters
-            <tr key={kegId}>
+            /* FIX: Safari does not support relative positioning of <tr>, div[role=row] is a workaround
+             @see https://github.com/w3c/csswg-drafts/issues/1899 */
+            <div key={kegId} role="row">
               <th scope="row">
                 {React.string(keg.serialFormatted)}
                 <button
@@ -54,7 +56,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
               <td>
                 <MeterKeg ariaLabelledby="remaining_th" keg />
               </td>
-            </tr>
+            </div>
           })
           ->React.array}
         </tbody>

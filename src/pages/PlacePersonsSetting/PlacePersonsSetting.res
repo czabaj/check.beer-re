@@ -98,23 +98,24 @@ let make = (~placeId) => {
             </button>}
             headerId="persons_accounts"
             headerSlot={React.string("Účetnictví")}>
-            <div
+            <table
               ariaLabelledby="persons_accounts"
-              className={`${Styles.table.stretch} ${classes.table}`}
-              role="table">
-              <div role="rowgroup">
-                <div role="row">
-                  <div role="columnheader"> {React.string("Návštěvník")} </div>
-                  <div role="columnheader"> {React.string("Role")} </div>
-                  <div role="columnheader"> {React.string("Poslední aktivita")} </div>
-                  <div role="columnheader"> {React.string("Bilance")} </div>
-                </div>
-              </div>
-              <div role="rowgroup">
+              className={`${Styles.table.stretch} ${classes.table}`}>
+              <thead>
+                <tr>
+                  <th scope="col"> {React.string("Návštěvník")} </th>
+                  <th scope="col"> {React.string("Role")} </th>
+                  <th scope="col"> {React.string("Poslední aktivita")} </th>
+                  <th scope="col"> {React.string("Bilance")} </th>
+                </tr>
+              </thead>
+              <tbody>
                 {personsAll
                 ->Array.map(((personId, person)) => {
+                  /* FIX: Safari does not support relative positioning of <tr>, div[role=row] is a workaround
+                   @see https://github.com/w3c/csswg-drafts/issues/1899 */
                   <div key=personId role="row">
-                    <div role="rowheader">
+                    <th scope="row">
                       {React.string(person.name)}
                       <button
                         className={Styles.utility.breakout}
@@ -122,30 +123,30 @@ let make = (~placeId) => {
                         title="Detail konzumace"
                         type_="button"
                       />
-                    </div>
-                    <div role="cell">
+                    </th>
+                    <td>
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
                       ->Option.flatMap(UserRoles.roleFromInt)
                       ->Option.map(UserRoles.roleI18n)
                       ->Option.mapOr(React.null, React.string)}
-                    </div>
-                    <div role="cell">
+                    </td>
+                    <td>
                       <FormattedRelativeTime
                         dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
                       />
-                    </div>
-                    <div role="cell">
+                    </td>
+                    <td>
                       <FormattedCurrency
                         format={FormattedCurrency.formatAccounting} value=person.balance
                       />
-                    </div>
+                    </td>
                   </div>
                 })
                 ->React.array}
-              </div>
-            </div>
+              </tbody>
+            </table>
           </SectionWithHeader>
         </main>
         {switch dialogState {

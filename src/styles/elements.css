@@ -64,19 +64,22 @@ body:has(dialog[open]) {
 }
 
 :where([role="table"]) {
-  display: grid;
-  column-gap: 0.5rem;
+  display: table;
 }
 
-:where([role="rowgroup"], [role="row"]) {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: subgrid !important;
+:where([role="rowgroup"]) {
+  display: table-row-group;
+}
+
+:where([role="row"]) {
+  display: table-row;
+}
+
+:where([role="cell"], [role="columnheader"], [role="rowheader"]) {
+  display: table-cell;
 }
 
 :where([role="columnheader"], [role="rowheader"]) {
   color: var(--text-2);
   font-weight: var(--font-weight-semibold);
 }
-
-
