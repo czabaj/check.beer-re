@@ -19,8 +19,12 @@ html {
   }
 }
 
+html,
 body {
+  display: flow-root;
   margin: 0;
+  min-block-size: 100vh;
+  min-block-size: 100svh;
   min-inline-size: 100%;
 }
 
