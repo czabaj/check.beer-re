@@ -18,8 +18,12 @@ html {
   }
 }
 
+html,
 body {
+  display: flow-root;
   margin: 0;
+  min-block-size: 100vh;
+  min-block-size: 100svh;
   min-inline-size: 100%;
 }
 
@@ -61,4 +65,25 @@ textarea {
 html:has(dialog[open]) {
   overflow: hidden;
   scrollbar-gutter: stable
+}
+
+:where([role="table"]) {
+  display: table;
+}
+
+:where([role="rowgroup"]) {
+  display: table-row-group;
+}
+
+:where([role="row"]) {
+  display: table-row;
+}
+
+:where([role="cell"], [role="columnheader"], [role="rowheader"]) {
+  display: table-cell;
+}
+
+:where([role="columnheader"], [role="rowheader"]) {
+  color: var(--text-2);
+  font-weight: var(--font-weight-semibold);
 }

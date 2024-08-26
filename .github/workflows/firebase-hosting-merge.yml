@@ -22,10 +22,13 @@ jobs:
       VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
     steps:
       - uses: actions/checkout@v4
+      - name: Init
+        run: |
+          echo "VITE_GIT_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
       - run: yarn install --frozen-lockfile && yarn build && yarn install --cwd functions --frozen-lockfile
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BEERBOOK2_PRODUCTION }}
           channelId: live
-          projectId:  ${{ vars.FIREBASE_PROJECT_ID }}
+          projectId: ${{ vars.FIREBASE_PROJECT_ID }}

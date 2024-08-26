@@ -1,4 +1,10 @@
+type classesType = {footer: string}
+
+@module("./MyPlaces.module.css") external classes: classesType = "default"
+
 type dialogState = Hidden | AddPlace | EditUser
+
+let gitShortSha: string = %raw(`import.meta.env.VITE_GIT_SHORT_SHA`)
 
 module Pure = {
   @genType @react.component
@@ -97,9 +103,8 @@ let make = () => {
   )
   let (dialogState, setDialogState) = React.useState(() => Hidden)
   let hideDialog = _ => setDialogState(_ => Hidden)
-
-  {
-    switch pageDataStatus.data {
+  <>
+    {switch pageDataStatus.data {
     | Some((currentUser, usersPlaces)) =>
       let userDisplayName = currentUser.displayName->Null.getExn
       <>
@@ -159,6 +164,7 @@ let make = () => {
         }}
       </>
     | _ => React.null
-    }
-  }
+    }}
+    <footer className=classes.footer> {React.string("v.\xA0" ++ gitShortSha)} </footer>
+  </>
 }

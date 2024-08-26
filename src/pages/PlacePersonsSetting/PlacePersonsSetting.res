@@ -112,7 +112,9 @@ let make = (~placeId) => {
               <tbody>
                 {personsAll
                 ->Array.map(((personId, person)) => {
-                  <tr key=personId>
+                  /* FIX: Safari does not support relative positioning of <tr>, div[role=row] is a workaround
+                   @see https://github.com/w3c/csswg-drafts/issues/1899 */
+                  <div key=personId role="row">
                     <th scope="row">
                       {React.string(person.name)}
                       <button
@@ -140,7 +142,7 @@ let make = (~placeId) => {
                         format={FormattedCurrency.formatAccounting} value=person.balance
                       />
                     </td>
-                  </tr>
+                  </div>
                 })
                 ->React.array}
               </tbody>
