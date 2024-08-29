@@ -31,16 +31,10 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
           ->Array.map(keg => {
             let kegId = Db.getUid(keg)
             let volume = keg.milliliters
-            <tr key={kegId}>
-              <th scope="row">
-                {React.string(keg.serialFormatted)}
-                <button
-                  className={Styles.utility.breakout}
-                  onClick={_ => onKegDetail(kegId)}
-                  title="Karta sudu"
-                  type_="button"
-                />
-              </th>
+            /* TODO: tr.onClick is not accessible, but breakout buttons not work since <tr> cannot have relative
+             positioning in Safari @see https://github.com/w3c/csswg-drafts/issues/1899 */
+            <tr key={kegId} onClick={_ => onKegDetail(kegId)}>
+              <th scope="row"> {React.string(keg.serialFormatted)} </th>
               <td> {React.string(keg.beer)} </td>
               <td>
                 <FormattedVolume milliliters=volume />

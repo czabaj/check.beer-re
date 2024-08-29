@@ -26,9 +26,6 @@
   text-align: right;
   padding-inline: 0.5rem;
 }
-.inDialog :where(td, th):where(:nth-child(1)) {
-  text-align: left;
-}
 .inDialog tbody > tr:nth-child(odd) {
   background-color: var(--surface-1);
 }

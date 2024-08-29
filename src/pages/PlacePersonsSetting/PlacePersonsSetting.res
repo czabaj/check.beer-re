@@ -112,16 +112,10 @@ let make = (~placeId) => {
               <tbody>
                 {personsAll
                 ->Array.map(((personId, person)) => {
-                  <tr key=personId>
-                    <th scope="row">
-                      {React.string(person.name)}
-                      <button
-                        className={Styles.utility.breakout}
-                        onClick={_ => setDialog(_ => PersonDetail({personId, person}))}
-                        title="Detail konzumace"
-                        type_="button"
-                      />
-                    </th>
+                  /* TODO: tr.onClick is not accessible, but breakout buttons not work since <tr> cannot have relative
+                   positioning in Safari @see https://github.com/w3c/csswg-drafts/issues/1899 */
+                  <tr key=personId onClick={_ => setDialog(_ => PersonDetail({personId, person}))}>
+                    <th scope="row"> {React.string(person.name)} </th>
                     <td>
                       {person.userId
                       ->Null.toOption

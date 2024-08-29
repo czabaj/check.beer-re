@@ -3,9 +3,7 @@
   border-collapse: collapse;
   border-spacing: 0;
 }
-.root table :where(td, th) {
-  text-align: left;
-}
+
 .root table :where(td, th):last-child {
   inline-size: 4ch;
 }

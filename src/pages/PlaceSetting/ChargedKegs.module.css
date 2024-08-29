@@ -10,11 +10,6 @@
   display: contents;
 }
 .table tr {
-  position: relative;
-  /* FIX: Safari does not support positioning of <tr> 
-     @see https://github.com/w3c/csswg-drafts/issues/1899
-  */
-  clip-path: inset(0);
   display: grid;
   grid-template-areas: "serial beer volume created price remains";
   grid-template-columns: 5ch 22ch 7ch 12ch 12ch 1fr;
@@ -25,11 +20,9 @@
 }
 .table :where(th, td):nth-child(1) {
   grid-area: serial;
-  text-align: left;
 }
 .table :where(th, td):nth-child(2) {
   grid-area: beer;
-  text-align: left;
 }
 .table :where(th, td):nth-child(3) {
   grid-area: volume;
@@ -65,9 +58,6 @@
       "serial beer    beer  beer    volume"
       "serial created price remains remains";
     grid-template-columns: 5ch 12ch 12ch 1fr 7ch;
-  }
-  .table :is(th, td) {
-    text-align: left;
   }
   .table :is(th, td):is(:nth-child(3), :nth-child(6)) {
     text-align: right;
