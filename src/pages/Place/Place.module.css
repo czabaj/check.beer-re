@@ -7,18 +7,6 @@
   align-self: center;
 }
 
-.list li > div:first-child {
-  margin-inline-end: auto;
-}
-.list li[aria-current="true"] > div:first-child {
-  font-weight: var(--font-weight-semibold);
-}
-
-.inactiveUsers ol > li time {
-  font-size: var(--font-size-16);
-  white-space: nowrap;
-}
-
 li:first-child .detailButton {
   border-start-end-radius: var(--radius-2);
 }

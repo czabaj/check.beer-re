@@ -4,3 +4,49 @@
   margin-inline-start: auto;
   max-width: 100%;
 }
+
+.emptyMessage {
+  text-align: right;
+}
+
+.labelShowAll > input {
+  appearance: none;
+  position: absolute;
+}
+
+.labelShowAll[data-checked="false"] > span {
+  opacity: 0.5;
+}
+.labelShowAll:hover > span {
+  opacity: 1;
+}
+.labelShowAll[data-checked="true"] {
+  background-color: var(--surface-warning);
+}
+
+.list li > div:first-child {
+  margin-inline-end: auto;
+}
+.list li[aria-current="true"] > div:first-child {
+  font-weight: var(--font-weight-semibold);
+}
+
+.list li > label {
+  display: grid;
+  padding-inline: 0.3rem;
+  place-content: center;
+  z-index: 1;
+}
+.list li > label img {
+  opacity: 0.5;
+}
+.list li > label input:checked + img {
+  opacity: 1;
+}
+.list li > label > input {
+  appearance: none;
+  position: absolute;
+}
+.list[data-show-all="false"] li > label {
+  display: none;
+}

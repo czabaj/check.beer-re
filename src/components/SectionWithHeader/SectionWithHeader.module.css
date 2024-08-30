@@ -6,8 +6,11 @@
   align-items: center;
   display: flex;
   gap: 1rem;
-  justify-content: space-between;
   padding-block: 0.75rem;
+}
+
+.root > header > :first-child {
+  margin-inline-end: auto
 }
 
 .root > div {

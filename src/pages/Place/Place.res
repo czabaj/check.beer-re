@@ -1,8 +1,4 @@
-type classesType = {
-  inactiveUsers: string,
-  list: string,
-  root: string,
-}
+type classesType = {root: string}
 
 @module("./Place.module.css") external classes: classesType = "default"
 
@@ -92,14 +88,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       ->Map.fromArray
     }),
   )
-  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)->op(
-    map((personsAllEntries: array<(string, Db.personsAllRecord)>, _) => {
-      let (active, inactive) =
-        personsAllEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
-      let all = Map.fromArray(personsAllEntries)
-      (all, active, inactive)
-    }),
-  )
+  let personsAllRx = Db.PersonsIndex.allEntriesSortedRx(firestore, ~placeId)
   let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
   combineLatest6(
     placeRx,
@@ -121,14 +110,11 @@ let make = (~placeId) => {
   )
   let (dialogState, setDialog) = React.useState(() => Hidden)
   let hideDialog = _ => setDialog(_ => Hidden)
-  let (activePersonsChanges, setActivePersonsChanges) = React.useState((): option<
-    Belt.Map.String.t<bool>,
-  > => None)
   switch pageDataStatus.data {
   | Some(None, _, _, _, _, _) => React.string("Place not found")
   | Some(
       Some(place),
-      (allActivePersonsMap, activePersonEntries, inactivePersonEntries),
+      personEntries,
       tapsWithKegs,
       unfinishedConsumptionsByUser,
       recentConsumptionsByUser,
@@ -152,81 +138,23 @@ let make = (~placeId) => {
         />
         <main>
           <BeerList
-            activePersonsChanges
-            activePersonEntries
             currentUserUid={currentUser.uid}
             isUserAuthorized
             onAddPerson={() => setDialog(_ => AddPerson)}
             onAddConsumption={((personId, person)) =>
               setDialog(_ => AddConsumption({personId, person}))}
+            onTogglePersonVisibility={((personId, person): (string, Db.personsAllRecord)) => {
+              let preferredTap =
+                person.preferredTap->Option.isSome ? None : place.taps->Js.Dict.keys->Array.get(0)
+              Db.PersonsIndex.update(
+                firestore,
+                ~placeId,
+                ~personsChanges=[(personId, {...person, preferredTap})],
+              )->ignore
+            }}
+            personEntries
             recentConsumptionsByUser
-            setActivePersonsChanges
           />
-          {switch activePersonsChanges {
-          | None =>
-            isUserAuthorized(UserRoles.SelfService)
-              ? <button
-                  className={Styles.button.base}
-                  onClick={_ => setActivePersonsChanges(_ => Some(Belt.Map.String.empty))}
-                  type_="button">
-                  {React.string("Nepřítomní")}
-                </button>
-              : React.null
-          | Some(changes) =>
-            <>
-              <button
-                className={Styles.button.variantPrimary}
-                onClick={_ => {
-                  if changes->Belt.Map.String.size > 0 {
-                    let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
-                    let personsChanges =
-                      changes
-                      ->Belt.Map.String.mapWithKey((personId, newActive) => {
-                        let person = allActivePersonsMap->Map.get(personId)->Option.getExn
-                        let newPerson = {
-                          ...person,
-                          preferredTap: newActive ? Some(firstTap) : None,
-                        }
-                        newPerson
-                      })
-                      ->Belt.Map.String.toArray
-                    Db.PersonsIndex.update(firestore, ~placeId, ~personsChanges)->ignore
-                  }
-                  setActivePersonsChanges(_ => None)
-                }}
-                type_="button">
-                {React.string("Uložit")}
-              </button>
-              <div className={`${Styles.box.base} ${classes.inactiveUsers}`}>
-                {inactivePersonEntries->Array.length === 0
-                  ? <p className=SectionWithHeader.classes.emptyMessage>
-                      {React.string("Nikdo nechybí 👌")}
-                    </p>
-                  : <ol className={`${Styles.list.base} ${classes.list}`}>
-                      {inactivePersonEntries
-                      ->Array.map(inactivePerson => {
-                        let (personId, person) = inactivePerson
-                        let recentActivityDate = person.recentActivityAt->Firebase.Timestamp.toDate
-                        let isCurrent =
-                          person.userId->Null.mapOr(false, userId => userId === currentUser.uid)
-                        <li ariaCurrent={isCurrent ? #"true" : #"false"} key={personId}>
-                          <div>
-                            {React.string(`${person.name} `)}
-                            <time dateTime={recentActivityDate->Js.Date.toISOString}>
-                              {React.string(`byl tu `)}
-                              <FormattedRelativeTime dateTime={recentActivityDate} />
-                            </time>
-                          </div>
-                          <ActiveCheckbox
-                            changes initialActive=false personId setChanges=setActivePersonsChanges
-                          />
-                        </li>
-                      })
-                      ->React.array}
-                    </ol>}
-              </div>
-            </>
-          }}
         </main>
         {switch dialogState {
         | Hidden => React.null
@@ -263,18 +191,20 @@ let make = (~placeId) => {
             ->Option.getOr([])}
           />
         | AddPerson =>
-          let existingActive = activePersonEntries->Array.map(((_, {name})) => name)
-          let existingInactive = inactivePersonEntries->Array.map(((_, {name})) => name)
+          let (active, inactive) =
+            personEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
+          let existingActive = active->Array.map(((_, {name})) => name)
+          let existingInactive = inactive->Array.map(((_, {name})) => name)
           <PersonAddPlace
             existingActive
             existingInactive
             onDismiss={hideDialog}
             onMoveToActive={personName => {
               let (personId, person) =
-                inactivePersonEntries
+                inactive
                 ->Array.find(((_, {name})) => name === personName)
                 ->Option.getExn
-              let firstTap = place.taps->Js.Dict.keys->Belt.Array.getExn(0)
+              let firstTap = place.taps->Js.Dict.keys->Array.getUnsafe(0)
               Db.PersonsIndex.update(
                 firestore,
                 ~placeId,
