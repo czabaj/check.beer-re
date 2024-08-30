@@ -40,8 +40,11 @@ dialog:modal {
 
 dl,
 dl dd,
-p {
+p,
+[popover] {
   margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 fieldset:where(.reset) {

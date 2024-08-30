@@ -11,7 +11,7 @@
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.list > li > div {
+.list > li > div:first-child {
   order: 1;
   margin-inline-end: auto;
 }

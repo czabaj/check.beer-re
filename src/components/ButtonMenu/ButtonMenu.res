@@ -9,27 +9,37 @@ type menuItem = {
 
 @genType @react.component
 let make = (~children, ~className=?, ~menuItems, ~title=?) => {
-  let popoverId = React.useId()
-  let anchorId = React.useId()
+  let nodeId = React.useId()->String.slice(~start=1, ~end=-1)
+  let popoverId = `popover-${nodeId}`
+  let anchorId = `anchor-${nodeId}`
+  let anchorName = `--button-menu-${nodeId}`
   <>
     {React.cloneElement(
-      <button ?className id=anchorId ?title type_="button"> {children} </button>,
+      <button
+        ?className
+        id=anchorId
+        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("anchor-name", anchorName)}
+        ?title
+        type_="button">
+        {children}
+      </button>,
       {
         "popovertarget": popoverId,
         "popovertargetaction": "toggle",
       },
     )}
     {React.cloneElement(
-      <div className={classes.popover} id={popoverId}>
+      <div
+        className={classes.popover}
+        id={popoverId}
+        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("position-anchor", anchorName)}>
         <nav>
           <ul>
             {menuItems
             ->Array.mapWithIndex((item, idx) =>
               <li key={idx->Int.toString}>
                 <button
-                  disabled={item.disabled->Option.getOr(false)}
-                  onClick=item.onClick
-                  type_="button">
+                  disabled={item.disabled->Option.getOr(false)} onClick=item.onClick type_="button">
                   {React.string(item.label)}
                 </button>
               </li>

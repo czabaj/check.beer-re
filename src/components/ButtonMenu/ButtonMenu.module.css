@@ -1,11 +1,12 @@
 .popover.popover.popover {
   background-color: var(--surface-2);
   border: var(--border-size-1) solid var(--surface-4);
-  top: anchor(bottom);
-  right: anchor(right);
-  padding: 0;
-  padding-block: 0.5rem;
   box-shadow: var(--shadow-3);
+  inset: unset;
+  padding-block: 0.5rem;
+  position-try-options: flip-block, flip-inline, flip-block flip-inline;
+  right: anchor(right);
+  top: anchor(bottom);
 }
 .popover li > :where(a, button) {
   color: var(--text-1);
