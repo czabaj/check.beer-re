@@ -112,7 +112,8 @@ let make = (
     headerSlot={React.string("Lístek")}>
     {!showAll && personsToShow->Array.length === 0
       ? <p className={`${SectionWithHeader.classes.emptyMessage} ${classes.emptyMessage}`}>
-          {React.string("Všichni jsou schovaní, posviť si na ně přes tlačítko zobrazit ⤴")}
+          <span> {React.string("Všichni jsou schovaní, koukni na ně přes očičko")} </span>
+          <span> {React.string("⤴")} </span>
         </p>
       : {
           <div className={classes.gridBeer} role="grid">
@@ -122,7 +123,7 @@ let make = (
               let consumptions = recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
               let isCurrent = person.userId->Null.mapOr(false, userId => userId === currentUserUid)
               let personVisible = !showAll || Db.isPersonActive(person)
-              <div ariaCurrent={isCurrent ? #"true" : #"false"} role="row">
+              <div ariaCurrent={isCurrent ? #"true" : #"false"} key={personId} role="row">
                 <PersonCell
                   consumptions={consumptions}
                   isCurrent
