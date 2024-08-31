@@ -289,6 +289,7 @@ module Keg = {
     ~kegId,
     ~personId,
     ~placeId,
+    ~tapName,
   ) => {
     let now = Date.now()
     let kegRef = placeKegDocument(firestore, placeId, kegId)
@@ -307,6 +308,7 @@ module Keg = {
       `all.${personId}`,
       personsAllRecordToTuple({
         ...personRecord,
+        preferredTap: Some(tapName),
         recentActivityAt: Firebase.Timestamp.now(),
       }),
     )

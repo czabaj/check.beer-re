@@ -75,10 +75,12 @@
 }
 .cellToggleVisibility input {
   appearance: none;
+  border: none;
   position: absolute;
 }
 .cellToggleVisibility img {
-  opacity: 0.5;
+  width: 2.5rem;
+  opacity: 0.25;
 }
 .cellToggleVisibility input:checked + img {
   opacity: 1;
@@ -89,6 +91,7 @@
 }
 .labelShowAll > input {
   appearance: none;
+  border: none;
   position: absolute;
 }
 .labelShowAll[data-checked="true"] {

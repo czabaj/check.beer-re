@@ -180,11 +180,15 @@ let make = (~placeId) => {
                 ~kegId=kegRef.id,
                 ~personId,
                 ~placeId,
+                ~tapName=values.tap,
               )->ignore
               hideDialog()
             }}
             personName={person.name}
-            preferredTap={person.preferredTap->Option.getExn}
+            preferredTap={switch person.preferredTap {
+            | Some(tap) => tap
+            | None => place.taps->Js.Dict.keys->Array.getUnsafe(0)
+            }}
             tapsWithKegs
             unfinishedConsumptions={unfinishedConsumptionsByUser
             ->Map.get(personId)
