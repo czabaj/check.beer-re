@@ -71,6 +71,8 @@ let personsAllTupleToRecord = ((name, recentActivityAt, balance, userId, preferr
   userId,
 }
 
+let isPersonActive = (p: personsAllRecord) => p.preferredTap !== None
+
 @genType
 type personsIndexConverted = {all: Js.Dict.t<personsAllRecord>}
 
@@ -680,7 +682,7 @@ module PersonsIndex = {
         | Some(personsIndex) => {
             let personsAllEntries = personsIndex.all->Js.Dict.entries
             personsAllEntries->Array.sort(((_, a), (_, b)) => {
-              a.name->Js.String2.localeCompare(b.name)
+              String.localeCompare(a.name, b.name)
             })
             personsAllEntries
           }
