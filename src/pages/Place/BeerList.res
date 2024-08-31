@@ -1,20 +1,27 @@
-type classesType = {consumption: string, emptyMessage: string, labelShowAll: string, list: string}
+type classesType = {
+  cellConsumption: string,
+  cellToggleVisibility: string,
+  consumption: string,
+  emptyMessage: string,
+  gridBeer: string,
+  labelShowAll: string,
+  root: string,
+  showAll: string,
+}
 
 @module("./BeerList.module.css") external classes: classesType = "default"
 
 // Handles the animation for changed consumption
-module PersonListItem = {
+module PersonCell = {
   @react.component
   let make = (
     ~consumptions: array<Db.userConsumption>,
     ~isCurrent,
     ~isUserAuthorized,
     ~onAddConsumption,
-    ~onTogglePersonVisibility,
     ~personName,
-    ~personVisible,
   ) => {
-    let listItemEl = React.useRef(Js.Nullable.null)
+    let rootNodeRef = React.useRef(Js.Nullable.null)
     let consumptionsStr =
       consumptions
       ->Array.map(consumption => {
@@ -25,7 +32,7 @@ module PersonListItem = {
     React.useEffect1(() => {
       switch (
         consumptionsStr === lastConsumptionsStr.current,
-        Nullable.toOption(listItemEl.current),
+        Nullable.toOption(rootNodeRef.current),
       ) {
       | (false, Some(el)) =>
         lastConsumptionsStr.current = consumptionsStr
@@ -46,7 +53,7 @@ module PersonListItem = {
       None
     }, [consumptionsStr])
 
-    <li ariaCurrent={isCurrent ? #"true" : #"false"} ref={ReactDOM.Ref.domRef(listItemEl)}>
+    <div className={classes.cellConsumption} ref={ReactDOM.Ref.domRef(rootNodeRef)} role="gridcell">
       <div> {React.string(personName)} </div>
       {isUserAuthorized(UserRoles.Staff) || (isCurrent && isUserAuthorized(UserRoles.SelfService))
         ? <button
@@ -57,13 +64,7 @@ module PersonListItem = {
           />
         : React.null}
       <div className={classes.consumption}> {React.string(consumptionsStr)} </div>
-      <label>
-        <input
-          checked={personVisible} onChange={_ => onTogglePersonVisibility()} type_="checkbox"
-        />
-        <img src={personVisible ? Assets.eyeShow : Assets.eyeHidden} />
-      </label>
-    </li>
+    </div>
   }
 }
 
@@ -84,14 +85,14 @@ let make = (
   <SectionWithHeader
     buttonsSlot={<>
       {isUserAuthorized(UserRoles.Staff)
-        ? <button className={Styles.button.base} type_="button" onClick={_ => onAddPerson()}>
-            {React.string("Přidat hosta")}
+        ? <button className={`${Styles.button.base}`} type_="button" onClick={_ => onAddPerson()}>
+            {React.string("Nový host")}
           </button>
         : React.null}
       {React.cloneElement(
         <label
-          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly}`}>
-          <span> {React.string("👁️")} </span>
+          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}>
+          {React.string("👁️")}
           <span className={Styles.utility.srOnly}> {React.string("Zobrazit všechny")} </span>
           <input
             type_="checkbox"
@@ -106,6 +107,7 @@ let make = (
         {"data-checked": showAll ? "true" : "false"},
       )}
     </>}
+    className={`${classes.root} ${showAll ? classes.showAll : ""}`}
     headerId="active_persons"
     headerSlot={React.string("Lístek")}>
     {!showAll && personsToShow->Array.length === 0
@@ -113,28 +115,36 @@ let make = (
           {React.string("Všichni jsou schovaní, posviť si na ně přes tlačítko zobrazit ⤴")}
         </p>
       : {
-          React.cloneElement(
-            <ol className={`${Styles.list.base} ${classes.list}`}>
-              {personsToShow
-              ->Array.map(personEntry => {
-                let (personId, person) = personEntry
-                let consumptions = recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
-                let personVisible = !showAll || Db.isPersonActive(person)
-                <PersonListItem
+          <div className={classes.gridBeer} role="grid">
+            {personsToShow
+            ->Array.map(personEntry => {
+              let (personId, person) = personEntry
+              let consumptions = recentConsumptionsByUser->Map.get(personId)->Option.getOr([])
+              let isCurrent = person.userId->Null.mapOr(false, userId => userId === currentUserUid)
+              let personVisible = !showAll || Db.isPersonActive(person)
+              <div ariaCurrent={isCurrent ? #"true" : #"false"} role="row">
+                <PersonCell
                   consumptions={consumptions}
-                  isCurrent={person.userId->Null.mapOr(false, userId => userId === currentUserUid)}
+                  isCurrent
                   isUserAuthorized
                   key={personId}
                   onAddConsumption={() => onAddConsumption(personEntry)}
-                  onTogglePersonVisibility={() => onTogglePersonVisibility(personEntry)}
                   personName={person.name}
-                  personVisible
                 />
-              })
-              ->React.array}
-            </ol>,
-            {"data-show-all": showAll ? "true" : "false"},
-          )
+                <div className={classes.cellToggleVisibility} role="gridcell">
+                  <label>
+                    <input
+                      checked={personVisible}
+                      onChange={_ => onTogglePersonVisibility(personEntry)}
+                      type_="checkbox"
+                    />
+                    <img src={personVisible ? Assets.eyeShow : Assets.eyeHidden} />
+                  </label>
+                </div>
+              </div>
+            })
+            ->React.array}
+          </div>
         }}
   </SectionWithHeader>
 }

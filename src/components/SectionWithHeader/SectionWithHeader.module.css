@@ -10,7 +10,8 @@
 }
 
 .root > header > :first-child {
-  margin-inline-end: auto
+  letter-spacing: 0.03em;
+  margin-inline-end: auto;
 }
 
 .root > div {

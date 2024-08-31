@@ -9,44 +9,87 @@
   text-align: right;
 }
 
+.gridBeer {
+  --breakout-hover-overlay: hsl(
+    var(--surface-warning-hs) var(--surface-warning-l) / 0.1
+  );
+
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+.gridBeer > * {
+  display: contents;
+}
+
+.cellConsumption {
+  background-color: var(--surface-2);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 150%;
+  justify-content: space-between;
+  padding-inline: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+[role="row"]:first-child .cellConsumption {
+  border-start-start-radius: var(--radius-2);
+  border-start-end-radius: var(--radius-2);
+}
+[role="row"]:last-child .cellConsumption {
+  border-end-start-radius: var(--radius-2);
+  border-end-end-radius: var(--radius-2);
+}
+[role="row"]:nth-child(n + 2) .cellConsumption {
+  border-block-start: var(--border-size-2) solid var(--border-ink);
+}
+.gridBeer [aria-current="true"] .cellConsumption > div:first-child {
+  font-weight: var(--font-weight-semibold);
+}
+.cellConsumption > div:nth-of-type(2) {
+  word-break: break-word;
+}
+
+.cellToggleVisibility {
+  display: flex;
+}
+.cellToggleVisibility label {
+  display: grid;
+  inline-size: 0;
+  overflow: hidden;
+  place-content: center;
+  transition: inline-size 0.2s ease-in-out;
+}
+.showAll .cellToggleVisibility label {
+  inline-size: 4.5rem;
+  border-end-end-radius: var(--radius-2);
+  border-start-end-radius: var(--radius-2);
+}
+.showAll .cellToggleVisibility label:hover {
+  background-color: var(--surface-4);
+}
+.cellToggleVisibility input {
+  appearance: none;
+  position: absolute;
+}
+.cellToggleVisibility img {
+  opacity: 0.5;
+}
+.cellToggleVisibility input:checked + img {
+  opacity: 1;
+}
+
+.labelShowAll {
+  min-inline-size: 4.5rem;
+}
 .labelShowAll > input {
   appearance: none;
   position: absolute;
 }
-
-.labelShowAll[data-checked="false"] > span {
-  opacity: 0.5;
-}
-.labelShowAll:hover > span {
-  opacity: 1;
-}
 .labelShowAll[data-checked="true"] {
-  background-color: var(--surface-warning);
+  background-color: var(--surface-danger-1);
 }
 
-.list li > div:first-child {
-  margin-inline-end: auto;
-}
-.list li[aria-current="true"] > div:first-child {
-  font-weight: var(--font-weight-semibold);
-}
-
-.list li > label {
-  display: grid;
-  padding-inline: 0.3rem;
-  place-content: center;
-  z-index: 1;
-}
-.list li > label img {
-  opacity: 0.5;
-}
-.list li > label input:checked + img {
-  opacity: 1;
-}
-.list li > label > input {
-  appearance: none;
-  position: absolute;
-}
-.list[data-show-all="false"] li > label {
-  display: none;
+.root > div {
+  background-color: transparent;
+  box-shadow: none;
 }

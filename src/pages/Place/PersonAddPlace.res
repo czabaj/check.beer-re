@@ -15,7 +15,7 @@ module FormFields = {
     type value. (state, field<value>, value) => state =
     (_state, field, value) =>
       switch field {
-      | Name => { name: value}
+      | Name => {name: value}
       }
 }
 
@@ -47,11 +47,7 @@ let make = (~existingActive, ~existingInactive, ~onDismiss, ~onMoveToActive, ~on
     </datalist>
   }, (existingActive, existingInactive))
   <DialogForm
-    className={classes.root}
-    formId="addPerson"
-    heading="Nový návštěvník"
-    onDismiss
-    visible=true>
+    className={classes.root} formId="addPerson" heading="Nový host" onDismiss visible=true>
     <Form.Provider value=Some(form)>
       <form id="addPerson" onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
         <fieldset className="reset">
