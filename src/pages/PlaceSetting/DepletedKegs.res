@@ -42,7 +42,7 @@ let make = (
             ->Array.map(keg => {
               let volume = keg.milliliters
               let kegId = Db.getUid(keg)
-              let effectivity = keg.consumptionsSum->Float.fromInt /. volume->Float.fromInt *. 100.0
+              let effectivity = keg.consumptionsSum->Float.fromInt /. volume->Float.fromInt
               let priceLargeBeer =
                 (keg.price->Int.toFloat /. keg.milliliters->Int.toFloat *. 500.0)->Int.fromFloat
 
@@ -80,7 +80,7 @@ let make = (
                   />
                 </td>
                 <td>
-                  <FormattedPercent value={effectivity} />
+                  <FormattedPercent value={effectivity *. 100.0} />
                 </td>
               </tr>
             })
