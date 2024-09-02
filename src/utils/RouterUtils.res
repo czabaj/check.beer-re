@@ -58,3 +58,7 @@ let createShareLink = shareLinkId => {
   let origin = Dom.location->Dom.Location.origin
   `${origin}/s/${shareLinkId}`
 }
+
+let fromHomepageHash = "from_homepage"
+
+let isFromHomepage = (url: RescriptReactRouter.url) => url.hash == fromHomepageHash

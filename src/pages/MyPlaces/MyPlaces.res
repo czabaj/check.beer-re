@@ -103,9 +103,14 @@ let make = () => {
   )
   let (dialogState, setDialogState) = React.useState(() => Hidden)
   let hideDialog = _ => setDialogState(_ => Hidden)
+  let fromHomepage = RescriptReactRouter.useUrl()->RouterUtils.isFromHomepage
   <>
-    {switch pageDataStatus.data {
-    | Some((currentUser, usersPlaces)) =>
+    {switch (fromHomepage, pageDataStatus.data) {
+    | (true, Some(_, [onePlaceOnly])) =>
+      let singlePlaceLocation = RouterUtils.resolveRelativePath(`./${Db.getUid(onePlaceOnly)}`)
+      RescriptReactRouter.replace(singlePlaceLocation)
+      React.null
+    | (_, Some(currentUser, usersPlaces)) =>
       let userDisplayName = currentUser.displayName->Null.getExn
       <>
         <Pure

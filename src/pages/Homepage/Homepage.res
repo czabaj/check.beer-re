@@ -21,8 +21,8 @@ let make = () => {
         <a
           className={Styles.button.sizeLarge}
           href="/misto"
-          onClick={RouterUtils.handleLinkClick((. ()) => {
-            let navigate = () => RescriptReactRouter.push("/misto")
+          onClick={RouterUtils.handleLinkClick(() => {
+            let navigate = () => RescriptReactRouter.push(`/misto#${RouterUtils.fromHomepageHash}`)
             if !supportsTransitionApi {
               navigate()
             } else {
