@@ -58,6 +58,14 @@ let make = (
             <FormattedVolume milliliters={keg.milliliters} />
           </dd>
         </div>
+        {keg.depletedAt !== Null.null || keg.consumptionsSum === 0
+          ? React.null
+          : <div>
+              <dt> {React.string("zbýbá")} </dt>
+              <dd>
+                <FormattedVolume milliliters={keg.milliliters - keg.consumptionsSum} />
+              </dd>
+            </div>}
         <div>
           <dt> {React.string("naskladněno dne")} </dt>
           <dd>
@@ -99,7 +107,7 @@ let make = (
             <div>
               <dt> {React.string("ze sudu se vytočilo")} </dt>
               <dd>
-                <FormattedVolume milliliters={keg.milliliters} />
+                <FormattedVolume milliliters={keg.consumptionsSum} />
               </dd>
             </div>
             <div>
