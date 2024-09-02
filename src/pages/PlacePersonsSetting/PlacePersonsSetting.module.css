@@ -1,6 +1,60 @@
 .table {
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
+  --cell-inline-padding: var(--padding-inline, 8px);
+  
+  font-size: 150%;
 }
-.table :where(td, th):last-child {
+.table > * {
+  display: contents;
+}
+.table tr {
+  display: grid;
+  grid-template-areas:
+    "name role lastSeen balance";
+  grid-template-columns: 1fr 7ch 13ch 13ch;
+}
+.table :where(th, td) {
+  padding-inline: var(--cell-inline-padding);
+}
+.table :where(th, td):nth-child(1) {
+  grid-area: name;
+}
+.table :where(th, td):nth-child(2) {
+  grid-area: role;
+}
+.table :where(th, td):nth-child(3) {
+  grid-area: lastSeen;
+}
+.table :where(th, td):nth-child(4) {
+  grid-area: balance;
   text-align: right;
+}
+.table td:nth-child(4) {
+  font-style: italic;
+}
+
+@supports (grid-template-columns: subgrid) {
+  .table {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+  }
+  .table tr {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid !important;
+  }
+}
+
+@media screen and (max-width: 33rem) {
+  .table {
+    grid-template-columns: auto repeat(2, 1fr);
+  }
+  .table tr {
+    grid-template-areas:
+      "name name     balance"
+      "role lastSeen lastSeen";
+    grid-template-columns: auto 1fr;
+  }
+  .table.table :is(th, td):nth-child(3) {
+    text-align: right;
+  }
 }
