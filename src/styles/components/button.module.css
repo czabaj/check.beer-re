@@ -26,7 +26,7 @@
   &:hover {
     background-color: var(--_hover-background, var(--surface-3));
     border-color: var(--_hover-border);
-    color: var(--_hover-text);
+    color: var(--_hover-text, var(--_text, var(--text-2)));
   }
 
   &:active {
@@ -50,21 +50,21 @@
 
 .variantPrimary {
   composes: base;
-  --_background: var(--surface-brand);
+  --_background: var(--surface-primary);
   --_border: var(--_background);
-  --_text: var(--text-brand-1);
-  --_active-background: var(--surface-brand);
-  --_active-border: hsl(var(--surface-brand-hsl) / 20%);
-  --_active-text: var(--text-brand-1);
-  --_disabled-background: hsl(var(--surface-brand-hsl) / 30%);
-  --_disabled-border: hsl(var(--surface-brand-hsl) / 20%);
+  --_text: var(--text-on-primary-1);
+  --_active-background: var(--surface-primary);
+  --_active-border: hsl(var(--surface-primary-hsl) / 20%);
+  --_active-text: var(--text-on-primary);
+  --_disabled-background: hsl(var(--surface-primary-hsl) / 30%);
+  --_disabled-border: hsl(var(--surface-primary-hsl) / 20%);
   --_disabled-text: var(--text-2);
   --_hover-background: hsl(
-    var(--surface-brand-hs) calc(var(--surface-brand-l) + 5%)
+    var(--surface-primary-hs) calc(var(--surface-primary-l) + 5%)
   );
   --_hover-border: var(--_hover-background);
-  --_hover-text: var(--text-brand-1);
-  --_separator: var(--text-brand-1);
+  --_hover-text: var(--text-on-primary-1);
+  --_separator: var(--text-on-primary-1);
 }
 
 .variantDanger {

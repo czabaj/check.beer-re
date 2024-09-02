@@ -5,7 +5,7 @@
 }
 
 html {
-  background-color: var(--surface-1);
+  background-color: var(--surface-brand);
   background-image: url("../assets/noise.svg");
   color: var(--text-1);
   font-family: var(--font-sans);

@@ -7,6 +7,7 @@
 
 .emptyMessage {
   align-items: flex-end;
+  color: var(--text-on-brand);
   display: flex;
   font-family: var(--font-cursive);
   font-size: 150%;
@@ -71,7 +72,7 @@
   border-start-end-radius: var(--radius-2);
 }
 .showAll .cellToggleVisibility label:hover {
-  background-color: var(--surface-4);
+  background-color: var(--surface-primary);
 }
 .cellToggleVisibility input {
   appearance: none;
@@ -95,7 +96,7 @@
   position: absolute;
 }
 .labelShowAll[data-checked="true"] {
-  background-color: var(--surface-danger-1);
+  background-color: var(--surface-warning);
 }
 
 .root > div {

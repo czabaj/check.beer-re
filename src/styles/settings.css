@@ -28,9 +28,10 @@ html {
   --surface-2: hsl(210deg 17% 98%);
   --surface-3: hsl(210deg 17% 95%);
   --surface-4: hsl(210deg 14% 83%);
-  --surface-brand: hsl(86deg 84% 36%);
-  --surface-brand-hs: 86deg 84%;
-  --surface-brand-l: 36%;
+  --surface-brand: hsl(87deg 22% 34%);
+  --surface-primary: hsl(87deg 84% 36%);
+  --surface-primary-hs: 86deg 84%;
+  --surface-primary-l: 36%;
   --surface-danger: hsl(0deg 63% 54%);
   --surface-danger-hs: 0deg 63%;
   --surface-danger-l: 54%;
@@ -43,8 +44,9 @@ html {
   --text-1: hsl(210deg 7% 13%);
   --text-2: hsl(210 7% 23%);
   --text-3: hsl(0 0% 52%);
-  --text-brand-1: hsl(210deg 17% 98%);
-  --text-brand-2: hsl(47deg 100% 62%);
+  --text-on-brand: hsl(210deg 17% 98%);
+  --text-on-primary-1: hsl(210deg 17% 98%);
+  --text-on-primary-2: hsl(47deg 100% 62%);
   --text-danger: hsl(0deg 63% 54%);
   --text-on-danger: hsl(210deg 17% 98%);
   --text-success: hsl(120deg 100% 27%);

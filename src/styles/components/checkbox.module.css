@@ -1,5 +1,5 @@
 .base {
-  --checkbox-color: var(--surface-brand);
+  --checkbox-color: var(--surface-primary);
 
   appearance: none;
   background-color: #fff;

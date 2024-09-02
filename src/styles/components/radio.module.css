@@ -1,5 +1,5 @@
 .base {
-  --radio-color: var(--surface-brand);
+  --radio-color: var(--surface-primary);
 
   appearance: none;
   background-color: #fff;

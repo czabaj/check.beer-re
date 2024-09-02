@@ -91,7 +91,7 @@ let make = (
         : React.null}
       {React.cloneElement(
         <label
-          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}>
+          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly}`}>
           {React.string("👁️")}
           <span className={Styles.utility.srOnly}> {React.string("Zobrazit všechny")} </span>
           <input

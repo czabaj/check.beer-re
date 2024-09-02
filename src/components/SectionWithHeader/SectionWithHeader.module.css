@@ -4,12 +4,15 @@
 
 .root > header {
   align-items: center;
+  color: var(--text-on-brand);
   display: flex;
   gap: 1rem;
   padding-block: 0.75rem;
 }
 
 .root > header > :first-child {
+  font-family: var(--font-cursive);
+  font-size: 200%;
   letter-spacing: 0.03em;
   margin-inline-end: auto;
 }
