@@ -1,0 +1,69 @@
+.table {
+  --cell-inline-padding: var(--padding-inline, 8px);
+}
+
+.table > * {
+  display: contents;
+}
+
+.table th[scope="row"] {
+  font-weight: var(--font-weight-regular);
+}
+
+.table tr {
+  display: grid;
+  grid-template-areas: "beer volume dateTime action";
+  grid-template-columns: 1fr 7ch 13ch 13ch;
+}
+.table :where(th, td) {
+  padding-inline: var(--cell-inline-padding);
+}
+.table :where(th, td):nth-child(1) {
+  grid-area: beer;
+  text-align: left;
+}
+.table :where(th, td):nth-child(2) {
+  grid-area: volume;
+  text-align: right;
+  place-content: end;
+}
+.table :where(th, td):nth-child(3) {
+  grid-area: dateTime;
+  text-align: right;
+}
+.table :where(th, td):nth-child(4) {
+  grid-area: action;
+  text-align: right;
+  place-content: center;
+}
+
+@supports (grid-template-columns: subgrid) {
+  .table {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+  }
+  .table tr {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid !important;
+  }
+}
+
+@media screen and (max-width: 33rem) {
+  .table {
+    grid-template-columns: auto 1fr auto;
+  }
+  .table tr {
+    grid-template-areas:
+      "beer     volume   action"
+      "dateTime dateTime action";
+    grid-template-columns: 7ch 1fr auto;
+  }
+  .table :where(th, td):nth-child(3) {
+    padding-inline-start: var(--dialog-padding-inline);
+    text-align: right;
+  }
+  .deleteButton {
+    white-space: wrap;
+    inline-size: min-content;
+  }
+}

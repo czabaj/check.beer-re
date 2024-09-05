@@ -33,7 +33,7 @@ module Validators = Validators.CustomValidators(FormFields)
 
 type selectOption = {text: React.element, value: string}
 
-@react.component
+@genType @react.component
 let make = (
   ~personName,
   ~preferredTap,

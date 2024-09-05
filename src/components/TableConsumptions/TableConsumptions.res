@@ -1,3 +1,10 @@
+type classesType = {
+  deleteButton: string,
+  table: string,
+}
+
+@module("./TableConsumptions.module.css") external classes: classesType = "default"
+
 @react.component
 let make = (
   ~ariaLabelledby=?,
@@ -5,7 +12,7 @@ let make = (
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
-  <table ?ariaLabelledby className={Styles.table.inDialog}>
+  <table ?ariaLabelledby className={`${classes.table} ${Styles.table.inDialog}`}>
     {switch captionSlot {
     | Some(slot) => <caption> {slot} </caption>
     | None => React.null
@@ -25,16 +32,16 @@ let make = (
       ->Array.map(consumption => {
         let createdAt = consumption.createdAt->Js.Date.toISOString
         <tr key={createdAt}>
-          <td> {React.string(consumption.beer)} </td>
+          <th scope="row"> {React.string(consumption.beer)} </th>
           <td>
             <FormattedVolume milliliters=consumption.milliliters />
           </td>
           <td>
-            <FormattedDateTime value=consumption.createdAt />
+            <FormattedDateTimeShort value=consumption.createdAt />
           </td>
           <td>
             <button
-              className={Styles.button.sizeExtraSmall}
+              className={`${classes.deleteButton} ${Styles.button.sizeExtraSmall}`}
               onClick={_ => onDeleteConsumption(consumption)}
               type_="button">
               {React.string("🗑️ Smáznout")}
