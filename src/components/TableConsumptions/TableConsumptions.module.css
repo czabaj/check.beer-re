@@ -2,17 +2,20 @@
   --cell-inline-padding: var(--padding-inline, 8px);
 }
 
-.table > * {
-  display: contents;
+.table caption {
+  font-size: 1.17rem;
+  font-weight: var(--font-weight-semibold);
+  margin-block: 0.25rem;
+  grid-column: 1 / -1;
 }
 
-.table th[scope="row"] {
-  font-weight: var(--font-weight-regular);
+.table :where(tbody, thead) {
+  display: contents;
 }
 
 .table tr {
   display: grid;
-  grid-template-areas: "beer volume dateTime action";
+  grid-template-areas: "beer dateTime volume action";
   grid-template-columns: 1fr 7ch 13ch 13ch;
 }
 .table :where(th, td) {
@@ -23,13 +26,18 @@
   text-align: left;
 }
 .table :where(th, td):nth-child(2) {
-  grid-area: volume;
+  grid-area: dateTime;
   text-align: right;
   place-content: end;
 }
 .table :where(th, td):nth-child(3) {
-  grid-area: dateTime;
+  grid-area: volume;
   text-align: right;
+}
+
+.table td:nth-child(3) {
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
 }
 .table :where(th, td):nth-child(4) {
   grid-area: action;
@@ -40,7 +48,7 @@
 @supports (grid-template-columns: subgrid) {
   .table {
     display: grid;
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: 1fr repeat(3, auto);
   }
   .table tr {
     grid-column: 1 / -1;
@@ -48,22 +56,29 @@
   }
 }
 
-@media screen and (max-width: 33rem) {
+@media screen and (max-width: 30rem) {
   .table {
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 1fr auto auto;
   }
   .table tr {
     grid-template-areas:
-      "beer     volume   action"
-      "dateTime dateTime action";
-    grid-template-columns: 7ch 1fr auto;
+      "beer     volume action"
+      "dateTime volume action";
+    grid-template-columns: 1fr 7ch auto;
   }
-  .table :where(th, td):nth-child(3) {
-    padding-inline-start: var(--dialog-padding-inline);
+  .table :where(th, td):nth-child(1) {
     text-align: right;
   }
+  .table :where(th, td):nth-child(2) {
+    padding-inline-start: var(--dialog-padding-inline);
+  }
+  .table td:nth-child(3) {
+    font-family: var(--font-cursive);
+    font-size: 200%;
+  }
   .deleteButton {
-    white-space: wrap;
     inline-size: min-content;
+    padding-block: 0.125rem;
+    white-space: wrap;
   }
 }

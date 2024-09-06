@@ -11,7 +11,8 @@ import type {userConsumption as Db_userConsumption} from '../../../src/backend/D
 
 export type FormFields_state = { readonly tap: string; readonly consumption: number };
 
-export type props<personName,preferredTap,onDeleteConsumption,onDismiss,onSubmit,tapsWithKegs,unfinishedConsumptions> = {
+export type props<formatConsumption,personName,preferredTap,onDeleteConsumption,onDismiss,onSubmit,tapsWithKegs,unfinishedConsumptions> = {
+  readonly formatConsumption: formatConsumption; 
   readonly personName: personName; 
   readonly preferredTap: preferredTap; 
   readonly onDeleteConsumption: onDeleteConsumption; 
@@ -22,6 +23,7 @@ export type props<personName,preferredTap,onDeleteConsumption,onDismiss,onSubmit
 };
 
 export const make: React.ComponentType<{
+  readonly formatConsumption: (_1:Db_userConsumption) => string; 
   readonly personName: string; 
   readonly preferredTap: string; 
   readonly onDeleteConsumption: (_1:Db_userConsumption) => void; 

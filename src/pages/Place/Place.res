@@ -122,6 +122,8 @@ let make = (~placeId) => {
     ) =>
     let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
+    let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
+
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
@@ -139,6 +141,7 @@ let make = (~placeId) => {
         <main>
           <BeerList
             currentUserUid={currentUser.uid}
+            formatConsumption
             isUserAuthorized
             onAddPerson={() => setDialog(_ => AddPerson)}
             onAddConsumption={((personId, person)) =>
@@ -160,6 +163,7 @@ let make = (~placeId) => {
         | Hidden => React.null
         | AddConsumption({personId, person}) =>
           <DrinkDialog
+            formatConsumption
             onDeleteConsumption={consumption => {
               Db.Keg.deleteConsumption(
                 firestore,

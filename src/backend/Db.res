@@ -460,34 +460,41 @@ module Place = {
       recentActivityAt: now,
       userId: Js.Null.return(userId),
     })
-    await Firebase.writeBatch(firestore)
-    ->Firebase.WriteBatch.set(
-      placeDoc,
-      {
-        createdAt: now,
-        currency: "CZK",
-        name: placeName,
-        taps: Dict.fromArray([(defaultTapName, Null.null)]),
-        users: Dict.fromArray([(userId, (UserRoles.Owner :> int))]),
-      },
-      {},
-    )
-    ->Firebase.WriteBatch.set(
-      personDoc,
-      {
-        createdAt: now,
-        transactions: [],
-      },
-      {},
-    )
-    ->Firebase.WriteBatch.set(
-      personsIndexDoc,
-      {
-        all: Dict.fromArray([(personDoc.id, personTuple)]),
-      },
-      {},
-    )
-    ->Firebase.WriteBatch.commit
+    try {
+      await Firebase.writeBatch(firestore)
+      ->Firebase.WriteBatch.set(
+        placeDoc,
+        {
+          consumptionSymbols: Js.Nullable.Null,
+          createdAt: now,
+          currency: "CZK",
+          name: placeName,
+          taps: Dict.fromArray([(defaultTapName, Null.null)]),
+          users: Dict.fromArray([(userId, (UserRoles.Owner :> int))]),
+        },
+        {},
+      )
+      ->Firebase.WriteBatch.set(
+        personDoc,
+        {
+          createdAt: now,
+          transactions: [],
+        },
+        {},
+      )
+      ->Firebase.WriteBatch.set(
+        personsIndexDoc,
+        {
+          all: Dict.fromArray([(personDoc.id, personTuple)]),
+        },
+        {},
+      )
+      ->Firebase.WriteBatch.commit
+    } catch {
+    | Exn.Error(e) =>
+      LogUtils.captureException(e)
+      raise(e->Exn.anyToExnInternal)
+    }
     placeDoc
   }
   let delete = (firestore, ~placeId) => {

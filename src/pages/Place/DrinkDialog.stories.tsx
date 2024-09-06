@@ -4,6 +4,7 @@ import { userEvent, waitFor, within } from "@storybook/testing-library";
 import { make as DrinkDialog } from "./DrinkDialog.gen";
 import { getKegMock, getUserConsumptionMock } from "../../test/mockGenerators";
 import { dayInMilliseconds } from "../../utils/DateUtils.gen";
+import { getFormatConsumption } from "../../utils/BackendUtils.gen";
 
 const meta: Meta<typeof DrinkDialog> = {
   component: DrinkDialog,
@@ -12,6 +13,7 @@ const meta: Meta<typeof DrinkDialog> = {
     layout: `centered`,
   },
   args: {
+    formatConsumption: getFormatConsumption(null),
     personName: `Vašík`,
     preferredTap: `Hlavní`,
     tapsWithKegs: {

@@ -35,7 +35,10 @@ export type keg = {
 
 export type person = { readonly createdAt: Firebase_Timestamp_t; readonly transactions: financialTransaction[] };
 
+export type consumptionSymbols = { readonly "300": string; readonly "500": string };
+
 export type place = {
+  readonly consumptionSymbols: (null | undefined | consumptionSymbols); 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly currency: string; 
   readonly name: string; 

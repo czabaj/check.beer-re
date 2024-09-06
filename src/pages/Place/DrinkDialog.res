@@ -35,6 +35,7 @@ type selectOption = {text: React.element, value: string}
 
 @genType @react.component
 let make = (
+  ~formatConsumption,
   ~personName,
   ~preferredTap,
   ~onDeleteConsumption,
@@ -127,22 +128,22 @@ let make = (
                     <label>
                       <img alt="" src=Assets.beerGlassSmall />
                       <input
-                        checked={field.value === 300}
+                        checked={field.value === BackendUtils.smallBeerInMilliliters}
                         name="consumption"
                         onChange=handleChange
                         type_="radio"
-                        value="300"
+                        value={BackendUtils.smallBeerInMilliliters->Int.toString}
                       />
                       <span> {React.string("Malé")} </span>
                     </label>
                     <label>
                       <img alt="" src=Assets.beerGlassLarge />
                       <input
-                        checked={field.value === 500}
+                        checked={field.value === BackendUtils.largeBeerInMilliliters}
                         name="consumption"
                         onChange=handleChange
                         type_="radio"
-                        value="500"
+                        value={BackendUtils.largeBeerInMilliliters->Int.toString}
                       />
                       <span> {React.string("Velké")} </span>
                     </label>
@@ -158,6 +159,7 @@ let make = (
         ? <p> {React.string(`${personName} nemá nezaúčtovaná piva.`)} </p>
         : <TableConsumptions
             ariaLabelledby="unfinished_consumptions"
+            formatConsumption
             onDeleteConsumption
             unfinishedConsumptions=unfinishedConsumptionsDesc
           />}

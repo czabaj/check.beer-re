@@ -9,6 +9,7 @@ type classesType = {
 let make = (
   ~ariaLabelledby=?,
   ~captionSlot=?,
+  ~formatConsumption,
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
@@ -18,10 +19,10 @@ let make = (
     | None => React.null
     }}
     <thead>
-      <tr>
+      <tr className={Styles.utility.srOnly}>
         <th scope="col"> {React.string("Pivo")} </th>
-        <th scope="col"> {React.string("Objem")} </th>
         <th scope="col"> {React.string("Kdy")} </th>
+        <th scope="col"> {React.string("Objem")} </th>
         <th scope="col">
           <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
         </th>
@@ -34,11 +35,9 @@ let make = (
         <tr key={createdAt}>
           <th scope="row"> {React.string(consumption.beer)} </th>
           <td>
-            <FormattedVolume milliliters=consumption.milliliters />
-          </td>
-          <td>
             <FormattedDateTimeShort value=consumption.createdAt />
           </td>
+          <td> {formatConsumption(consumption)->React.string} </td>
           <td>
             <button
               className={`${classes.deleteButton} ${Styles.button.sizeExtraSmall}`}

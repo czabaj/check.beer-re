@@ -15,6 +15,7 @@ let byCreatedDesc = (
 
 @react.component
 let make = (
+  ~formatConsumption,
   ~hasNext,
   ~hasPrevious,
   ~onDeleteConsumption,
@@ -131,6 +132,7 @@ let make = (
           </p>
         : <TableConsumptions
             captionSlot={React.string("Nezaúčtované konzumace")}
+            formatConsumption
             onDeleteConsumption
             unfinishedConsumptions
           />}
