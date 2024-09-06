@@ -34,8 +34,15 @@ and person = {
 }
 @@warning("+30")
 
+type consumptionSymbols = {
+  "300": string,
+  "500": string,
+}
+
 @genType
 type place = {
+  // maps consumption volume to symbol
+  consumptionSymbols: Js.nullable<consumptionSymbols>,
   createdAt: Firebase.Timestamp.t,
   currency: string,
   name: string,

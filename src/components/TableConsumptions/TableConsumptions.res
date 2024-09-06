@@ -9,6 +9,7 @@ type classesType = {
 let make = (
   ~ariaLabelledby=?,
   ~captionSlot=?,
+  ~formatConsumption,
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
@@ -33,9 +34,7 @@ let make = (
         let createdAt = consumption.createdAt->Js.Date.toISOString
         <tr key={createdAt}>
           <th scope="row"> {React.string(consumption.beer)} </th>
-          <td>
-            <FormattedVolume milliliters=consumption.milliliters />
-          </td>
+          <td> {formatConsumption(consumption)->React.string} </td>
           <td>
             <FormattedDateTimeShort value=consumption.createdAt />
           </td>

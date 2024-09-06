@@ -16,6 +16,7 @@ module PersonCell = {
   @react.component
   let make = (
     ~consumptions: array<Db.userConsumption>,
+    ~formatConsumption,
     ~isCurrent,
     ~isUserAuthorized,
     ~onAddConsumption,
@@ -24,9 +25,7 @@ module PersonCell = {
     let rootNodeRef = React.useRef(Js.Nullable.null)
     let consumptionsStr =
       consumptions
-      ->Array.map(consumption => {
-        consumption.milliliters > 400 ? "X" : "I"
-      })
+      ->Array.map(formatConsumption)
       ->Array.join("")
     let lastConsumptionsStr = React.useRef(consumptionsStr)
     React.useEffect1(() => {
@@ -71,6 +70,7 @@ module PersonCell = {
 @genType @react.component
 let make = (
   ~currentUserUid,
+  ~formatConsumption,
   ~isUserAuthorized,
   ~onAddConsumption,
   ~onAddPerson,
@@ -126,6 +126,7 @@ let make = (
               <div ariaCurrent={isCurrent ? #"true" : #"false"} key={personId} role="row">
                 <PersonCell
                   consumptions={consumptions}
+                  formatConsumption
                   isCurrent
                   isUserAuthorized
                   key={personId}
