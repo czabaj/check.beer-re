@@ -83,7 +83,6 @@ let make = (~placeId) => {
     if !isUserAuthorized(UserRoles.Admin) {
       Exn.raiseError(`Insufficient permissions to view this page`)
     }
-    let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
     <FormattedCurrency.Provider value={place.currency}>
       <div className=Styles.page.narrow>
         <PlaceHeader
@@ -167,17 +166,8 @@ let make = (~placeId) => {
             let unfinishedConsumptions =
               unfinishedConsumptionsByUser->Map.get(personId)->Option.getOr([])
             <PersonDetail
-              formatConsumption
               hasNext
               hasPrevious
-              onDeleteConsumption={consumption => {
-                Db.Keg.deleteConsumption(
-                  firestore,
-                  ~placeId,
-                  ~kegId=consumption.kegId,
-                  ~consumptionId=consumption.consumptionId,
-                )->ignore
-              }}
               onDeletePerson={_ => {
                 Db.Person.delete(firestore, ~placeId, ~personId)->ignore
               }}

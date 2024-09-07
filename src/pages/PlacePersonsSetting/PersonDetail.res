@@ -15,10 +15,8 @@ let byCreatedDesc = (
 
 @react.component
 let make = (
-  ~formatConsumption,
   ~hasNext,
   ~hasPrevious,
-  ~onDeleteConsumption,
   ~onDeletePerson,
   ~onDismiss,
   ~onNextPerson,
@@ -112,30 +110,22 @@ let make = (
           }}
         </p>
       }}
-      {unfinishedConsumptions->Array.length === 0
-        ? <p>
-            {React.string(`${person.name} nemá nezaúčtovaná piva.`)}
-            {switch (pendingTransactions, maybePersonDoc) {
-            | ([], Some({transactions: []})) =>
-              <>
-                {React.string(` Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `)}
-                <button
-                  className={Styles.link.base}
-                  onClick={_ => setDialog(_ => ConfirmDeletePerson)}
-                  type_="button">
-                  {React.string("zcela odebrat z aplikace")}
-                </button>
-                {React.string(". S účetním záznamem to později již není možné ☝️")}
-              </>
-            | _ => React.null
-            }}
-          </p>
-        : <TableConsumptions
-            captionSlot={React.string("Nezaúčtované konzumace")}
-            formatConsumption
-            onDeleteConsumption
-            unfinishedConsumptions
-          />}
+      {switch (unfinishedConsumptions, pendingTransactions, maybePersonDoc) {
+      | ([], [], Some({transactions: []})) =>
+        <p>
+          {React.string(
+            `${person.name} nemá nezaúčtovaná piva. Dokonce nemá ani účetní záznam. Pokud jste tuto osobu přidali omylem, můžete jí nyní `,
+          )}
+          <button
+            className={Styles.link.base}
+            onClick={_ => setDialog(_ => ConfirmDeletePerson)}
+            type_="button">
+            {React.string("zcela odebrat z aplikace")}
+          </button>
+          {React.string(". S účetním záznamem to později již není možné ☝️")}
+        </p>
+      | _ => React.null
+      }}
       <section ariaLabelledby="financial_transactions">
         <header>
           <h3 id="financial_transactions"> {React.string("Účetní záznamy")} </h3>

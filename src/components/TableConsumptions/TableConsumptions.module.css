@@ -2,13 +2,6 @@
   --cell-inline-padding: var(--padding-inline, 8px);
 }
 
-.table caption {
-  font-size: 1.17rem;
-  font-weight: var(--font-weight-semibold);
-  margin-block: 0.25rem;
-  grid-column: 1 / -1;
-}
-
 .table :where(tbody, thead) {
   display: contents;
 }

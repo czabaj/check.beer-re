@@ -8,16 +8,11 @@ type classesType = {
 @react.component
 let make = (
   ~ariaLabelledby=?,
-  ~captionSlot=?,
   ~formatConsumption,
   ~onDeleteConsumption,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
   <table ?ariaLabelledby className={`${classes.table} ${Styles.table.inDialog}`}>
-    {switch captionSlot {
-    | Some(slot) => <caption> {slot} </caption>
-    | None => React.null
-    }}
     <thead>
       <tr className={Styles.utility.srOnly}>
         <th scope="col"> {React.string("Pivo")} </th>
