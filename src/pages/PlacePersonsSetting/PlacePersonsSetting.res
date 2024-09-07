@@ -95,7 +95,7 @@ let make = (~placeId) => {
               className={Styles.button.base}
               type_="button"
               onClick={_ => setDialog(_ => AddPerson)}>
-              {React.string("Přidat osobu")}
+              {React.string("Přidat hosta")}
             </button>}
             headerId="persons_accounts"
             headerSlot={React.string("Účetnictví")}>
@@ -104,10 +104,10 @@ let make = (~placeId) => {
               className={`${Styles.table.stretch} ${classes.table}`}>
               <thead>
                 <tr>
-                  <th scope="col"> {React.string("Návštěvník")} </th>
+                  <th scope="col"> {React.string("Host")} </th>
                   <th scope="col"> {React.string("Role")} </th>
-                  <th scope="col"> {React.string("Poslední aktivita")} </th>
-                  <th scope="col"> {React.string("Bilance")} </th>
+                  <th scope="col"> {React.string("Naposledy")} </th>
+                  <th scope="col"> {React.string("Konto")} </th>
                 </tr>
               </thead>
               <tbody>

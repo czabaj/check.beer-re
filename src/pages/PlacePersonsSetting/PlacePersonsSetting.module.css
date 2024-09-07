@@ -1,16 +1,20 @@
 .table {
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
   --cell-inline-padding: var(--padding-inline, 8px);
-  
+
   font-size: 150%;
 }
 .table > * {
   display: contents;
 }
+
+.table th[scope="row"] {
+  font-weight: var(--font-weight-regular);
+}
+
 .table tr {
   display: grid;
-  grid-template-areas:
-    "name role lastSeen balance";
+  grid-template-areas: "name role lastSeen balance";
   grid-template-columns: 1fr 7ch 13ch 13ch;
 }
 .table :where(th, td) {
@@ -24,6 +28,7 @@
 }
 .table :where(th, td):nth-child(3) {
   grid-area: lastSeen;
+  text-align: right;
 }
 .table :where(th, td):nth-child(4) {
   grid-area: balance;
@@ -53,8 +58,5 @@
       "name name     balance"
       "role lastSeen lastSeen";
     grid-template-columns: auto 1fr;
-  }
-  .table.table :is(th, td):nth-child(3) {
-    text-align: right;
   }
 }

@@ -15,7 +15,7 @@ let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount) => {
     headerId="accounting_overview"
     headerSlot={React.string("Účetnictví")}>
     <dl className={classes.descriptionList}>
-      <dt> {React.string("Počet návštěvníků")} </dt>
+      <dt> {React.string("Počet hostů")} </dt>
       <dd>
         <ReactIntl.FormattedNumber value={personsCount->Float.fromInt} />
       </dd>
