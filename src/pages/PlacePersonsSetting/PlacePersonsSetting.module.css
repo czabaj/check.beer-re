@@ -14,7 +14,7 @@
 
 .table tr {
   display: grid;
-  grid-template-areas: "name role lastSeen balance";
+  grid-template-areas: "name lastSeen role balance";
   grid-template-columns: 1fr 7ch 13ch 13ch;
 }
 .table :where(th, td) {
@@ -24,10 +24,11 @@
   grid-area: name;
 }
 .table :where(th, td):nth-child(2) {
-  grid-area: role;
+  grid-area: lastSeen;
+  text-align: right;
 }
 .table :where(th, td):nth-child(3) {
-  grid-area: lastSeen;
+  grid-area: role;
   text-align: right;
 }
 .table :where(th, td):nth-child(4) {
@@ -51,12 +52,15 @@
 
 @media screen and (max-width: 33rem) {
   .table {
-    grid-template-columns: auto repeat(2, 1fr);
+    grid-template-columns: auto 1fr auto;
   }
   .table tr {
     grid-template-areas:
-      "name name     balance"
-      "role lastSeen lastSeen";
-    grid-template-columns: auto 1fr;
+      "name     name balance"
+      "lastSeen .    role";
+    grid-template-columns: auto 1fr auto;
+  }
+  .table :where(th, td):nth-child(2) {
+    padding-inline-start: 2ch;
   }
 }

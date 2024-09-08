@@ -1,4 +1,4 @@
-type classesType = {root: string, unclosed: string}
+type classesType = {root: string, tableTransactions: string, unclosed: string}
 @module("./PersonDetail.module.css") external classes: classesType = "default"
 
 type dialogState =
@@ -134,7 +134,7 @@ let make = (
               className={Styles.button.base}
               onClick={_ => setDialog(_ => AddTransaction)}
               type_="button">
-              {React.string("Zaznamenat platbu")}
+              {React.string("Nová platba")}
             </button>,
             personsAll->Array.length < 2
               ? {"disabled": true, "title": "Přidejte další osoby"}
@@ -148,7 +148,9 @@ let make = (
         | (pending, Some({transactions})) =>
           pending->Array.sort(byCreatedDesc)
           transactions->Array.sort(byCreatedDesc)
-          <table ariaLabelledby="financial_transactions" className={Styles.table.inDialog}>
+          <table
+            ariaLabelledby="financial_transactions"
+            className={`${classes.tableTransactions} ${Styles.table.inDialog}`}>
             <thead>
               <tr>
                 <th scope="col"> {React.string("Datum")} </th>

@@ -22,6 +22,10 @@ const meta: Meta<typeof DrinkDialog> = {
     unfinishedConsumptions: [
       {
         ...getUserConsumptionMock(),
+        createdAt: new Date(Date.now() - 8 * dayInMilliseconds),
+      },
+      {
+        ...getUserConsumptionMock(),
         createdAt: new Date(Date.now() - 4 * dayInMilliseconds),
       },
       {

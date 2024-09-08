@@ -104,8 +104,8 @@ let make = (~placeId) => {
               <thead>
                 <tr>
                   <th scope="col"> {React.string("Host")} </th>
-                  <th scope="col"> {React.string("Role")} </th>
                   <th scope="col"> {React.string("Naposledy")} </th>
+                  <th scope="col"> {React.string("Role")} </th>
                   <th scope="col"> {React.string("Konto")} </th>
                 </tr>
               </thead>
@@ -117,17 +117,17 @@ let make = (~placeId) => {
                   <tr key=personId onClick={_ => setDialog(_ => PersonDetail({personId, person}))}>
                     <th scope="row"> {React.string(person.name)} </th>
                     <td>
+                      <FormattedRelativeTime
+                        dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
+                      />
+                    </td>
+                    <td>
                       {person.userId
                       ->Null.toOption
                       ->Option.flatMap(userId => place.users->Dict.get(userId))
                       ->Option.flatMap(UserRoles.roleFromInt)
                       ->Option.map(UserRoles.roleI18n)
                       ->Option.mapOr(React.null, React.string)}
-                    </td>
-                    <td>
-                      <FormattedRelativeTime
-                        dateTime={person.recentActivityAt->Firebase.Timestamp.toDate}
-                      />
                     </td>
                     <td>
                       <FormattedCurrency

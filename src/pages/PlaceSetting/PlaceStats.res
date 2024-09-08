@@ -19,7 +19,7 @@ let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount) => {
       <dd>
         <ReactIntl.FormattedNumber value={personsCount->Float.fromInt} />
       </dd>
-      <dt> {React.string("Hodnota sudů na skladě")} </dt>
+      <dt> {React.string("Sudy na skladě")} </dt>
       <dd>
         <FormattedCurrency value={chargedKegsValue} />
       </dd>

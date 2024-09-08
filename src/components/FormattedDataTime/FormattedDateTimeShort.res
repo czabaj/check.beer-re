@@ -32,7 +32,7 @@ let make = (~value) => {
     />
   | _ =>
     <ReactIntl.FormattedDate
-      year=#numeric month=#numeric day=#numeric hour=#numeric minute=#numeric value
+      month=#numeric day=#numeric hour=#numeric minute=#numeric value weekday=#short
     />
   }
 }

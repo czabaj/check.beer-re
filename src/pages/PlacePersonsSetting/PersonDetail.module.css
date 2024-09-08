@@ -8,6 +8,65 @@
   display: flex;
   gap: 1rem;
   justify-content: space-between;
+  margin-block-end: 0.5rem;
+}
+
+.tableTransactions {
+  --cell-inline-padding: var(--padding-inline, 8px);
+}
+
+.tableTransactions :where(tbody, thead) {
+  display: contents;
+}
+
+.tableTransactions tr {
+  display: grid;
+  grid-template-areas: "dateTime amount description";
+  grid-template-columns: 15ch 12ch 1fr;
+}
+.tableTransactions :where(th, td) {
+  padding-inline: var(--cell-inline-padding);
+}
+.tableTransactions :where(th, td):nth-child(1) {
+  grid-area: dateTime;
+  text-align: right;
+}
+.tableTransactions :where(th, td):nth-child(2) {
+  grid-area: amount;
+  text-align: right;
+}
+.tableTransactions :where(th, td):nth-child(3) {
+  grid-area: description;
+}
+
+
+@supports (grid-template-columns: subgrid) {
+  .tableTransactions {
+    display: grid;
+    grid-template-columns: repeat(2, auto) 1fr;
+  }
+  .tableTransactions tr {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid !important;
+  }
+}
+
+@media screen and (max-width: 30rem) {
+  .tableTransactions {
+    grid-template-columns: auto 1fr auto;
+  }
+  .tableTransactions tr {
+    grid-template-areas:
+      "dateTime    .           amount"
+      "description description description";
+    grid-template-columns: 1fr 7ch auto;
+  }
+  .tableTransactions th:nth-child(1) {
+    text-align: left;
+  }
+  .tableTransactions :where(th, td):nth-child(2) {
+    padding-inline-end: var(--dialog-padding-inline);
+  }
 }
 
 .unclosed {
