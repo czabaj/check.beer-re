@@ -2,7 +2,7 @@
   --breakout-hover-overlay: hsl(47deg 100% 62% / 0.1);
   --cell-inline-padding: var(--padding-inline, 8px);
 
-  font-size: 150%;
+  font-size: 1.5rem;
 }
 .table > * {
   display: contents;
@@ -25,7 +25,6 @@
 }
 .table :where(th, td):nth-child(2) {
   grid-area: lastSeen;
-  text-align: right;
 }
 .table :where(th, td):nth-child(3) {
   grid-area: role;
@@ -60,7 +59,8 @@
       "lastSeen .    role";
     grid-template-columns: auto 1fr auto;
   }
-  .table :where(th, td):nth-child(2) {
-    padding-inline-start: 2ch;
+  .table :where(td):nth-child(2),
+  .table :where(td):nth-child(3) {
+    font-size: 1.2rem;
   }
 }
