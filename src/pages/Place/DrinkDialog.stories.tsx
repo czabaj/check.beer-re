@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { userEvent, waitFor, within } from "@storybook/testing-library";
+import { userEvent, within } from "@storybook/testing-library";
 
 import { make as DrinkDialog } from "./DrinkDialog.gen";
 import { getKegMock, getUserConsumptionMock } from "../../test/mockGenerators";

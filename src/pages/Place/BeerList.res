@@ -93,7 +93,7 @@ let make = (
         <label
           className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}>
           {React.string("👁️")}
-          <span className={Styles.utility.srOnly}> {React.string("Zobrazit všechny")} </span>
+          <span className={Styles.utility.srOnly}> {React.string("Zobrazit všechny hosty")} </span>
           <input
             type_="checkbox"
             checked={showAll}
@@ -102,6 +102,7 @@ let make = (
               let checked = target["checked"]
               setShowAll(_ => checked)
             }}
+            role="switch"
           />
         </label>,
         {"data-checked": showAll ? "true" : "false"},
@@ -139,6 +140,7 @@ let make = (
                       checked={personVisible}
                       onChange={_ => onTogglePersonVisibility(personEntry)}
                       type_="checkbox"
+                      role="switch"
                     />
                     <img src={personVisible ? Assets.eyeShow : Assets.eyeHidden} />
                   </label>

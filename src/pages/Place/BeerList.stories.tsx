@@ -5,9 +5,7 @@ import type {
   personsAllRecord as Db_personsAllRecord,
   userConsumption as Db_userConsumption,
 } from "../../../src/backend/Db.gen";
-import { make } from "./BeerList.gen";
-
-const BeerList = make;
+import { make as BeerList } from "./BeerList.gen";
 
 const getPersonRecord = (
   seed: Partial<Db_personsAllRecord>
@@ -33,7 +31,7 @@ const meta: Meta<typeof BeerList> = {
   title: "Pages/Place/BeerList",
   component: BeerList,
   args: {
-    activePersonEntries: Object.entries({
+    personEntries: Object.entries({
       lenny: getPersonRecord({ name: `Lenny`, userId: `lenny` }),
       karl: getPersonRecord({ name: `Karl`, userId: `karl` }),
     }),
@@ -54,15 +52,18 @@ export const Basic: StoryObj<typeof BeerList> = {};
 
 export const Empty: StoryObj<typeof BeerList> = {
   args: {
-    activePersonEntries: [],
+    personEntries: [],
   },
 };
 
 export const LongConsumption: StoryObj<typeof BeerList> = {
   args: {
-    activePersonEntries: Object.entries({
+    personEntries: Object.entries({
       lenny: getPersonRecord({ name: `Lenny`, userId: `lenny` }),
-      karl: getPersonRecord({ name: `Karl Gustavson The Third From Nordic Island`, userId: `karl` }),
+      karl: getPersonRecord({
+        name: `Karl Gustavson The Third From Nordic Island`,
+        userId: `karl`,
+      }),
     }),
     recentConsumptionsByUser: new Map(
       Object.entries({

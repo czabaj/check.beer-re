@@ -1,16 +1,17 @@
-type classesType = {root: string}
+type classesType = {inputToggle: string}
 @module("./InputToggle.module.css") external classes: classesType = "default"
 
-@react.component
-let make = (~\"aria-describedby"=?, ~\"aria-invalid"=?, ~checked, ~id=?, ~name=?, ~onChange) => {
-  <div className=classes.root>
-    {React.cloneElement(
-      <input checked ?id ?name type_="checkbox" onChange />,
-      {
-        "aria-describedby": \"aria-describedby",
-        "aria-invalid": \"aria-invalid",
-      },
-    )}
-    <div />
-  </div>
+@genType @react.component
+let make = (~ariaDescribedby=?, ~ariaInvalid=?, ~checked, ~id=?, ~name=?, ~onChange) => {
+  <input
+    ?ariaDescribedby
+    ?ariaInvalid
+    className={`${classes.inputToggle}`}
+    checked
+    ?id
+    ?name
+    type_="checkbox"
+    onChange
+    role="switch"
+  />
 }
