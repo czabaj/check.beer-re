@@ -1,5 +1,5 @@
 import { Timestamp } from "firebase/firestore";
-import { kegConverted, userConsumption } from "../backend/Db.gen";
+import { kegConverted, userConsumption, personsAllRecord } from "../backend/Db.gen";
 import {
   hourInMilliseconds,
   monthInMilliseconds,
@@ -35,12 +35,24 @@ export const getKegMock = (): kegConverted => {
   };
 };
 
+let uid = 0;
 export const getUserConsumptionMock = (): userConsumption => {
   return {
-    consumptionId: `1`,
+    consumptionId: String(uid++),
     kegId: `1`,
     beer: `Pilsner Urquell`,
     milliliters: 500,
     createdAt: getRandomDateInstanceInHistory(Date.now() - hourInMilliseconds),
   };
 };
+
+export const getPersonMock = (
+  seed: Partial<personsAllRecord>
+): personsAllRecord => ({
+  balance: 0,
+  name: `Lenny`,
+  preferredTap: undefined,
+  recentActivityAt: Timestamp.now(),
+  userId: `user1`,
+  ...seed,
+});

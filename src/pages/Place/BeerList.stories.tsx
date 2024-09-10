@@ -1,46 +1,41 @@
-import { Timestamp } from "firebase/firestore";
 import { type Meta, type StoryObj } from "@storybook/react";
 
-import type {
-  personsAllRecord as Db_personsAllRecord,
-  userConsumption as Db_userConsumption,
-} from "../../../src/backend/Db.gen";
 import { make as BeerList } from "./BeerList.gen";
-
-const getPersonRecord = (
-  seed: Partial<Db_personsAllRecord>
-): Db_personsAllRecord => ({
-  balance: 0,
-  name: `Lenny`,
-  preferredTap: undefined,
-  recentActivityAt: Timestamp.now(),
-  userId: `user1`,
-  ...seed,
-});
-
-let uid = 0;
-const getConsumptionRecord = (milliliters = 500): Db_userConsumption => ({
-  beer: `beer1`,
-  consumptionId: String(uid++),
-  createdAt: new Date(),
-  kegId: `keg1`,
-  milliliters,
-});
+import { getFormatConsumption } from "../../utils/BackendUtils.gen";
+import {
+  getPersonMock,
+  getUserConsumptionMock,
+} from "../../test/mockGenerators";
 
 const meta: Meta<typeof BeerList> = {
   title: "Pages/Place/BeerList",
   component: BeerList,
   args: {
     personEntries: Object.entries({
-      lenny: getPersonRecord({ name: `Lenny`, userId: `lenny` }),
-      karl: getPersonRecord({ name: `Karl`, userId: `karl` }),
+      lenny: getPersonMock({
+        name: `Lenny`,
+        preferredTap: "active",
+        userId: `lenny`,
+      }),
+      karl: getPersonMock({
+        name: `Karl`,
+        preferredTap: "active",
+        userId: `karl`,
+      }),
     }),
     currentUserUid: `karl`,
+    formatConsumption: getFormatConsumption(null),
     isUserAuthorized: () => true,
     recentConsumptionsByUser: new Map(
       Object.entries({
-        lenny: [500, 300, 500].map(getConsumptionRecord),
-        karl: [300].map(getConsumptionRecord),
+        lenny: [500, 300, 500].map((milliliters) => ({
+          ...getUserConsumptionMock(),
+          milliliters,
+        })),
+        karl: [300].map((milliliters) => ({
+          ...getUserConsumptionMock(),
+          milliliters,
+        })),
       })
     ),
   },
@@ -59,9 +54,14 @@ export const Empty: StoryObj<typeof BeerList> = {
 export const LongConsumption: StoryObj<typeof BeerList> = {
   args: {
     personEntries: Object.entries({
-      lenny: getPersonRecord({ name: `Lenny`, userId: `lenny` }),
-      karl: getPersonRecord({
+      lenny: getPersonMock({
+        name: `Lenny`,
+        preferredTap: "active",
+        userId: `lenny`,
+      }),
+      karl: getPersonMock({
         name: `Karl Gustavson The Third From Nordic Island`,
+        preferredTap: "active",
         userId: `karl`,
       }),
     }),
@@ -71,8 +71,11 @@ export const LongConsumption: StoryObj<typeof BeerList> = {
           500, 300, 500, 500, 300, 500, 500, 300, 500, 500, 300, 500, 500, 300,
           500, 500, 300, 500, 500, 300, 500, 500, 300, 500, 500, 300, 500, 500,
           300, 500, 500, 300, 500, 500, 300, 500,
-        ].map(getConsumptionRecord),
-        karl: [300].map(getConsumptionRecord),
+        ].map((milliliters) => ({ ...getUserConsumptionMock(), milliliters })),
+        karl: [300].map((milliliters) => ({
+          ...getUserConsumptionMock(),
+          milliliters,
+        })),
       })
     ),
   },
