@@ -25,7 +25,7 @@ module PersonCell = {
     let rootNodeRef = React.useRef(Js.Nullable.null)
     let consumptionsStr =
       consumptions
-      ->Array.map(formatConsumption)
+      ->Array.map(c => formatConsumption(c.milliliters))
       ->Array.join("")
     let lastConsumptionsStr = React.useRef(consumptionsStr)
     React.useEffect1(() => {

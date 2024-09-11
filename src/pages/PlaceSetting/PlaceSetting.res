@@ -145,8 +145,10 @@ let make = (~placeId) => {
               setDialog(_ => KegDetail(nextKegId))
             }
           }
+          let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
           let keg = chargedKegs->Belt.Array.getExn(currentIdx)
           <KegDetail
+            formatConsumption
             hasNext
             hasPrevious
             isUserAuthorized

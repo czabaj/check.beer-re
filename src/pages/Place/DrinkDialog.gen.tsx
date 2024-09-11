@@ -23,7 +23,7 @@ export type props<formatConsumption,personName,preferredTap,onDeleteConsumption,
 };
 
 export const make: React.ComponentType<{
-  readonly formatConsumption: (_1:Db_userConsumption) => string; 
+  readonly formatConsumption: (_1:number) => string; 
   readonly personName: string; 
   readonly preferredTap: string; 
   readonly onDeleteConsumption: (_1:Db_userConsumption) => void; 

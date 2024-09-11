@@ -32,7 +32,7 @@ let make = (
           <td>
             <FormattedDateTimeShort value=consumption.createdAt />
           </td>
-          <td> {formatConsumption(consumption)->React.string} </td>
+          <td> {formatConsumption(consumption.milliliters)->React.string} </td>
           <td>
             <button
               className={`${classes.deleteButton} ${Styles.button.sizeExtraSmall}`}

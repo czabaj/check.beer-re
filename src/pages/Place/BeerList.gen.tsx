@@ -26,7 +26,7 @@ export type props<currentUserUid,formatConsumption,isUserAuthorized,onAddConsump
 
 export const make: React.ComponentType<{
   readonly currentUserUid: string; 
-  readonly formatConsumption: (_1:Db_userConsumption) => string; 
+  readonly formatConsumption: (_1:number) => string; 
   readonly isUserAuthorized: (_1:UserRoles_role) => boolean; 
   readonly onAddConsumption: (_1:[string, Db_personsAllRecord]) => void; 
   readonly onAddPerson: () => void; 

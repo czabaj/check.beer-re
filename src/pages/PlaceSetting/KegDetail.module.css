@@ -2,3 +2,9 @@
   inline-size: 60ch;
   block-size: min(40rem, 80vh);
 }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
