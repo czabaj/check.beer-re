@@ -1,4 +1,4 @@
-type classesType = {actions: string, root: string}
+type classesType = {actions: string, dialogCloseKeg: string, root: string}
 @module("./KegDetail.module.css") external classes: classesType = "default"
 
 type tableConsumptionsClassesType = {
@@ -143,17 +143,19 @@ let make = (
           <b> {React.string(tapName)} </b>
         </p>
       }}
-      <div className={classes.actions}>
-        {keg.depletedAt !== Null.null || !isUserAuthorized(UserRoles.Admin)
-          ? React.null
-          : <button
+      {keg.depletedAt !== Null.null ||
+      !isUserAuthorized(UserRoles.Admin) ||
+      consumptionsByTimestampDesc->Array.length === 0
+        ? React.null
+        : <div className={classes.actions}>
+            <button
               className={Styles.button.variantDanger}
               disabled={consumptionsByTimestampDesc->Array.length === 0}
               onClick={_ => setDialog(_ => ConfirmFinalize)}
               type_="button">
               {React.string("Odepsat ze skladu a rozúčtovat")}
-            </button>}
-      </div>
+            </button>
+          </div>}
       {switch consumptionsByTimestampDesc {
       | [] =>
         <p>
@@ -174,46 +176,44 @@ let make = (
           }}
         </p>
       | _ =>
-        <>
-          <table className={`${Styles.table.inDialog} ${tableConsumptionsClasses.table}`}>
-            <caption> {React.string("Natočená piva")} </caption>
-            <thead>
-              <tr>
-                <th scope="col"> {React.string("Jméno")} </th>
-                <th scope="col"> {React.string("Kdy")} </th>
-                <th scope="col"> {React.string("Objem")} </th>
-                <th scope="col">
-                  <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
-                </th>
+        <table className={`${Styles.table.inDialog} ${tableConsumptionsClasses.table}`}>
+          <caption> {React.string("Vytočená piva")} </caption>
+          <thead>
+            <tr>
+              <th scope="col"> {React.string("Jméno")} </th>
+              <th scope="col"> {React.string("Kdy")} </th>
+              <th scope="col"> {React.string("Objem")} </th>
+              <th scope="col">
+                <span className={Styles.utility.srOnly}> {React.string("Akce")} </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {consumptionsByTimestampDesc
+            ->Array.map(((timestampStr, consumption)) => {
+              let person = personsAllById->Dict.getUnsafe(consumption.person.id)
+              let createdData = timestampStr->Float.fromString->Option.getExn->Date.fromTime
+              <tr key={timestampStr}>
+                <th scope="row"> {React.string(person.name)} </th>
+                <td>
+                  <FormattedDateTimeShort value={createdData} />
+                </td>
+                <td> {formatConsumption(consumption.milliliters)->React.string} </td>
+                <td>
+                  {keg.depletedAt !== Null.null
+                    ? React.null
+                    : <button
+                        className={`${Styles.button.sizeExtraSmall} ${tableConsumptionsClasses.deleteButton}`}
+                        onClick={_ => onDeleteConsumption(timestampStr)}
+                        type_="button">
+                        {React.string("🗑️ Smáznout")}
+                      </button>}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {consumptionsByTimestampDesc
-              ->Array.map(((timestampStr, consumption)) => {
-                let person = personsAllById->Dict.getUnsafe(consumption.person.id)
-                let createdData = timestampStr->Float.fromString->Option.getExn->Date.fromTime
-                <tr key={timestampStr}>
-                  <th scope="row"> {React.string(person.name)} </th>
-                  <td>
-                    <FormattedDateTimeShort value={createdData} />
-                  </td>
-                  <td> {formatConsumption(consumption.milliliters)->React.string} </td>
-                  <td>
-                    {keg.depletedAt !== Null.null
-                      ? React.null
-                      : <button
-                          className={`${Styles.button.sizeExtraSmall} ${tableConsumptionsClasses.deleteButton}`}
-                          onClick={_ => onDeleteConsumption(timestampStr)}
-                          type_="button">
-                          {React.string("🗑️ Smáznout")}
-                        </button>}
-                  </td>
-                </tr>
-              })
-              ->React.array}
-            </tbody>
-          </table>
-        </>
+            })
+            ->React.array}
+          </tbody>
+        </table>
       }}
     </DialogCycling>
     {switch dialogState {
@@ -236,7 +236,7 @@ let make = (
       </DialogConfirmation>
     | ConfirmFinalize =>
       <DialogConfirmation
-        className={DialogConfirmation.classes.deleteConfirmation}
+        className={`${DialogConfirmation.classes.deleteConfirmation} ${classes.dialogCloseKeg}`}
         heading="Chystáte se rozúčtovat sud"
         onConfirm={() => {
           onDismiss()
@@ -244,7 +244,7 @@ let make = (
         }}
         onDismiss={() => hideDialog()}
         visible=true>
-        <dl>
+        <dl className={Styles.descriptionList.hyphen}>
           <dt> {React.string("Název sudu")} </dt>
           <dd> {React.string(kegName)} </dd>
           <dt> {React.string("Celkem vytočeno")} </dt>
@@ -256,7 +256,7 @@ let make = (
             <FormattedPercent value={effectivity *. 100.0} />
             {React.string(")")}
           </dd>
-          <dt> {React.string(`Výsledná cena velkého piva${HtmlEntities.nbsp}`)} </dt>
+          <dt> {React.string(`Výsledná cena velkého piva${HtmlEntities.nbsp}*`)} </dt>
           <dd>
             <FormattedCurrency
               value={(priceLargeBeer->Int.toFloat /. effectivity)->Int.fromFloat}
@@ -267,6 +267,14 @@ let make = (
           {React.string(`* Mezi konzumenty se rozpočítává cena sudu, výslednou cenu velkého piva tak ovlivňuje
           efektivita výtoče.`)}
         </p>
+        {effectivity > 0.7
+          ? <p className=Styles.messageBar.base>
+              {React.string(`Rozúčtování je nevratná operace. Ujistěte se, že máte správny sud.`)}
+            </p>
+          : <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
+              <b> {React.string(`Efektivita výtoče je velmi nízká.`)} </b>
+              {React.string(` Rozúčtování je nevratná operace. Ujistěte se, že máte správny sud.`)}
+            </p>}
       </DialogConfirmation>
     }}
   </>

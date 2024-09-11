@@ -8,3 +8,11 @@
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+
+.dialogCloseKeg p:first-of-type {
+  font-size: 90%;
+}
+.dialogCloseKeg p:last-of-type {
+  margin-inline: var(--dialog-padding-inline);
+  padding-inline: 2rem;
+}
