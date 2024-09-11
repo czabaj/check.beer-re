@@ -18,7 +18,7 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
       <button
         ?className
         id=anchorId
-        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("anchor-name", anchorName)}
+        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("anchorName", anchorName)}
         ?title
         type_="button">
         {children}
@@ -32,7 +32,7 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
       <div
         className={classes.popover}
         id={popoverId}
-        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("position-anchor", anchorName)}>
+        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("positionAnchor", anchorName)}>
         <nav>
           <ul>
             {menuItems
