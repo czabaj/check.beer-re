@@ -1,4 +1,4 @@
-type classesType = {footer: string}
+type classesType = {footer: string, list: string}
 
 @module("./MyPlaces.module.css") external classes: classesType = "default"
 
@@ -60,7 +60,7 @@ module Pure = {
             </p>
           | places =>
             <nav>
-              <ul className={Styles.list.base}>
+              <ul className={`${Styles.list.base} ${classes.list}`}>
                 {places
                 ->Array.map(place => {
                   let stringId = Db.getUid(place)
@@ -70,6 +70,15 @@ module Pure = {
                       className={Styles.utility.breakout}>
                       {React.string(place.name)}
                     </a>
+                    <span>
+                      {React.string("Založeno: ")}
+                      <ReactIntl.FormattedDate
+                        day=#numeric
+                        month=#numeric
+                        year=#numeric
+                        value={place.createdAt->Firebase.Timestamp.toDate}
+                      />
+                    </span>
                   </li>
                 })
                 ->React.array}

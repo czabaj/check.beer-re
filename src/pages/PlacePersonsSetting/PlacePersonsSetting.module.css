@@ -12,6 +12,13 @@
   font-weight: var(--font-weight-regular);
 }
 
+.table thead tr {
+  border-block-end: calc(var(--border-size-2) * 2) double var(--border-ink);
+}
+.table tbody tr:nth-child(n+2) {
+  border-block-start: var(--border-size-2) solid var(--border-ink);
+}
+
 .table tr {
   display: grid;
   grid-template-areas: "name lastSeen role balance";

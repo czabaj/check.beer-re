@@ -3,3 +3,13 @@
   padding: 0.5rem;
   text-align: right;
 }
+
+.list li {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.list li > span {
+  font-size: 0.8rem;
+}
