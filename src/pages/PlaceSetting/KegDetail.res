@@ -268,10 +268,10 @@ let make = (
           efektivita výtoče.`)}
         </p>
         {effectivity > 0.7
-          ? <p className=Styles.messageBar.base>
+          ? <p className=Styles.messageBar.base role="alert">
               {React.string(`Rozúčtování je nevratná operace. Ujistěte se, že máte správny sud.`)}
             </p>
-          : <p className={`${Styles.messageBar.base} ${Styles.messageBar.variantDanger}`}>
+          : <p className={Styles.messageBar.variantDanger} role="alert">
               <b> {React.string(`Efektivita výtoče je velmi nízká.`)} </b>
               {React.string(` Rozúčtování je nevratná operace. Ujistěte se, že máte správny sud.`)}
             </p>}

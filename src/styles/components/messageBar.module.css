@@ -23,3 +23,9 @@
 .variantDanger::before {
   content: "🚨 ";
 }
+
+dialog .base {
+  margin-inline: var(--dialog-padding-inline);
+  padding-inline-end: 0.75rem;
+  padding-inline-start: calc(0.5rem + 3ch);
+}

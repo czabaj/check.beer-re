@@ -2,7 +2,6 @@ type classesType = {root: string}
 
 @module("./PlaceDelete.module.css") external classes: classesType = "default"
 
-
 module FormFields = {
   type state = {name: string}
   type rec field<_> = Name: field<string>
@@ -47,11 +46,10 @@ let make = (~onConfirm, ~onDismiss, ~placeName) => {
     onDismiss={onDismiss}
     visible=true>
     <Form.Provider value=Some(form)>
-      <p>
-        {React.string(`Pokud si přejete smazat místo, napište jeho název a potvrďte. `)}
-        <strong>
-          {React.string(`Smazání místa je nevratná operace, tímto ztratíte veškeré údaje o místu a nepůjdou vrátit zpět!`)}
-        </strong>
+      <p> {React.string(`Pokud si přejete smazat místo, napište jeho název a potvrďte. `)} </p>
+      <p className={Styles.messageBar.variantDanger} role="alert">
+        <strong> {React.string(`Smazání místa je nevratná operace!`)} </strong>
+        {React.string(` Tímto ztratíte veškeré údaje o místu a nepůjdou vrátit zpět`)}
       </p>
       <form id="place_delete" onSubmit={ReForm__Helpers.handleSubmit(form.submit)}>
         <fieldset className={`reset ${Styles.fieldset.grid}`}>

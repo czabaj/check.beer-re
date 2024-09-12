@@ -38,10 +38,7 @@ dialog:modal {
   color: var(--text-2);
 }
 
-dl,
-dl dd,
-p,
-[popover] {
+:where(dl, dl dd, p, [popover]) {
   margin: 0;
   padding: 0;
   border: 0;
