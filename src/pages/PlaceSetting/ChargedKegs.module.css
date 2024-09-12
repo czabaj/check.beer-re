@@ -9,6 +9,12 @@
 .table > * {
   display: contents;
 }
+.table thead tr {
+  border-block-end: calc(var(--border-size-2) * 2) double var(--border-ink);
+}
+.table tbody tr:nth-child(n+2) {
+  border-block-start: var(--border-size-2) solid var(--border-ink);
+}
 .table tr {
   display: grid;
   grid-template-areas: "serial beer volume created price remains";
@@ -40,7 +46,7 @@
 @supports (grid-template-columns: subgrid) {
   .table {
     display: grid;
-    grid-template-columns: repeat(5, auto) 1fr;
+    grid-template-columns: auto 1fr repeat(4, auto);
   }
   .table tr {
     grid-column: 1 / -1;
@@ -51,13 +57,13 @@
 @media screen and (min-width: 25rem) and (max-width: 45rem) {
   /* Applies only when subgrid is supported */
   .table {
-    grid-template-columns: repeat(5, auto);
+    grid-template-columns: repeat(4, auto);
   }
   .table tr {
     grid-template-areas:
-      "serial beer    beer  beer    volume"
-      "serial created price remains remains";
-    grid-template-columns: 5ch 12ch 12ch 1fr 7ch;
+      "serial beer    beer  volume"
+      "serial created price remains";
+    grid-template-columns: 5ch 12ch 1fr 7ch;
   }
   .table :is(th, td):is(:nth-child(3), :nth-child(6)) {
     text-align: right;
@@ -67,14 +73,14 @@
 @media screen and (max-width: 25rem) {
   /* Applies only when subgrid is supported */
   .table {
-    grid-template-columns: repeat(4, auto);
+    grid-template-columns: repeat(3, auto);
   }
   .table tr {
     grid-template-areas:
-      "serial beer   beer    beer    beer"
-      "serial price  price   created created"
-      "serial volume remains remains remains";
-    grid-template-columns: 5ch 6ch 6ch 6fr 6ch;
+      "serial beer   beer"
+      "serial price  created"
+      "serial volume remains";
+    grid-template-columns: 5ch 1fr 6ch;
   }
   .table :is(th, td) {
     text-align: left;

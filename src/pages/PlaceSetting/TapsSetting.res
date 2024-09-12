@@ -60,48 +60,57 @@ let make = (
 
           <li key={tapName}>
             <div>
-              {React.string(tapName)}
-              {tappedKeg->Option.mapOr(React.null, keg => {
-                <div className={classes.tappedBeer}>
-                  <span> {React.string(keg.serialFormatted)} </span>
-                  {React.string(HtmlEntities.nbsp)}
-                  {React.string(keg.beer)}
-                </div>
-              })}
+              <div>
+                {React.string(tapName)}
+                {tappedKeg->Option.mapOr(React.null, keg => {
+                  <div className={classes.tappedBeer}>
+                    <span> {React.string(keg.serialFormatted)} </span>
+                    {React.string(HtmlEntities.nbsp)}
+                    {React.string(keg.beer)}
+                  </div>
+                })}
+              </div>
+              {switch tappedKeg {
+              | None =>
+                <button
+                  disabled={!hasKegsToTap}
+                  className={Styles.button.variantPrimary}
+                  onClick={_ => setDialog(_ => TapKegOn(tapName))}
+                  type_="button">
+                  {React.string("Narazit")}
+                </button>
+              | Some(_) =>
+                <button
+                  className={Styles.button.variantDanger}
+                  onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
+                  type_="button">
+                  {React.string("Odrazit")}
+                </button>
+              }}
+              <ButtonMenu
+                className={Styles.button.iconOnly}
+                title="další akce"
+                menuItems={[
+                  {
+                    label: "Přejmenovat",
+                    onClick: _ => setDialog(_ => RenameTap(tapName)),
+                  },
+                  {
+                    disabled: tappedKeg != None || tapsCount < 2,
+                    label: "Smazat",
+                    onClick: _ => setDialog(_ => DeleteTap(tapName)),
+                  },
+                ]}>
+                {React.string("⋯")}
+              </ButtonMenu>
             </div>
             {switch tappedKeg {
-            | None =>
-              <button
-                disabled={!hasKegsToTap}
-                className={Styles.button.variantPrimary}
-                onClick={_ => setDialog(_ => TapKegOn(tapName))}
-                type_="button">
-                {React.string("Narazit")}
-              </button>
-            | Some(_) =>
-              <button
-                className={Styles.button.variantDanger}
-                onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
-                type_="button">
-                {React.string("Odrazit")}
-              </button>
+            | None => React.null
+            | Some(keg) =>
+              <MeterKeg
+                ariaLabel={`Sud ${keg.serialFormatted} pivo ${keg.beer} zbývající hladina`} keg
+              />
             }}
-            <ButtonMenu
-              className={Styles.button.iconOnly}
-              title="další akce"
-              menuItems={[
-                {
-                  label: "Přejmenovat",
-                  onClick: _ => setDialog(_ => RenameTap(tapName)),
-                },
-                {
-                  disabled: tappedKeg != None || tapsCount < 2,
-                  label: "Smazat",
-                  onClick: _ => setDialog(_ => DeleteTap(tapName)),
-                },
-              ]}>
-              {React.string("⋯")}
-            </ButtonMenu>
           </li>
         })
         ->React.array

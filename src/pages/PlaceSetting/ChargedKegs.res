@@ -23,7 +23,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
             <th scope="col"> {React.string("Objem")} </th>
             <th scope="col"> {React.string("Naskladněno")} </th>
             <th scope="col"> {React.string("Cena")} </th>
-            <th id="remaining_th" scope="col"> {React.string("Zbývá")} </th>
+            <th scope="col"> {React.string("Zbývá")} </th>
           </tr>
         </thead>
         <tbody>
@@ -46,7 +46,7 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
                 <FormattedCurrency value={keg.price} />
               </td>
               <td>
-                <MeterKeg ariaLabelledby="remaining_th" keg />
+                <FormattedVolume milliliters={volume - keg.consumptionsSum} />
               </td>
             </tr>
           })

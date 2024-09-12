@@ -1,4 +1,4 @@
-.list > li {
+.list > li > div {
   align-items: center;
   display: flex;
   flex-direction: row-reverse;
@@ -11,9 +11,16 @@
   border-block-start: var(--border-size-2) solid var(--surface-1);
 }
 
-.list > li > div:first-child {
+.list > li > div > div:first-child {
   order: 1;
   margin-inline-end: auto;
+}
+
+.list meter {
+  display: block;
+  margin-inline: auto;
+  margin-block-start: -0.5rem;
+  width: calc(100% - 0.5rem);
 }
 
 .tappedBeer {

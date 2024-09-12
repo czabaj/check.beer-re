@@ -1,9 +1,10 @@
 @react.component
-let make = (~ariaLabelledby=?, ~keg: Db.kegConverted) => {
+let make = (~ariaLabel=?, ~ariaLabelledby=?, ~keg: Db.kegConverted) => {
   let volume = keg.milliliters
   <FormattedVolume milliliters={Math.Int.max(volume - keg.consumptionsSum, 0)}>
     {(~formattedNumber) =>
       <meter
+        ?ariaLabel
         ?ariaLabelledby
         low={volume / 3}
         max={volume->Int.toString}
