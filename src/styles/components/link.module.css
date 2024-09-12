@@ -1,8 +1,15 @@
 .base {
+  appearance: none;
+  font: inherit;
   color: var(--link-text, var(--text-3));
+  display: inline;
   letter-spacing: 0.02em;
   text-decoration: underline;
 }
 .base:hover {
   color: currentColor;
+}
+.base:focus {
+  outline: 2px solid -webkit-focus-ring-color;
+  outline-offset: 2px;
 }
