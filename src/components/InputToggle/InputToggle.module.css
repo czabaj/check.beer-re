@@ -34,5 +34,5 @@
   background: #009578;
 }
 .inputToggle:checked::before {
-  transform: translateX(var(--toggle-height));
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height) / 2));
 }
