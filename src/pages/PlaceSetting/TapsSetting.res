@@ -65,8 +65,7 @@ let make = (
                 {tappedKeg->Option.mapOr(React.null, keg => {
                   <div className={classes.tappedBeer}>
                     <span> {React.string(keg.serialFormatted)} </span>
-                    {React.string(HtmlEntities.nbsp)}
-                    {React.string(keg.beer)}
+                    {React.string(` ${keg.beer}`)}
                   </div>
                 })}
               </div>
