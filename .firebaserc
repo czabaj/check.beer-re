@@ -14,5 +14,6 @@
         "firebase-web-authn": "6296fe3651d8075c81c14ee588145de306632f768934af789d7cd19783c5993b"
       }
     }
-  }
+  },
+  "dataconnectEmulatorConfig": {}
 }

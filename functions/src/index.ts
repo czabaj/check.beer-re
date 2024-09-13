@@ -92,9 +92,7 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
         const placePersonsIndex =
           placePersonsIndexSnapshot.data() as PersonsIndex;
         const personEntry = Object.entries(placePersonsIndex.all).find(
-          ([, personTuple]) => {
-            personTuple[3] === user.uid;
-          }
+          ([, personTuple]) => personTuple[3] === user.uid
         );
         if (personEntry) {
           const [personId, personTuple] = personEntry;

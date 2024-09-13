@@ -9,9 +9,13 @@
   "bsc-flags": ["-open RescriptCore"],
   "gentypeconfig": {
     "language": "typescript",
-    "shims": {},
+    "shims": {
+      "Js": "Js",
+      "Map": "Map"
+    },
     "generatedFileExtension": ".gen.tsx",
     "module": "esmodule",
+    "moduleResolution": "node",
     "debug": {
       "all": false,
       "basic": false
