@@ -85,7 +85,7 @@ module Analytics = {
   external getAnalytics: FirebaseApp.t => t = "getAnalytics"
 
   @module("firebase/analytics")
-  external logEvent: (. t, eventName, eventParams) => unit = "logEvent"
+  external logEvent: (t, eventName, eventParams) => unit = "logEvent"
 }
 
 // @module("firebase/app")
@@ -155,9 +155,9 @@ external deleteDoc: documentReference<'a> => promise<unit> = "deleteDoc"
 external serverTimestamp: unit => 'a = "serverTimestamp"
 
 type documentSnapshot<'a> = {
-  data: (. snapshotOptions) => 'a,
-  exists: (. unit) => bool,
-  get: (. ~fieldPath: string, ~options: snapshotOptions) => unknown,
+  data: snapshotOptions => 'a,
+  exists: unit => bool,
+  get: (~fieldPath: string, ~options: snapshotOptions) => unknown,
   id: string,
   ref: documentReference<'a>,
 }
@@ -166,7 +166,7 @@ external getDoc: documentReference<'a> => promise<documentSnapshot<'a>> = "getDo
 
 type querySnapshot<'a> = {
   docs: array<documentSnapshot<'a>>,
-  forEach: (. documentSnapshot<'a> => unit) => unit,
+  forEach: (documentSnapshot<'a> => unit) => unit,
 }
 @module("firebase/firestore")
 external getDocs: query<'a> => promise<querySnapshot<'a>> = "getDocs"
@@ -177,8 +177,8 @@ external getDocFromCache: documentReference<'a> => promise<documentSnapshot<'a>>
 type setOptions = {merge?: bool, mergeFields?: array<string>}
 
 type dataConverter<'a, 'b> = {
-  fromFirestore: (. documentSnapshot<'a>, snapshotOptions) => 'b,
-  toFirestore: (. 'b, setOptions) => 'a,
+  fromFirestore: (documentSnapshot<'a>, snapshotOptions) => 'b,
+  toFirestore: ('b, setOptions) => 'a,
 }
 
 @send
@@ -209,7 +209,7 @@ external where: (
 ) => queryConstraint = "where"
 
 type aggregateSpecData = {count: int}
-type aggregateQuerySnapshot = {data: (. unit) => aggregateSpecData}
+type aggregateQuerySnapshot = {data: unit => aggregateSpecData}
 @module("firebase/firestore")
 external getCountFromServer: collectionReference<'a> => promise<aggregateQuerySnapshot> =
   "getCountFromServer"
@@ -227,8 +227,7 @@ module Transaction = {
 }
 
 @module("firebase/firestore")
-external runTransaction: (. firestore, Transaction.t => promise<'a>) => promise<'a> =
-  "runTransaction"
+external runTransaction: (firestore, Transaction.t => promise<'a>) => promise<'a> = "runTransaction"
 
 module WriteBatch = {
   type t
@@ -330,21 +329,21 @@ module Auth = {
 
   @module("firebase/auth")
   external sendSignInLinkToEmail: (
-    . t,
+    t,
     ~email: string,
     ~actionCodeSettings: actionCodeSettings,
   ) => promise<unit> = "sendSignInLinkToEmail"
 
   @module("firebase/auth")
-  external isSignInWithEmailLink: (. t, ~href: string) => bool = "isSignInWithEmailLink"
+  external isSignInWithEmailLink: (t, ~href: string) => bool = "isSignInWithEmailLink"
 
   @module("firebase/auth")
-  external signInWithEmailLink: (. t, ~email: string, ~href: string) => promise<userCredential> =
+  external signInWithEmailLink: (t, ~email: string, ~href: string) => promise<userCredential> =
     "signInWithEmailLink"
 
   @module("firebase/auth")
   external createUserWithEmailAndPassword: (
-    . t,
+    t,
     ~email: string,
     ~password: string,
   ) => promise<userCredential> = "createUserWithEmailAndPassword"
@@ -359,32 +358,32 @@ module Auth = {
   }
 
   @module("firebase/auth")
-  external reauthenticateWithCredential: (. User.t, authCredential) => promise<userCredential> =
+  external reauthenticateWithCredential: (User.t, authCredential) => promise<userCredential> =
     "reauthenticateWithCredential"
 
   @module("firebase/auth")
-  external sendPasswordResetEmail: (. t, ~email: string) => promise<unit> = "sendPasswordResetEmail"
+  external sendPasswordResetEmail: (t, ~email: string) => promise<unit> = "sendPasswordResetEmail"
 
   @module("firebase/auth")
   external signInWithEmailAndPassword: (
-    . t,
+    t,
     ~email: string,
     ~password: string,
   ) => promise<userCredential> = "signInWithEmailAndPassword"
 
   @module("firebase/auth")
-  external signInWithPopup: (. t, FederatedAuthProvider.t) => promise<userCredential> =
+  external signInWithPopup: (t, FederatedAuthProvider.t) => promise<userCredential> =
     "signInWithPopup"
 
   @module("firebase/auth")
-  external signInWithRedirect: (. t, FederatedAuthProvider.t) => promise<userCredential> =
+  external signInWithRedirect: (t, FederatedAuthProvider.t) => promise<userCredential> =
     "signInWithRedirect"
 
   @module("firebase/auth")
-  external connectAuthEmulator: (. t, string) => unit = "connectAuthEmulator"
+  external connectAuthEmulator: (t, string) => unit = "connectAuthEmulator"
 
   @module("firebase/auth")
-  external updatePassword: (. User.t, ~newPassword: string) => promise<unit> = "updatePassword"
+  external updatePassword: (User.t, ~newPassword: string) => promise<unit> = "updatePassword"
 }
 
 type appCheckToken
@@ -407,10 +406,10 @@ module FirestoreLocalCache = {
     type t
 
     @module("firebase/firestore")
-    external persistentSingleTabManager: (. unit) => t = "persistentLocalCache"
+    external persistentSingleTabManager: unit => t = "persistentLocalCache"
 
     @module("firebase/firestore")
-    external persistentMultipleTabManager: (. unit) => t = "persistentMultipleTabManager"
+    external persistentMultipleTabManager: unit => t = "persistentMultipleTabManager"
   }
 
   type persistentCacheSettings = {
@@ -434,6 +433,18 @@ module AppCheckProvider = {
   @react.component @module("reactfire")
   external make: (~sdk: appCheck, ~children: React.element) => React.element = "AppCheckProvider"
 }
+
+module Messaging = {
+  type t
+
+  type getTokenOptions = { vapidKey: string }
+
+  @module("firebase/messaging")
+  external getToken: (t, getTokenOptions) => unit = "getToken"
+}
+
+@module("firebase/messaging")
+external getMessaging: FirebaseApp.t => Messaging.t = "getMessaging"
 
 module Timestamp = {
   @genType.import("firebase/firestore") @genType.as("Timestamp")
@@ -465,8 +476,8 @@ module Functions = {
 
   type callResult<'a> = {data: 'a}
   @module("firebase/functions")
-  external httpsCallable: (t, string) => (. 'a) => promise<callResult<'b>> = "httpsCallable"
+  external httpsCallable: (t, string) => 'a => promise<callResult<'b>> = "httpsCallable"
 }
 
 @module("firebase/firestore")
-external connectFirestoreEmulator: (. firestore, string, int) => unit = "connectFirestoreEmulator"
+external connectFirestoreEmulator: (firestore, string, int) => unit = "connectFirestoreEmulator"
