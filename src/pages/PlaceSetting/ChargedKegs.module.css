@@ -17,8 +17,8 @@
 }
 .table tr {
   display: grid;
-  grid-template-areas: "serial beer volume created price remains";
-  grid-template-columns: 5ch 22ch 7ch 12ch 12ch 1fr;
+  grid-template-areas: "serial beer created price volume remains";
+  grid-template-columns: 5ch 22ch 12ch 12ch 7ch 1fr;
 }
 .table :where(th, td) {
   padding-inline: var(--cell-inline-padding);
@@ -31,13 +31,13 @@
   grid-area: beer;
 }
 .table :where(th, td):nth-child(3) {
-  grid-area: volume;
-}
-.table :where(th, td):nth-child(4) {
   grid-area: created;
 }
-.table :where(th, td):nth-child(5) {
+.table :where(th, td):nth-child(4) {
   grid-area: price;
+}
+.table :where(th, td):nth-child(5) {
+  grid-area: volume;
 }
 .table :where(th, td):nth-child(6) {
   grid-area: remains;
@@ -65,8 +65,8 @@
       "serial created price remains";
     grid-template-columns: 5ch 12ch 1fr 7ch;
   }
-  .table :is(th, td):is(:nth-child(3), :nth-child(6)) {
-    text-align: right;
+  .table :is(th, td):is(:nth-child(2), :nth-child(3)) {
+    text-align: left;
   }
 }
 
@@ -77,15 +77,15 @@
   }
   .table tr {
     grid-template-areas:
-      "serial beer   beer"
-      "serial price  created"
-      "serial volume remains";
+      "serial beer    beer"
+      "serial created volume"
+      "serial price   remains";
     grid-template-columns: 5ch 1fr 6ch;
   }
   .table :is(th, td) {
     text-align: left;
   }
-  .table :is(th, td):is(:nth-child(4), :nth-child(6)) {
+  .table :is(th, td):is(:nth-child(5), :nth-child(6)) {
     text-align: right;
   }
 }

@@ -20,9 +20,9 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
           <tr>
             <th scope="col"> {React.string("No.")} </th>
             <th scope="col"> {React.string("Pivo")} </th>
-            <th scope="col"> {React.string("Objem")} </th>
             <th scope="col"> {React.string("Naskladněno")} </th>
             <th scope="col"> {React.string("Cena")} </th>
+            <th scope="col"> {React.string("Objem")} </th>
             <th scope="col"> {React.string("Zbývá")} </th>
           </tr>
         </thead>
@@ -37,13 +37,13 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
               <th scope="row"> {React.string(keg.serialFormatted)} </th>
               <td> {React.string(keg.beer)} </td>
               <td>
-                <FormattedVolume milliliters=volume />
-              </td>
-              <td>
                 <ReactIntl.FormattedDate value={keg.createdAt->Firebase.Timestamp.toDate} />
               </td>
               <td>
                 <FormattedCurrency value={keg.price} />
+              </td>
+              <td>
+                <FormattedVolume milliliters=volume />
               </td>
               <td>
                 <FormattedVolume milliliters={volume - keg.consumptionsSum} />
