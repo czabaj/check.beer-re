@@ -5,7 +5,7 @@
 
 import * as DbJS from './Db.bs.js';
 
-import type {Dict_key as Js_Dict_key} from './Js.gen';
+import type {Dict_key as Js_Dict_key} from '../../src/shims/Js.shim';
 
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 

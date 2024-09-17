@@ -27,30 +27,40 @@ module PersonCell = {
       consumptions
       ->Array.map(c => formatConsumption(c.milliliters))
       ->Array.join("")
-    let lastConsumptionsStr = React.useRef(consumptionsStr)
+    let recentConsumptionTimestamp =
+      consumptions->Array.at(-1)->Option.map(c => c.createdAt->Date.getTime)
+    let prevRecentConsumptionTimestampRef = React.useRef(recentConsumptionTimestamp)
     React.useEffect1(() => {
-      switch (
-        consumptionsStr === lastConsumptionsStr.current,
-        Nullable.toOption(rootNodeRef.current),
-      ) {
-      | (false, Some(el)) =>
-        lastConsumptionsStr.current = consumptionsStr
-        el
-        ->Webapi.Dom.Element.animate(
-          {
-            "backgroundColor": "var(--surface-warning)",
-          },
-          {
-            "duration": 500,
-            "iterations": 3,
-            "direction": "reverse",
-          },
-        )
-        ->ignore
+      let prevRecentConsumptionTimestamp = prevRecentConsumptionTimestampRef.current
+      prevRecentConsumptionTimestampRef.current = recentConsumptionTimestamp
+      switch Nullable.toOption(rootNodeRef.current) {
+      | Some(listElement) =>
+        let initialEffect = recentConsumptionTimestamp === prevRecentConsumptionTimestamp
+        if !initialEffect {
+          let changedDueToExpiredConsumptions =
+            recentConsumptionTimestamp === None &&
+              prevRecentConsumptionTimestamp->Option.mapOr(false, t =>
+                Date.now() -. t > Db.slidingWindowInMillis
+              )
+          if !changedDueToExpiredConsumptions {
+            listElement
+            ->Webapi.Dom.Element.animate(
+              {
+                "backgroundColor": "var(--surface-warning)",
+              },
+              {
+                "duration": 500,
+                "iterations": 3,
+                "direction": "reverse",
+              },
+            )
+            ->ignore
+          }
+        }
       | _ => ()
       }
       None
-    }, [consumptionsStr])
+    }, [recentConsumptionTimestamp])
 
     <div className={classes.cellConsumption} ref={ReactDOM.Ref.domRef(rootNodeRef)} role="gridcell">
       <div> {React.string(personName)} </div>
