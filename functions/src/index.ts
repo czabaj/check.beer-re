@@ -21,9 +21,12 @@ import type {
 import { UserRole } from "../../src/backend/UserRoles";
 
 initializeApp();
-const db = getFirestore();
 
-async function deleteQueryBatch(query: Query, resolve: () => void) {
+async function deleteQueryBatch(
+  db: FirebaseFirestore.Firestore,
+  query: Query,
+  resolve: () => void
+) {
   const snapshot = await query.get();
 
   const batchSize = snapshot.size;
@@ -43,16 +46,20 @@ async function deleteQueryBatch(query: Query, resolve: () => void) {
   // Recurse on the next process tick, to avoid
   // exploding the stack.
   process.nextTick(() => {
-    deleteQueryBatch(query, resolve);
+    deleteQueryBatch(db, query, resolve);
   });
 }
 
-async function deleteCollection(collectionPath: string, batchSize = 30) {
+async function deleteCollection(
+  db: FirebaseFirestore.Firestore,
+  collectionPath: string,
+  batchSize = 30
+) {
   const collectionRef = db.collection(collectionPath);
   const query = collectionRef.orderBy("__name__").limit(batchSize);
 
   return new Promise((resolve, reject) => {
-    deleteQueryBatch(query, resolve as any).catch(reject);
+    deleteQueryBatch(db, query, resolve as any).catch(reject);
   });
 }
 
@@ -64,54 +71,91 @@ export const deletePlaceSubcollection = firestore.onDocumentDeleted(
     const collections = [`kegs`, `persons`, `personsIndex`].map(
       (collection) => `places/${placeId}/${collection}`
     );
+    const db = getFirestore();
     for (const collection of collections) {
-      await deleteCollection(collection);
+      await deleteCollection(db, collection);
     }
   }
 );
 
 export const truncateUserInDb = auth.user().onDelete(async (user) => {
-  logger.info(`Delete user`, user);
+  const USER_TAG = `Delete user "${user.uid}"`;
+  logger.info(USER_TAG);
+  const db = getFirestore();
   const placesQuery = db
     .collection("places")
     .where(`users.${user.uid}`, `>=`, 0);
-  const placesToRole: Array<[string, number]> = [];
-  placesQuery
-    .stream()
-    .on(`data`, async (placeSnapshot: DocumentSnapshot<Place>) => {
-      const placeData = placeSnapshot.data() as Place;
-      const userRole = placeData.users[user.uid];
-      placesToRole.push([placeSnapshot.ref.id, userRole]);
-      if (userRole === UserRole.owner) {
-        placeSnapshot.ref.delete();
-      } else {
-        const placePersonsIndexRef = db.doc(
-          `places/${placeSnapshot.id}/personsIndex/1`
-        );
-        const placePersonsIndexSnapshot = await placePersonsIndexRef.get();
-        const placePersonsIndex =
-          placePersonsIndexSnapshot.data() as PersonsIndex;
-        const personEntry = Object.entries(placePersonsIndex.all).find(
-          ([, personTuple]) => personTuple[3] === user.uid
-        );
-        if (personEntry) {
-          const [personId, personTuple] = personEntry;
-          personTuple[3] = null;
-          placePersonsIndexRef.update({
-            [`all.${personId}`]: personTuple,
+  const pendingPromises: Promise<any>[] = [];
+  await new Promise((resolve, reject) => {
+    placesQuery
+      .stream()
+      .on(`data`, (placeSnapshot: DocumentSnapshot<Place>) => {
+        const placeData = placeSnapshot.data() as Place;
+        const PLACE_TAG = `place ${placeSnapshot.ref.id}`;
+        const promise = (async () => {
+          const userRole = placeData.users[user.uid];
+          let newOwner: string | undefined;
+          if (userRole === UserRole.owner) {
+            const otherPlaceUserEntriesByRoleDesc = Object.entries(
+              placeData.users
+            )
+              .filter(([uid]) => uid !== user.uid)
+              .sort((a, b) => b[1] - a[1]);
+            const ownerOnly = otherPlaceUserEntriesByRoleDesc.length === 0;
+            if (ownerOnly) {
+              // if the place has only owner, delete the whole place
+              await placeSnapshot.ref.delete();
+              logger.info(
+                USER_TAG,
+                PLACE_TAG,
+                `only owner, place deleted`,
+                placeData
+              );
+              return;
+            } else {
+              const secondHighestRank = otherPlaceUserEntriesByRoleDesc[0];
+              newOwner = secondHighestRank[0];
+            }
+          }
+          const placePersonsIndexRef = db.doc(
+            `places/${placeSnapshot.id}/personsIndex/1`
+          );
+          const placePersonsIndexSnapshot = await placePersonsIndexRef.get();
+          const placePersonsIndex =
+            placePersonsIndexSnapshot.data() as PersonsIndex;
+          const personEntry = Object.entries(placePersonsIndex.all).find(
+            ([, personTuple]) => personTuple[3] === user.uid
+          );
+          if (personEntry) {
+            const [personId, personTuple] = personEntry;
+            // person will remain in the list, but without connected account
+            personTuple[3] = null;
+            await placePersonsIndexRef.update({
+              [`all.${personId}`]: personTuple,
+            });
+          }
+          await placeSnapshot.ref.update({
+            [`users.${user.uid}`]: FieldValue.delete(),
+            ...(newOwner && { [`users.${newOwner}`]: UserRole.owner }),
           });
-        }
-        placeSnapshot.ref.update({
-          [`users.${user.uid}`]: FieldValue.delete(),
-        });
-      }
-    })
-    .on(`end`, () => {
-      logger.info(
-        `Delete user "${user.uid}" affected places:`,
-        placesToRole.length === 0
-          ? `none deleted`
-          : Object.fromEntries(placesToRole)
-      );
-    });
+          logger.info(USER_TAG, PLACE_TAG, `user relation removed`);
+          if (newOwner) {
+            logger.info(
+              USER_TAG,
+              PLACE_TAG,
+              `ownership transferred to ${newOwner}`
+            );
+          }
+        })();
+        pendingPromises.push(
+          promise.catch((err) => logger.error(USER_TAG, PLACE_TAG, err))
+        );
+      })
+      .on(`end`, resolve)
+      .on(`error`, (err) => {
+        logger.error(USER_TAG, err);
+        reject(err);
+      });
+  });
+  return Promise.all(pendingPromises);
 });

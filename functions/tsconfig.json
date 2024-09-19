@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
+    "esModuleInterop": true,
     "jsx": "react",
-    "module": "commonjs",
+    "module": "CommonJS",
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "outDir": "lib",
+    "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2017"
+    "target": "es2020"
   },
   "compileOnSave": true,
   "include": ["src"]

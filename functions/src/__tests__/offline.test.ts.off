@@ -1,0 +1,6 @@
+import "jest";
+
+import * as admin from "firebase-admin";
+import functions from "firebase-functions-test";
+
+const testEnv = functions();
