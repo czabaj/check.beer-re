@@ -1,14 +1,11 @@
 import * as path from "node:path";
 
-import "jest";
-
-import functions from "firebase-functions-test";
-import * as admin from "firebase-admin";
 import {
   getFirestore,
   Timestamp,
   CollectionReference,
 } from "firebase-admin/firestore";
+import functions from "firebase-functions-test";
 
 import * as myFunctions from "../index";
 import { UserRole } from "../../../src/backend/UserRoles";
@@ -18,20 +15,12 @@ const testEnv = functions(
     projectId: process.env.VITE_FIREBASE_PROJECT_ID,
     storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
   },
-  path.join(__dirname, "../../../../beerbook2-da255-1c582faf4499.json")
+  path.join(__dirname, "../../../certs/beerbook2-da255-1c582faf4499.json")
 );
 
 afterAll(() => {
   testEnv.cleanup();
 });
-
-// Make a fake document snapshot to pass to the function
-const mock = testEnv.firestore.makeDocumentSnapshot(
-  {
-    text: "hello world",
-  },
-  "/lowercase/foo"
-);
 
 describe(`deletePlaceSubcollection`, () => {
   const addPlace = async (opts: { placeId: string; withKegs: boolean }) => {

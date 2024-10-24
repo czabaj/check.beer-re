@@ -47,7 +47,7 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
-    "test": "FIRESTORE_EMULATOR_HOST=\"127.0.0.1:9090\" jest",
+    "test": "FIRESTORE_EMULATOR_HOST=\"127.0.0.1:9090\" FIREBASE_AUTH_EMULATOR_HOST=\"127.0.0.1:9099\" jest",
     "test:emulators": "firebase emulators:exec  \"jest --watchAll\""
   },
   "source": "src/index.ts"
