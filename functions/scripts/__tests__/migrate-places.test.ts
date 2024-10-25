@@ -1,5 +1,6 @@
 import * as path from "node:path";
 
+import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { https } from "firebase-functions";
 import functions from "firebase-functions-test";
@@ -8,6 +9,8 @@ import { place } from "../../../src/backend/FirestoreModels.gen";
 import { NotificationEvent } from "../../../src/backend/NotificationEvents";
 import { UserRole } from "../../../src/backend/UserRoles";
 import { migratePlaces } from "../migrate-places";
+
+const app = initializeApp();
 
 const testEnv = functions(
   {
@@ -32,7 +35,7 @@ const addPlace = async (opts: { placeId: string; users: place["users"] }) => {
 };
 
 const migratePlaceFn = https.onCall(async () => {
-  await migratePlaces();
+  await migratePlaces(app);
 });
 
 test(`migratePlaces`, async () => {
