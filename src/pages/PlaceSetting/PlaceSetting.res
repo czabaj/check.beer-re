@@ -24,7 +24,7 @@ let make = (~placeId) => {
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
   | Some((place, personsAll, chargedKegs, currentUser)) =>
-    let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let kegsOnTapUids =
       place.taps
@@ -76,9 +76,9 @@ let make = (~placeId) => {
             } else {
               let ownerRoleInt = (UserRoles.Owner :> int)
               let placeOwnerUid =
-                place.users
+                place.accounts
                 ->Dict.toArray
-                ->Array.find(((_, role)) => role === ownerRoleInt)
+                ->Array.find(((_, (role, _))) => role === ownerRoleInt)
                 ->Option.getExn
                 ->fst
               let placeOwnerPersonId =

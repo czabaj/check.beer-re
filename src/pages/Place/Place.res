@@ -120,7 +120,7 @@ let make = (~placeId) => {
       recentConsumptionsByUser,
       currentUser,
     ) =>
-    let currentUserRole = place.users->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
 

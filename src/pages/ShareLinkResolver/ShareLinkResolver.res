@@ -80,7 +80,7 @@ let pageDataRx = (auth, firestore, ~linkId) => {
       switch maybeShareLinkPlace {
       | None => ()
       | Some(shareLinkPlace) => {
-          let userAlreadyInPlace = shareLinkPlace.users->Dict.get(currentUser.uid)->Option.isSome
+          let userAlreadyInPlace = shareLinkPlace.accounts->Dict.get(currentUser.uid)->Option.isSome
           if userAlreadyInPlace {
             Db.ShareLink.delete(firestore, ~linkId)->ignore
             redirectToPlace(Db.getUid(shareLinkPlace))

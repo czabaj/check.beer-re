@@ -48,11 +48,11 @@ describe(`Keg`, () => {
       userId: null,
     };
     let place = {
+      accounts: {},
       createdAt: now,
       currency: "EUR",
       name: "testPlace",
       taps: { [tapName]: { id: kegId } as any },
-      users: {},
     };
     let personsIndex = {
       all: {

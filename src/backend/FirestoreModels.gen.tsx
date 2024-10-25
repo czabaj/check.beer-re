@@ -37,13 +37,15 @@ export type person = { readonly createdAt: Firebase_Timestamp_t; readonly transa
 
 export type consumptionSymbols = { readonly "300": string; readonly "500": string };
 
+export type accountTuple = [number, number];
+
 export type place = {
+  readonly accounts: {[id: string]: accountTuple}; 
   readonly consumptionSymbols: (null | undefined | consumptionSymbols); 
   readonly createdAt: Firebase_Timestamp_t; 
   readonly currency: string; 
   readonly name: string; 
-  readonly taps: {[id: string]: (null | Firebase_documentReference<keg>)}; 
-  readonly users: {[id: string]: number}
+  readonly taps: {[id: string]: (null | Firebase_documentReference<keg>)}
 };
 
 export type personsAllItem = [personName, Firebase_Timestamp_t, number, (null | string), (undefined | tapName)];

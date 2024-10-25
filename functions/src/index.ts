@@ -84,7 +84,7 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
   const db = getFirestore();
   const placesQuery = db
     .collection("places")
-    .where(`users.${user.uid}`, `>=`, 0);
+    .where(`accounts.${user.uid}`, `!=`, null);
   const pendingPromises: Promise<any>[] = [];
   await new Promise((resolve, reject) => {
     placesQuery
@@ -93,14 +93,15 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
         const placeData = placeSnapshot.data() as Place;
         const PLACE_TAG = `place ${placeSnapshot.ref.id}`;
         const promise = (async () => {
-          const userRole = placeData.users[user.uid];
-          let newOwner: string | undefined;
+          const userRole = placeData.accounts[user.uid][0] as UserRole;
+          let newOwner: [string, [number, number]] | undefined;
           if (userRole === UserRole.owner) {
             const otherPlaceUserEntriesByRoleDesc = Object.entries(
-              placeData.users
+              placeData.accounts
             )
               .filter(([uid]) => uid !== user.uid)
-              .sort((a, b) => b[1] - a[1]);
+              // roles are ints ordered by priviledge, so we can sort them
+              .sort(([, [aRole]], [, [bRole]]) => bRole - aRole);
             const ownerOnly = otherPlaceUserEntriesByRoleDesc.length === 0;
             if (ownerOnly) {
               // if the place has only owner, delete the whole place
@@ -114,7 +115,7 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
               return;
             } else {
               const secondHighestRank = otherPlaceUserEntriesByRoleDesc[0];
-              newOwner = secondHighestRank[0];
+              newOwner = secondHighestRank;
             }
           }
           const placePersonsIndexRef = db.doc(
@@ -135,8 +136,13 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
             });
           }
           await placeSnapshot.ref.update({
-            [`users.${user.uid}`]: FieldValue.delete(),
-            ...(newOwner && { [`users.${newOwner}`]: UserRole.owner }),
+            [`accounts.${user.uid}`]: FieldValue.delete(),
+            ...(newOwner && {
+              [`accounts.${newOwner[0]}`]: [
+                UserRole.owner,
+                ...newOwner[1].slice(1),
+              ],
+            }),
           });
           logger.info(USER_TAG, PLACE_TAG, `user relation removed`);
           if (newOwner) {

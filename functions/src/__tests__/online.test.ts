@@ -9,6 +9,8 @@ import functions from "firebase-functions-test";
 
 import * as myFunctions from "../index";
 import { UserRole } from "../../../src/backend/UserRoles";
+import { place } from "../../../src/backend/FirestoreModels.gen";
+import { NotificationEvent } from "../../../src/backend/NotificationEvents";
 
 const testEnv = functions(
   {
@@ -89,22 +91,24 @@ describe(`truncateUserInDb`, () => {
     moreUsers?: Array<{ uid: string; role?: UserRole }>;
   }) => {
     const db = getFirestore();
-    const placeCollection = db.collection("places");
+    const placeCollection = db.collection(
+      "places"
+    ) as CollectionReference<place>;
     const placeDoc = placeCollection.doc(opts.placeId);
     const docData = {
-      createdAt: Timestamp.now(),
-      name: "Test Place",
-      users: {
-        [opts.userUid]: opts.userRole,
+      accounts: {
+        [opts.userUid]: [opts.userRole, NotificationEvent.unsubscribed],
         ...opts.moreUsers?.reduce((acc, u) => {
           if (u.role) {
-            acc[u.uid] = u.role;
+            acc[u.uid] = [u.role, NotificationEvent.unsubscribed];
           }
           return acc;
-        }, {} as Record<string, UserRole>),
+        }, {} as Record<string, [UserRole, NotificationEvent]>),
       },
-    };
-    await placeDoc.set(docData);
+      createdAt: Timestamp.now() as any,
+      name: "Test Place",
+    } satisfies Partial<place>;
+    await placeDoc.set(docData as place);
     const personsIndexCollection = placeDoc.collection("personsIndex");
     const personsIndexDocData = {
       [opts.userUid]: [opts.userUid, Timestamp.now(), 0, opts.userUid],
@@ -149,8 +153,11 @@ describe(`truncateUserInDb`, () => {
     });
     const wrapped = testEnv.wrap(myFunctions.truncateUserInDb);
     await wrapped({ uid: userUid });
-    const placeData = (await placeDoc.get()).data();
-    expect(placeData!.users[`user_admin`]).toBe(UserRole.owner);
+    const placeData = (await placeDoc.get()).data() as place;
+    expect(placeData!.accounts[`user_admin`]).toEqual([
+      UserRole.owner,
+      NotificationEvent.unsubscribed,
+    ]);
   });
 
   it(`should delete relationship to the user from the place when non-owner`, async () => {
@@ -168,7 +175,7 @@ describe(`truncateUserInDb`, () => {
     const wrapped = testEnv.wrap(myFunctions.truncateUserInDb);
     await wrapped({ uid: userUid });
     const placeData = (await placeDoc.get()).data();
-    expect(placeData!.users[userUid]).toBeUndefined();
+    expect(placeData!.accounts[userUid]).toBeUndefined();
     // the personsIndex should contain the user, but with null at 3th position (userId)
     expect((await personsIndexDoc.get()).data()!.all[userUid][3]).toBe(null);
   });
@@ -205,8 +212,12 @@ describe(`truncateUserInDb`, () => {
     await wrapped({ uid: userUid });
     expect((await placeDocOwnerOnly.get()).exists).toBe(false);
     expect((await placeDocStaff.get()).exists).toBe(true);
-    expect((await placeDocStaff.get()).data()!.users[userUid]).toBe(undefined);
+    expect((await placeDocStaff.get()).data()!.accounts[userUid]).toBe(
+      undefined
+    );
     expect((await placeDocAdmin.get()).exists).toBe(true);
-    expect((await placeDocAdmin.get()).data()!.users[userUid]).toBe(undefined);
+    expect((await placeDocAdmin.get()).data()!.accounts[userUid]).toBe(
+      undefined
+    );
   });
 });

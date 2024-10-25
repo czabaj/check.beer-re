@@ -41,8 +41,8 @@ let make = (
   let personRole =
     person.userId
     ->Null.toOption
-    ->Option.flatMap(userId => place.users->Dict.get(userId))
-    ->Option.flatMap(UserRoles.roleFromInt)
+    ->Option.flatMap(userId => place.accounts->Dict.get(userId))
+    ->Option.flatMap(((role, _)) => UserRoles.roleFromInt(role))
   <>
     <DialogCycling
       className={classes.root}

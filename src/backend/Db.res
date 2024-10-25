@@ -169,7 +169,7 @@ let getUid: 'a => string = %raw("data => data?.uid")
 let placesByUserIdRx = (firestore, userId) => {
   let query = Firebase.query(
     placeCollection(firestore),
-    [Firebase.where(`users.${userId}`, #">=", 0)],
+    [Firebase.where(`accounts.${userId}`, #"!=", null)],
   )
   Rxfire.collectionData(query)
 }
@@ -465,12 +465,14 @@ module Place = {
       ->Firebase.WriteBatch.set(
         placeDoc,
         {
+          accounts: Dict.fromArray([
+            (userId, ((UserRoles.Owner :> int), (NotificationEvents.Unsubscribed :> int))),
+          ]),
           consumptionSymbols: Js.Nullable.Null,
           createdAt: now,
           currency: "CZK",
           name: placeName,
           taps: Dict.fromArray([(defaultTapName, Null.null)]),
-          users: Dict.fromArray([(userId, (UserRoles.Owner :> int))]),
         },
         {},
       )
@@ -508,8 +510,10 @@ module Place = {
     let personRecord = personsAllTupleToRecord(personTuple)
     let personUserId = personRecord.userId->Null.toOption->Option.getExn
     let placeRef = placeDocument(firestore, placeId)
+    let place = (await Firebase.getDocFromCache(placeRef)).data({})
+    let (_, notificationSettings) = place.accounts->Dict.getUnsafe(personUserId)
     let updateObject = Object.make()
-    updateObject->Object.set(`users.${personUserId}`, role)
+    updateObject->Object.set(`accounts.${personUserId}`, (role, notificationSettings))
     await Firebase.updateDoc(placeRef, updateObject)
   }
   let tapAdd = (firestore, ~placeId, ~tapName) => {
@@ -783,9 +787,12 @@ module ShareLink = {
       }
       let personsIndexUpdateData = Object.make()
       personsIndexUpdateData->Object.set(`all.${person}`, personsAllRecordToTuple(newPersonRecord))
-      // update place - add userId to users dict
+      // update place - add userId to accounts dict
       let placeUpdateData = Object.make()
-      placeUpdateData->Object.set(`users.${userId}`, role)
+      placeUpdateData->Object.set(
+        `accounts.${userId}`,
+        (role, (NotificationEvents.Unsubscribed :> int)),
+      )
 
       transaction->Transaction.update(placeDocument(firestore, place), placeUpdateData)
       transaction->Transaction.update(placeIndexDocument, personsIndexUpdateData)

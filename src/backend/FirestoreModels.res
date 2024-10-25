@@ -34,13 +34,15 @@ and person = {
 }
 @@warning("+30")
 
-type consumptionSymbols = {
-  "300": string,
-  "500": string,
-}
+type consumptionSymbols = {"300": string, "500": string}
+
+// (role, notificationsSubsription)
+type accountTuple = (int, int)
 
 @genType
 type place = {
+  // key is UUID of the firebase user, value is tuple of various data
+  accounts: Js.Dict.t<accountTuple>,
   // maps consumption volume to symbol
   consumptionSymbols: Js.nullable<consumptionSymbols>,
   createdAt: Firebase.Timestamp.t,
@@ -48,7 +50,6 @@ type place = {
   name: string,
   // null means the tap is not in use, undefined would remove the key
   taps: Js.Dict.t<Js.null<Firebase.documentReference<keg>>>,
-  users: Js.Dict.t<int>,
 }
 
 // use tuple to reduce byte size (hello gRPC) this is converted to records on
