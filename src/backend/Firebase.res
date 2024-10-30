@@ -481,6 +481,9 @@ module Functions = {
   @module("firebase/functions")
   external getFunctions: FirebaseApp.t => t = "getFunctions"
 
+  @module("firebase/functions")
+  external getFunctionsInRegion: (FirebaseApp.t, string) => t = "getFunctions"
+
   type callResult<'a> = {data: 'a}
   @module("firebase/functions")
   external httpsCallable: (t, string) => 'a => promise<callResult<'b>> = "httpsCallable"

@@ -14,7 +14,7 @@ let make = (~children) => {
   Auth.setLanguageCode(auth, "cs")
 
   let analytics = app->Analytics.getAnalytics
-  let functions = app->Functions.getFunctions
+  let functions = app->Functions.getFunctionsInRegion(`europe-west3`)
   let messaging = app->Messaging.getMessaging
 
   <AppCheckProvider sdk=appCheck>
