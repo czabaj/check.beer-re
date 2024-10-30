@@ -19,13 +19,27 @@ let make = () => {
     | list{"misto", ..._} =>
       <FirebaseAuthProvider>
         <SignInWrapper>
-          {switch List.tail(url.path) {
-          | Some(list{}) => <MyPlaces />
-          | Some(list{placeId}) => <Place placeId />
-          | Some(list{placeId, "nastaveni"}) => <PlaceSetting placeId />
-          | Some(list{placeId, "nastaveni", "osob"}) => <PlacePersonsSetting placeId />
-          | _ => <PageNotFound />
-          }}
+          {
+            let maybePlaceSubPath = List.tail(url.path)
+            switch maybePlaceSubPath {
+            | None
+            | Some(list{}) =>
+              <MyPlaces />
+            | Some(placeSubPath) => {
+                let placeId = List.headExn(placeSubPath)
+                let placeIdSub = List.tail(placeSubPath)
+                <>
+                  <FcmTokenSync placeId />
+                  {switch placeIdSub {
+                  | Some(list{}) => <Place placeId />
+                  | Some(list{"nastaveni"}) => <PlaceSetting placeId />
+                  | Some(list{"nastaveni", "osob"}) => <PlacePersonsSetting placeId />
+                  | _ => <PageNotFound />
+                  }}
+                </>
+              }
+            }
+          }
         </SignInWrapper>
       </FirebaseAuthProvider>
     | list{"s", linkId} =>

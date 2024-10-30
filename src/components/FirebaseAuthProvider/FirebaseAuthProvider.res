@@ -15,11 +15,14 @@ let make = (~children) => {
 
   let analytics = app->Analytics.getAnalytics
   let functions = app->Functions.getFunctions
+  let messaging = app->Messaging.getMessaging
 
   <AppCheckProvider sdk=appCheck>
     <AnalyticsProvider sdk=analytics>
       <AuthProvider sdk=auth>
-        <FunctionsProvider sdk=functions> {children} </FunctionsProvider>
+        <FunctionsProvider sdk=functions>
+          <MessagingProvider value=Some(messaging)> {children} </MessagingProvider>
+        </FunctionsProvider>
       </AuthProvider>
     </AnalyticsProvider>
   </AppCheckProvider>

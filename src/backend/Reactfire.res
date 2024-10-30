@@ -30,6 +30,14 @@ module FunctionsProvider = {
     "FunctionsProvider"
 }
 
+let messagingContext = React.createContext((None: option<Firebase.Messaging.t>))
+
+module MessagingProvider = {
+  let make = React.Context.provider(messagingContext)
+}
+
+let useMessaging = () => React.useContext(messagingContext)->Option.getExn
+
 type observableStatus<'a> = {
   data: option<'a>,
   error: option<Js.Exn.t>,

@@ -437,14 +437,21 @@ module AppCheckProvider = {
 module Messaging = {
   type t
 
-  type getTokenOptions = { vapidKey: string }
-
   @module("firebase/messaging")
-  external getToken: (t, getTokenOptions) => unit = "getToken"
-}
+  external getMessaging: FirebaseApp.t => t = "getMessaging"
 
-@module("firebase/messaging")
-external getMessaging: FirebaseApp.t => Messaging.t = "getMessaging"
+  type getTokenOptions = {vapidKey: string}
+
+  // Subscribes the Messaging instance to push notifications. Returns a Firebase Cloud Messaging registration token that
+  // can be used to send push messages to that Messaging instance. If notification permission isn't already granted,
+  // this method asks the user for permission. The returned promise rejects if the user does not allow the app to show
+  // notifications.
+  @module("firebase/messaging")
+  external _getToken: (t, getTokenOptions) => promise<string> = "getToken"
+
+  let getToken = (messaging: t) =>
+    _getToken(messaging, {vapidKey: %raw(`import.meta.env.VITE_FIREBASE_VAPID_KEY`)})
+}
 
 module Timestamp = {
   @genType.import("firebase/firestore") @genType.as("Timestamp")
