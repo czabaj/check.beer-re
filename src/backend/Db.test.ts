@@ -49,6 +49,7 @@ describe(`Keg`, () => {
     };
     let place = {
       accounts: {},
+      consumptionSymbols: null,
       createdAt: now,
       currency: "EUR",
       name: "testPlace",

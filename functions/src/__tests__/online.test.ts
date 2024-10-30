@@ -4,13 +4,30 @@ import {
   getFirestore,
   Timestamp,
   CollectionReference,
+  DocumentReference,
 } from "firebase-admin/firestore";
+import { getMessaging } from "firebase-admin/messaging";
 import functions from "firebase-functions-test";
 
 import * as myFunctions from "../index";
 import { UserRole } from "../../../src/backend/UserRoles";
-import { place } from "../../../src/backend/FirestoreModels.gen";
-import { NotificationEvent } from "../../../src/backend/NotificationEvents";
+import {
+  keg,
+  personsIndex,
+  place,
+} from "../../../src/backend/FirestoreModels.gen";
+import {
+  FreeTableMessage,
+  FreshKegMessage,
+  NotificationEvent,
+  UpdateDeviceTokenMessage,
+} from "../../../src/backend/NotificationEvents";
+import {
+  getNotificationTokensDoc,
+  getPersonsIndexDoc,
+  getPlacesCollection,
+  NotificationTokensDocument,
+} from "../helpers";
 
 const testEnv = functions(
   {
@@ -27,12 +44,12 @@ afterAll(() => {
 describe(`deletePlaceSubcollection`, () => {
   const addPlace = async (opts: { placeId: string; withKegs: boolean }) => {
     const db = getFirestore();
-    const placeCollection = db.collection("places");
+    const placeCollection = getPlacesCollection(db);
     const placeDoc = placeCollection.doc(opts.placeId);
     await placeDoc.set({
       createdAt: Timestamp.now(),
       name: "Test Place",
-    });
+    } as any);
     const result = {
       kegsCollection: undefined as CollectionReference<any> | undefined,
       personsCollection: placeDoc.collection("persons"),
@@ -219,5 +236,213 @@ describe(`truncateUserInDb`, () => {
     expect((await placeDocAdmin.get()).data()!.accounts[userUid]).toBe(
       undefined
     );
+  });
+
+  it(`should also delete the user from the document with notification tokens`, async () => {
+    const userUid = `beatle`;
+    const db = getFirestore();
+    const notificationTokensDoc = getNotificationTokensDoc(db);
+    await notificationTokensDoc.set({
+      tokens: { [userUid]: `registrationToken` },
+    });
+    const notificationTokensBefore = (
+      await notificationTokensDoc.get()
+    ).data()!;
+    expect(notificationTokensBefore.tokens[userUid]).toBe(`registrationToken`);
+    const wrapped = testEnv.wrap(myFunctions.truncateUserInDb);
+    await wrapped({ uid: userUid });
+    const notificationTokensAfter = (await notificationTokensDoc.get()).data()!;
+    expect(notificationTokensAfter.tokens[userUid]).toBeUndefined();
+  });
+});
+
+describe(`updateNotificationToken`, () => {
+  const db = getFirestore();
+  const notificationTokensDoc = getNotificationTokensDoc(db);
+  it(`should add a user to notification collection if not there`, async () => {
+    const userUid = `eleanor`;
+    const deviceToken = `testingDeviceToken`;
+    await notificationTokensDoc.set({ tokens: {} });
+    const wrapped = testEnv.wrap(myFunctions.updateNotificationToken);
+    await wrapped({
+      auth: { uid: userUid },
+      data: {
+        deviceToken,
+      } satisfies UpdateDeviceTokenMessage,
+    });
+    const notificationTokens = (await notificationTokensDoc.get()).data()!;
+    expect(notificationTokens.tokens[userUid]).toBe(deviceToken);
+  });
+  it(`should update the user token if already there`, async () => {
+    const uid = `condor`;
+    const oldDeviceToken = `oldDeviceToken`;
+    const newDeviceToken = `newDeviceToken`;
+    await notificationTokensDoc.set({ tokens: { [uid]: oldDeviceToken } });
+    const wrapped = testEnv.wrap(myFunctions.updateNotificationToken);
+    await wrapped({
+      auth: { uid },
+      data: { deviceToken: newDeviceToken } satisfies UpdateDeviceTokenMessage,
+    });
+    const notificationTokens = (await notificationTokensDoc.get()).data()!;
+    expect(notificationTokens.tokens[uid]).toBe(newDeviceToken);
+  });
+});
+
+describe(`dispatchNotification`, () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+  it(`should use jest automock for messaging`, () => {
+    const messaging = getMessaging();
+    expect(messaging.sendEachForMulticast).toHaveBeenCalledTimes(0);
+  });
+
+  const createPlace = async (opts: {
+    placeId: string;
+    keg?: {
+      beer: string;
+      serial: number;
+    };
+    users: Array<{
+      accountTuple: [UserRole, NotificationEvent];
+      name: string;
+      registrationToken: string;
+      uid: string;
+    }>;
+  }) => {
+    const db = getFirestore();
+    const placeCollection = getPlacesCollection(db);
+    const placeDoc = placeCollection.doc(opts.placeId);
+    const accounts: place["accounts"] = opts.users.reduce((acc, u) => {
+      acc[u.uid] = u.accountTuple;
+      return acc;
+    }, {} as place["accounts"]);
+    await placeDoc.set({
+      accounts: accounts,
+      createdAt: Timestamp.now(),
+      name: "Test Place",
+    } as any);
+    const personsIndexDoc = getPersonsIndexDoc(placeDoc);
+    const personsIndexAll: personsIndex["all"] = opts.users.reduce((acc, u) => {
+      acc[u.uid] = [u.name, Timestamp.now(), 0, u.uid] as any;
+      return acc;
+    }, {} as personsIndex["all"]);
+    await personsIndexDoc.set({
+      all: personsIndexAll,
+    });
+    const notificationTokensDoc = getNotificationTokensDoc(db);
+    const tokens: NotificationTokensDocument["tokens"] = opts.users.reduce(
+      (acc, u) => {
+        acc[u.uid] = u.registrationToken;
+        return acc;
+      },
+      {} as NotificationTokensDocument["tokens"]
+    );
+    await notificationTokensDoc.set({ tokens });
+    let kegDoc: DocumentReference<keg> | undefined;
+    if (opts.keg) {
+      const kegsCollection = placeDoc.collection(
+        "kegs"
+      ) as CollectionReference<keg>;
+      kegDoc = await kegsCollection.add({
+        beer: opts.keg.beer,
+        createdAt: Timestamp.now(),
+        serial: opts.keg.serial,
+      } as any);
+    }
+    return { kegDoc, placeDoc, personsIndexDoc, notificationTokensDoc };
+  };
+
+  it(`should dispatch a notification for freeTable message to subscribed users`, async () => {
+    const { placeDoc } = await createPlace({
+      placeId: `testDispatchNotification_freeTable`,
+      users: [
+        {
+          accountTuple: [UserRole.owner, NotificationEvent.freeTable],
+          name: `Alice`,
+          registrationToken: `registrationToken1`,
+          uid: `user1`,
+        },
+        {
+          accountTuple: [
+            UserRole.staff,
+            NotificationEvent.freeTable | NotificationEvent.freshKeg,
+          ],
+          name: `Bob`,
+          registrationToken: `registrationToken2`,
+          uid: `user2`,
+        },
+        {
+          accountTuple: [UserRole.admin, NotificationEvent.unsubscribed],
+          name: `Dan`,
+          registrationToken: `registrationToken3`,
+          uid: `user3`,
+        },
+      ],
+    });
+    const wrapped = testEnv.wrap(myFunctions.dispatchNotification);
+    await wrapped({
+      auth: { uid: `user1` },
+      data: {
+        place: placeDoc.path,
+        tag: NotificationEvent.freeTable,
+      } satisfies FreeTableMessage,
+    });
+    const messaging = getMessaging();
+    expect(messaging.sendEachForMulticast).toHaveBeenCalledTimes(1);
+    const callArg = (messaging.sendEachForMulticast as any).mock.calls[0][0];
+    expect(callArg.tokens).toEqual([
+      `registrationToken1`,
+      `registrationToken2`,
+    ]);
+    expect(callArg.notification.body.startsWith(`Alice`)).toBe(true);
+  });
+  it(`should dispatch notification for freshKeg message to subscribed users`, async () => {
+    const { kegDoc } = await createPlace({
+      keg: {
+        beer: `Test Beer`,
+        serial: 1,
+      },
+      placeId: `testDispatchNotification_freshKeg`,
+      users: [
+        {
+          accountTuple: [UserRole.owner, NotificationEvent.freshKeg],
+          name: `Alice`,
+          registrationToken: `registrationToken1`,
+          uid: `user1`,
+        },
+        {
+          accountTuple: [
+            UserRole.staff,
+            NotificationEvent.freeTable | NotificationEvent.freshKeg,
+          ],
+          name: `Bob`,
+          registrationToken: `registrationToken2`,
+          uid: `user2`,
+        },
+        {
+          accountTuple: [UserRole.admin, NotificationEvent.unsubscribed],
+          name: `Dan`,
+          registrationToken: `registrationToken3`,
+          uid: `user3`,
+        },
+      ],
+    });
+    const wrapped = testEnv.wrap(myFunctions.dispatchNotification);
+    await wrapped({
+      auth: { uid: `user1` },
+      data: {
+        keg: kegDoc!.path,
+        tag: NotificationEvent.freshKeg,
+      } satisfies FreshKegMessage,
+    });
+    const messaging = getMessaging();
+    expect(messaging.sendEachForMulticast).toHaveBeenCalledTimes(1);
+    const callArg = (messaging.sendEachForMulticast as any).mock.calls[0][0];
+    expect(callArg.tokens).toEqual([
+      `registrationToken1`,
+      `registrationToken2`,
+    ]);
+    expect(callArg.notification.body.includes(`Test Beer`)).toBe(true);
   });
 });

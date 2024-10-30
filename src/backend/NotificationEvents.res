@@ -2,7 +2,8 @@ type notificationEvent =
   | @as(0) Unsubscribed
   | @as(1) FreeTable
   | @as(2) FreshKeg
-@module("./NotificationEvents.ts") external notificationEvent: notificationEvent = "NotificationEvent"
+@module("./NotificationEvents.ts")
+external notificationEvent: notificationEvent = "NotificationEvent"
 
 let notificationEventFromInt = (notificationEvent: int) =>
   switch notificationEvent {
@@ -18,3 +19,33 @@ let roleI18n = (notificationEvent: notificationEvent) =>
   | FreeTable => "Prázdný stůl"
   | FreshKeg => "Čerstvý sud"
   }
+
+type _updateDeviceTokenMessage = {deviceToken: string}
+@module("./NotificationEvents.ts")
+external updateDeviceTokenMessage: _updateDeviceTokenMessage = "UpdateDeviceTokenMessage"
+
+type _freeTableMessage = {tag: notificationEvent, place: string}
+@module("./NotificationEvents.ts")
+external freeTableMessage: _freeTableMessage = "FreeTableMessage"
+
+type _freshKegMessage = {tag: notificationEvent, keg: string}
+@module("./NotificationEvents.ts")
+external freshKegMessage: _freshKegMessage = "FreshKegMessage"
+
+let useDispatchFreeTable = () => {
+  let functions = Reactfire.useFunctions()
+  let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
+  (place: string) => dispatchNotification({tag: FreeTable, place})
+}
+
+let useDispatchFreshKeg = () => {
+  let functions = Reactfire.useFunctions()
+  let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
+  (keg: string) => dispatchNotification({tag: FreshKeg, keg})
+}
+
+let useUpdateNotificationToken = () => {
+  let functions = Reactfire.useFunctions()
+  let updateDeviceToken = Firebase.Functions.httpsCallable(functions, "updateNotificationToken")
+  (deviceToken: string) => updateDeviceToken({deviceToken})
+}

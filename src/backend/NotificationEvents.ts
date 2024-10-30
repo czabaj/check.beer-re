@@ -19,12 +19,15 @@ export enum NotificationEvent {
 }
 
 export type FreeTableMessage = {
-  type: NotificationEvent.freeTable;
-  placeId: string;
+  tag: NotificationEvent.freeTable;
+  place: string;
 };
 
 export type FreshKegMessage = {
-  type: NotificationEvent.freshKeg;
-  placeId: string;
-  kegId: string;
+  tag: NotificationEvent.freshKeg;
+  keg: string;
+};
+
+export type UpdateDeviceTokenMessage = {
+  deviceToken: string;
 };
