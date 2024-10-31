@@ -262,6 +262,11 @@ export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
             body: `${currentUserFamiliarName} právě zapsal/a první pivo.`,
           },
           tokens: subscribedNotificationTokens,
+          webpush: {
+            fcmOptions: {
+              link: `https://check.beer/misto/${placeDoc.id}`,
+            },
+          },
         });
       }
       case NotificationEvent.freshKeg: {
@@ -289,6 +294,11 @@ export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
             body: `Právě bylo vytočeno první pivo ze sudu ${kegData.serial}, ${kegData.beer}.`,
           },
           tokens: subscribedNotificationTokens,
+          webpush: {
+            fcmOptions: {
+              link: `https://check.beer/misto/${placeDoc.id}`,
+            },
+          },
         });
       }
     }

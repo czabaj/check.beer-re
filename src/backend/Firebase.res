@@ -117,12 +117,12 @@ external arrayUnion: array<'a> => {..} = "arrayUnion"
 external incrementInt: int => {..} = "increment"
 
 @genType.import("firebase/firestore") @genType.as("DocumentReference")
-type documentReference<'a> = {id: string}
+type rec documentReference<'a> = {id: string, parent: option<collectionReference<'a>>, path: string}
+@genType.import("firebase/firestore") @genType.as("CollectionReference") and collectionReference<'a>
+
 @module("firebase/firestore")
 external doc: (firestore, ~path: string) => documentReference<'a> = "doc"
 
-@genType.import("firebase/firestore") @genType.as("CollectionReference")
-type collectionReference<'a>
 @module("firebase/firestore")
 external collection: (firestore, ~path: string) => collectionReference<'a> = "collection"
 

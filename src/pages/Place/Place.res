@@ -123,6 +123,8 @@ let make = (~placeId) => {
     let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
+    let dispatchFreeTableNotification = NotificationEvents.useDispatchFreeTableNotification()
+    let dispatchFreshKegNotification = NotificationEvents.useDispatchFreshKegNotification()
 
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
@@ -174,7 +176,36 @@ let make = (~placeId) => {
             }}
             onDismiss={hideDialog}
             onSubmit={values => {
-              let kegRef = place.taps->Dict.getUnsafe(values.tap)->Null.getExn
+              let keg = tapsWithKegs->Dict.getUnsafe(values.tap)
+              let kegRef = Db.kegDoc(firestore, placeId, Db.getUid(keg))
+              let firstBeerFromKeg = keg.consumptions->Dict.keysToArray->Array.length === 0
+              if firstBeerFromKeg {
+                dispatchFreshKegNotification(kegRef)
+                ->Promise.then(_ => Promise.resolve())
+                ->Promise.catch(error => {
+                  let exn = Js.Exn.asJsExn(error)->Option.getExn
+                  LogUtils.captureException(exn)
+                  Promise.resolve()
+                })
+                ->ignore
+              } else {
+                let freeTable =
+                  recentConsumptionsByUser
+                  ->Map.values
+                  ->Array.fromIterator
+                  ->Array.every(consumptions => consumptions->Array.length === 0)
+                if freeTable {
+                  dispatchFreeTableNotification(Db.placeDocument(firestore, placeId))
+                  ->Promise.then(_ => Promise.resolve())
+                  ->Promise.catch(error => {
+                    let exn = Js.Exn.asJsExn(error)->Option.getExn
+                    LogUtils.captureException(exn)
+                    Promise.resolve()
+                  })
+                  ->ignore
+                }
+              }
+
               Db.Keg.addConsumption(
                 firestore,
                 ~consumption={

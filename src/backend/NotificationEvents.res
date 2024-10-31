@@ -24,16 +24,18 @@ type _freshKegMessage = {tag: notificationEvent, keg: string}
 @module("./NotificationEvents.ts")
 external freshKegMessage: _freshKegMessage = "FreshKegMessage"
 
-let useDispatchFreeTable = () => {
+let useDispatchFreeTableNotification = () => {
   let functions = Reactfire.useFunctions()
   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
-  (place: string) => dispatchNotification({tag: FreeTable, place})
+  (placeRef: Firebase.documentReference<FirestoreModels.place>) =>
+    dispatchNotification({tag: FreeTable, place: placeRef.path})
 }
 
-let useDispatchFreshKeg = () => {
+let useDispatchFreshKegNotification = () => {
   let functions = Reactfire.useFunctions()
   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
-  (keg: string) => dispatchNotification({tag: FreshKeg, keg})
+  (kegRef: Firebase.documentReference<FirestoreModels.keg>) =>
+    dispatchNotification({tag: FreshKeg, keg: kegRef.path})
 }
 
 let useUpdateNotificationToken = () => {
