@@ -47,7 +47,8 @@ module Pure = {
             {React.string("Nové místo")}
           </button>}
           headerId="my_places"
-          headerSlot={React.string("Moje místa")}>
+          headerSlot={React.string("Moje místa")}
+          noBackground={true}>
           {switch usersPlaces {
           | [] =>
             <p className=SectionWithHeader.classes.emptyMessage>
@@ -60,7 +61,7 @@ module Pure = {
             </p>
           | places =>
             <nav>
-              <ul className={`${Styles.list.base} ${classes.list}`}>
+              <ul className={classes.list}>
                 {places
                 ->Array.map(place => {
                   let stringId = Db.getUid(place)

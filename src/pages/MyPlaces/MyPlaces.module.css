@@ -4,10 +4,24 @@
   text-align: right;
 }
 
-.list li {
+.list {
+  --breakout-hover-overlay: hsl(
+    var(--surface-warning-hs) var(--surface-warning-l) / 0.1
+  );
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 1rem;
+}
+.list > li {
+  background-color: var(--surface-2);
+  border-radius: var(--radius-2);
+  box-shadow: var(--shadow-2);
+  display: flex;
+  flex-direction: column;
+  font-size: 150%;
+  padding-inline: var(--padding-inline, 8px);
+  padding-block: 0.25rem;
+  position: relative;
 }
 
 .list li > span {
