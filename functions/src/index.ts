@@ -7,7 +7,6 @@ import {
   type DocumentReference,
   type DocumentSnapshot,
   FieldValue,
-  type Query,
   getFirestore,
 } from "firebase-admin/firestore";
 import { getMessaging } from "firebase-admin/messaging";
@@ -35,66 +34,22 @@ import {
   getPrivateCollection,
 } from "./helpers";
 
+const CORS = [`https://check.beer`, /localhost:\d+$/];
+const REGION = `europe-west3`;
+
 initializeApp();
-
-async function deleteQueryBatch(
-  db: FirebaseFirestore.Firestore,
-  query: Query,
-  resolve: () => void
-) {
-  const snapshot = await query.get();
-
-  const batchSize = snapshot.size;
-  if (batchSize === 0) {
-    // When there are no documents left, we are done
-    resolve();
-    return;
-  }
-
-  // Delete documents in a batch
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-  });
-  await batch.commit();
-
-  // Recurse on the next process tick, to avoid
-  // exploding the stack.
-  process.nextTick(() => {
-    deleteQueryBatch(db, query, resolve);
-  });
-}
-
-async function deleteCollection(
-  db: FirebaseFirestore.Firestore,
-  collectionPath: string,
-  batchSize = 30
-) {
-  const collectionRef = db.collection(collectionPath);
-  const query = collectionRef.orderBy("__name__").limit(batchSize);
-
-  return new Promise((resolve, reject) => {
-    deleteQueryBatch(db, query, resolve as any).catch(reject);
-  });
-}
 
 /**
  * Firestore by default does not support deleting of sub-collections, which might lead to orphaned data. This function
  * listens to a place deletion and deletes all sub-collections of the place.
  */
 export const deletePlaceSubcollection = firestore.onDocumentDeleted(
-  "/places/{placeId}",
+  { document: "/places/{placeId}", region: REGION },
   async (event) => {
     const placeId = event.params.placeId;
     logger.info(`Delete place id: "${placeId}"`);
     const db = getFirestore();
-    const placeDoc = getPlacesCollection(db).doc(placeId);
-    const collections = [`kegs`, `persons`, `personsIndex`, `private`].map(
-      (collection) => placeDoc.collection(collection)
-    );
-    for (const collection of collections) {
-      await deleteCollection(db, collection.path);
-    }
+    return db.recursiveDelete(getPlacesCollection(db).doc(placeId));
   }
 );
 
@@ -209,7 +164,7 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
  * This function has access to a private collection and stores there the notification registration token of the user.
  */
 export const updateNotificationToken = onCall<UpdateDeviceTokenMessage>(
-  { cors: ["https://check.beer"], region: `europe-west3` },
+  { cors: CORS, region: REGION },
   async (request) => {
     const uid = request.auth?.uid;
     if (!uid) {
@@ -271,7 +226,7 @@ const getUserFamiliarName = async (
  *
  */
 export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
-  { cors: ["https://check.beer"], region: `europe-west3` },
+  { cors: CORS, region: REGION },
   async (request) => {
     const uid = request.auth?.uid;
     if (!uid) {
