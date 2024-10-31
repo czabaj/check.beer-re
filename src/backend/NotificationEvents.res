@@ -39,5 +39,5 @@ let useDispatchFreshKeg = () => {
 let useUpdateNotificationToken = () => {
   let functions = Reactfire.useFunctions()
   let updateDeviceToken = Firebase.Functions.httpsCallable(functions, "updateNotificationToken")
-  (deviceToken: string) => updateDeviceToken({deviceToken})
+  (deviceToken: string) => updateDeviceToken({deviceToken: deviceToken})
 }
