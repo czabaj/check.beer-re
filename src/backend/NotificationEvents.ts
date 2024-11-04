@@ -17,17 +17,3 @@ export enum NotificationEvent {
    */
   freshKeg = 2,
 }
-
-export type FreeTableMessage = {
-  tag: NotificationEvent.freeTable;
-  place: string;
-};
-
-export type FreshKegMessage = {
-  tag: NotificationEvent.freshKeg;
-  keg: string;
-};
-
-export type UpdateDeviceTokenMessage = {
-  deviceToken: string;
-};

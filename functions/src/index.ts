@@ -20,12 +20,11 @@ import type {
   place as Place,
   personsIndex as PersonsIndex,
 } from "../../src/backend/FirestoreModels.gen";
-import {
-  NotificationEvent,
-  type FreeTableMessage,
-  type FreshKegMessage,
-  type UpdateDeviceTokenMessage,
-} from "../../src/backend/NotificationEvents";
+import { NotificationEvent } from "../../src/backend/NotificationEvents";
+import type {
+  notificationEventMessages as NotificationEventMessages,
+  updateDeviceTokenMessage as UpdateDeviceTokenMessage,
+} from "../../src/backend/NotificationHooks.gen";
 import { UserRole } from "../../src/backend/UserRoles";
 import {
   getNotificationTokensDoc,
@@ -186,10 +185,32 @@ export const updateNotificationToken = onCall<UpdateDeviceTokenMessage>(
   }
 );
 
-const getRegistrationTokensFormEvent = async (
-  placeDoc: DocumentReference<Place>,
-  event: NotificationEvent
+const getRegistrationTokens = async (
+  firestore: FirebaseFirestore.Firestore,
+  subscribedAccounts: string[]
 ): Promise<string[]> => {
+  const notificationTokensDoc = getNotificationTokensDoc(firestore);
+  const notificationTokens = (await notificationTokensDoc.get()).data()!.tokens;
+  return subscribedAccounts
+    .map((uid) => notificationTokens[uid])
+    .filter(Boolean);
+};
+
+const validateRequest = async ({
+  currentUserUid,
+  placeDoc,
+  subscribedUsers,
+}: {
+  currentUserUid: string;
+  placeDoc: DocumentReference<Place>;
+  subscribedUsers: string[];
+}) => {
+  if (subscribedUsers.length === 0) {
+    throw new HttpsError(
+      `failed-precondition`,
+      `There are no subscribed users for the event.`
+    );
+  }
   const place = await placeDoc.get();
   if (!place.exists) {
     throw new HttpsError(
@@ -197,17 +218,19 @@ const getRegistrationTokensFormEvent = async (
       `Place "${placeDoc.path}" does not exist.`
     );
   }
-  const subscribedAccounts = Object.entries(place.data()!.accounts).filter(
-    ([, [, subscribed]]) => subscribed & event
-  );
-  if (!subscribedAccounts.length) {
-    return [];
+  const { accounts } = place.data()!;
+  if (!accounts[currentUserUid]) {
+    throw new HttpsError(
+      `permission-denied`,
+      `The current user is not associated with the place "${placeDoc.path}".`
+    );
   }
-  const notificationTokensDoc = getNotificationTokensDoc(place.ref.firestore);
-  const notificationTokens = (await notificationTokensDoc.get()).data()!.tokens;
-  return subscribedAccounts
-    .map(([uid]) => notificationTokens[uid])
-    .filter(Boolean);
+  if (subscribedUsers.some((uid) => !accounts[uid])) {
+    throw new HttpsError(
+      `failed-precondition`,
+      `Some of the subscribed users are not associated with the place "${placeDoc.path}".`
+    );
+  }
 };
 
 const getUserFamiliarName = async (
@@ -225,7 +248,7 @@ const getUserFamiliarName = async (
 /**
  *
  */
-export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
+export const dispatchNotification = onCall<NotificationEventMessages>(
   { cors: CORS, region: REGION },
   async (request) => {
     const uid = request.auth?.uid;
@@ -234,7 +257,7 @@ export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
     }
     const db = getFirestore();
     const messaging = getMessaging();
-    switch (request.data.tag) {
+    switch (request.data.TAG) {
       default:
         throw new HttpsError(
           `invalid-argument`,
@@ -244,11 +267,16 @@ export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
         );
       case NotificationEvent.freeTable: {
         const placeDoc = db.doc(request.data.place) as DocumentReference<Place>;
-        const subscribedNotificationTokens =
-          await getRegistrationTokensFormEvent(
-            placeDoc,
-            NotificationEvent.freeTable
-          );
+        const subscribedUsers = request.data.users;
+        await validateRequest({
+          currentUserUid: uid,
+          placeDoc,
+          subscribedUsers,
+        });
+        const subscribedNotificationTokens = await getRegistrationTokens(
+          db,
+          subscribedUsers
+        );
         if (subscribedNotificationTokens.length === 0) {
           return;
         }
@@ -279,11 +307,16 @@ export const dispatchNotification = onCall<FreeTableMessage | FreshKegMessage>(
           );
         }
         const placeDoc = kegDoc.parent.parent as DocumentReference<Place>;
-        const subscribedNotificationTokens =
-          await getRegistrationTokensFormEvent(
-            placeDoc,
-            NotificationEvent.freshKeg
-          );
+        const subscribedUsers = request.data.users;
+        await validateRequest({
+          currentUserUid: uid,
+          placeDoc,
+          subscribedUsers,
+        });
+        const subscribedNotificationTokens = await getRegistrationTokens(
+          db,
+          subscribedUsers
+        );
         if (subscribedNotificationTokens.length === 0) {
           return;
         }

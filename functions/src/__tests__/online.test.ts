@@ -16,12 +16,11 @@ import {
   personsIndex,
   place,
 } from "../../../src/backend/FirestoreModels.gen";
-import {
-  FreeTableMessage,
-  FreshKegMessage,
-  NotificationEvent,
-  UpdateDeviceTokenMessage,
-} from "../../../src/backend/NotificationEvents";
+import { NotificationEvent } from "../../../src/backend/NotificationEvents";
+import type {
+  notificationEventMessages as NotificationEventMessages,
+  updateDeviceTokenMessage as UpdateDeviceTokenMessage,
+} from "../../../src/backend/NotificationHooks.gen";
 import {
   getNotificationTokensDoc,
   getPersonsIndexDoc,
@@ -384,17 +383,15 @@ describe(`dispatchNotification`, () => {
     await wrapped({
       auth: { uid: `user1` },
       data: {
+        TAG: NotificationEvent.freeTable,
         place: placeDoc.path,
-        tag: NotificationEvent.freeTable,
-      } satisfies FreeTableMessage,
+        users: [`user2`],
+      } satisfies NotificationEventMessages,
     });
     const messaging = getMessaging();
     expect(messaging.sendEachForMulticast).toHaveBeenCalledTimes(1);
     const callArg = (messaging.sendEachForMulticast as any).mock.calls[0][0];
-    expect(callArg.tokens).toEqual([
-      `registrationToken1`,
-      `registrationToken2`,
-    ]);
+    expect(callArg.tokens).toEqual([`registrationToken2`]);
     expect(callArg.notification.body.startsWith(`Alice`)).toBe(true);
   });
   it(`should dispatch notification for freshKeg message to subscribed users`, async () => {
@@ -432,17 +429,15 @@ describe(`dispatchNotification`, () => {
     await wrapped({
       auth: { uid: `user1` },
       data: {
+        TAG: NotificationEvent.freshKeg,
         keg: kegDoc!.path,
-        tag: NotificationEvent.freshKeg,
-      } satisfies FreshKegMessage,
+        users: [`user2`],
+      } satisfies NotificationEventMessages,
     });
     const messaging = getMessaging();
     expect(messaging.sendEachForMulticast).toHaveBeenCalledTimes(1);
     const callArg = (messaging.sendEachForMulticast as any).mock.calls[0][0];
-    expect(callArg.tokens).toEqual([
-      `registrationToken1`,
-      `registrationToken2`,
-    ]);
+    expect(callArg.tokens).toEqual([`registrationToken2`]);
     expect(callArg.notification.body.includes(`Test Beer`)).toBe(true);
   });
 });

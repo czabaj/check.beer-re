@@ -22,7 +22,7 @@ let make = (~placeId) => {
   let auth = Reactfire.useAuth()
   let firestore = Reactfire.useFirestore()
   let messaging = Reactfire.useMessaging()
-  let updateNotificationToken = NotificationEvents.useUpdateNotificationToken()
+  let updateNotificationToken = NotificationHooks.useUpdateNotificationToken()
   let isStandaloneModeStatus = DomUtils.useIsStandaloneMode()
   let isSubscribedToNotifications = Reactfire.useObservable(
     ~observableId="isSubscribedToNotifications",
