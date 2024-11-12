@@ -2,8 +2,8 @@ type view = NickName | ThrustDevice | BiometricAuthn
 
 @react.component
 let make = (~children, ~user: Firebase.User.t) => {
+  let app = Reactfire.useFirebaseApp()
   let auth = Reactfire.useAuth()
-  let functions = Reactfire.useFunctions()
   let supportsWebAuthn = DomUtils.useSuportsPlatformWebauthn()
   let (webAuthn, setWebAuthn) = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)
   let (thrustDevice, setThrustDevice) = AppStorage.useLocalStorage(AppStorage.keyThrustDevice)
@@ -21,6 +21,8 @@ let make = (~children, ~user: Firebase.User.t) => {
   let (setupWebAuthn, runSetupWebAuthn) = Hooks.usePromise(async () => {
     let email = user.email->Null.getExn
     try {
+      // TODO: upgrade the FirebaseWebAuthn and deploy to "europe-west3"
+      let functions = app->Firebase.Functions.getFunctionsInRegion(`us-central1`)
       let _ = await FirebaseWebAuthn.linkWithPasskey(auth, functions, email)
       setWebAuthn(Some("1"))
     } catch {
