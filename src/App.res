@@ -8,6 +8,8 @@ external polyfillAnchorPositioning: anchorPositioningPolyfillFn = "default"
 
 polyfillAnchorPositioning()->ignore
 
+ServiceWorker.registerSW({})
+
 @react.component
 let make = () => {
   let url = RescriptReactRouter.useUrl()

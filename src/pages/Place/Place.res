@@ -133,6 +133,11 @@ let make = (~placeId) => {
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
 
+    let dispatchTestNotification = NotificationHooks.useDispatchTestNotification(
+      ~currentUserUid=currentUser.uid,
+      ~place,
+    )
+
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
@@ -147,6 +152,9 @@ let make = (~placeId) => {
           createdTimestamp={place.createdAt}
           placeName={place.name}
         />
+        <button onClick={_ => dispatchTestNotification()}>
+          {React.string("Test notification")}
+        </button>
         <main>
           <BeerList
             currentUserUid={currentUser.uid}
