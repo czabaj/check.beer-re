@@ -35,18 +35,18 @@ let useDispatchFreeTableNotification = (
   let firestore = Reactfire.useFirestore()
   let functions = Reactfire.useFunctions()
   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
-  let subsciredUsers = useGetSubscibedUsers(~currentUserUid, ~event=FreeTable, ~place)
+  let subscribedUsers = useGetSubscibedUsers(~currentUserUid, ~event=FreeTable, ~place)
   let freeTableSituation = React.useMemo2(() => {
-    subsciredUsers->Array.length > 0 &&
+    subscribedUsers->Array.length > 0 &&
       recentConsumptionsByUser
       ->Map.values
       ->Array.fromIterator
       ->Array.every(consumptions => consumptions->Array.length === 0)
-  }, (recentConsumptionsByUser, subsciredUsers))
+  }, (recentConsumptionsByUser, subscribedUsers))
   () =>
     if freeTableSituation {
       let placeRef = Db.placeDocument(firestore, Db.getUid(place))
-      dispatchNotification(FreeTableMessage({place: placeRef.path, users: subsciredUsers}))->ignore
+      dispatchNotification(FreeTableMessage({place: placeRef.path, users: subscribedUsers}))->ignore
     }
 }
 
@@ -54,15 +54,25 @@ let useDispatchFreshKegNotification = (~currentUserUid: string, ~place: Firestor
   let firestore = Reactfire.useFirestore()
   let functions = Reactfire.useFunctions()
   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
-  let subsciredUsers = useGetSubscibedUsers(~currentUserUid, ~event=FreshKeg, ~place)
+  let subscribedUsers = useGetSubscibedUsers(~currentUserUid, ~event=FreshKeg, ~place)
   (keg: Db.kegConverted) => {
-    let freshKegSituation = subsciredUsers->Array.length > 0 && keg.consumptionsSum === 0
+    let freshKegSituation = subscribedUsers->Array.length > 0 && keg.consumptionsSum === 0
     if freshKegSituation {
       let kegRef = Db.kegDoc(firestore, Db.getUid(place), Db.getUid(keg))
-      dispatchNotification(FreshKegMessage({keg: kegRef.path, users: subsciredUsers}))->ignore
+      dispatchNotification(FreshKegMessage({keg: kegRef.path, users: subscribedUsers}))->ignore
     }
   }
 }
+
+// let useDispatchTestNotification = (~currentUserUid: string, ~place: FirestoreModels.place) => {
+//   let firestore = Reactfire.useFirestore()
+//   let functions = Reactfire.useFunctions()
+//   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
+//   () => {
+//     let placeRef = Db.placeDocument(firestore, Db.getUid(place))
+//     dispatchNotification(FreeTableMessage({place: placeRef.path, users: [currentUserUid]}))->ignore
+//   }
+// }
 
 let useUpdateNotificationToken = () => {
   let functions = Reactfire.useFunctions()

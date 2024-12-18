@@ -452,11 +452,30 @@ module Messaging = {
   @module("firebase/messaging")
   external _getToken: (t, getTokenOptions) => promise<string> = "getToken"
 
-  let getToken = (messaging: t, serviceWorkerRegistration) =>
-    _getToken(
+  let getToken = async (messaging: t) => {
+    let serviceWorkerRegistration = await ServiceWorker.serviceWorkerRegistration
+    await _getToken(
       messaging,
       {serviceWorkerRegistration, vapidKey: %raw(`import.meta.env.VITE_FIREBASE_VAPID_KEY`)},
     )
+  }
+
+  type fcmOptions = {
+    analyticsLabel?: string,
+    link?: string,
+  }
+
+  type messagePayload = {
+    collapseKey: string,
+    data: Js.Dict.t<string>,
+    fcmOptions: fcmOptions,
+    from: string,
+    messageId: string,
+    notification: Js.Dict.t<string>,
+  }
+
+  @module("firebase/messaging")
+  external onMessage: (t, messagePayload => unit) => unit => unit = "onMessage"
 }
 
 module Timestamp = {

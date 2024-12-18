@@ -16,25 +16,8 @@ type registerSWOptions = {
 }
 
 @module("virtual:pwa-register")
-external _registerSW: registerSWOptions => unit = "registerSW"
+external registerSW: registerSWOptions => unit = "registerSW"
 
-let serviceWorkerRegistrationSubject: Rxjs.ReplaySubject.t<
+let serviceWorkerRegistration: promise<
   serviceWorkerRegistration,
-> = Rxjs.ReplaySubject.make(~bufferSize=1)
-
-let registerSW = (options: registerSWOptions) => {
-  _registerSW({
-    ...options,
-    onRegisteredSW: (swUrl, maybeServiceWorkerRegistration) => {
-      switch maybeServiceWorkerRegistration {
-      | Some(registration) =>
-        serviceWorkerRegistrationSubject->Rxjs.ReplaySubject.next(registration)
-      | None => ()
-      }
-      switch options.onRegisteredSW {
-      | Some(fn) => fn(swUrl, maybeServiceWorkerRegistration)
-      | _ => ()
-      }
-    },
-  })
-}
+> = %raw(`navigator.serviceWorker.ready`)

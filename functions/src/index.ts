@@ -33,7 +33,11 @@ import {
   getPrivateCollection,
 } from "./helpers";
 
-const CORS = [`https://check.beer`, /localhost:\d+$/];
+const CORS = [
+  `https://check.beer`,
+  /localhost:\d+$/,
+  /^https:\/\/beerbook2-da255--pr2-vg-web-push-\w+\.web\.app$/,
+];
 const REGION = `europe-west3`;
 
 initializeApp();
@@ -163,7 +167,7 @@ export const truncateUserInDb = auth.user().onDelete(async (user) => {
  * This function has access to a private collection and stores there the notification registration token of the user.
  */
 export const updateNotificationToken = onCall<UpdateDeviceTokenMessage>(
-  { cors: CORS, region: REGION },
+  { cors: CORS, enforceAppCheck: true, region: REGION },
   async (request) => {
     const uid = request.auth?.uid;
     if (!uid) {
@@ -249,7 +253,7 @@ const getUserFamiliarName = async (
  *
  */
 export const dispatchNotification = onCall<NotificationEventMessages>(
-  { cors: CORS, region: REGION },
+  { cors: CORS, enforceAppCheck: true, region: REGION },
   async (request) => {
     const uid = request.auth?.uid;
     if (!uid) {
@@ -278,6 +282,10 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
           subscribedUsers
         );
         if (subscribedNotificationTokens.length === 0) {
+          logger.log(
+            `No registration tokens stored for notification event`,
+            request.data
+          );
           return;
         }
         const currentUserFamiliarName = await getUserFamiliarName(
@@ -318,6 +326,10 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
           subscribedUsers
         );
         if (subscribedNotificationTokens.length === 0) {
+          logger.log(
+            `No registration tokens stored for notification event`,
+            request.data
+          );
           return;
         }
         const kegData = keg.data()!;

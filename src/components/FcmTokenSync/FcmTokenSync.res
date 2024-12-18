@@ -1,6 +1,9 @@
 let isMobileIOs: bool = %raw(`navigator.userAgent.match(/(iPhone|iPad)/)`)
-// on iOS the notifications are only allowed in standalone mode
-let canSubscribe = !isMobileIOs || %raw(`window.navigator.standalone === true`)
+let canSubscribe =
+  // avoid excessive call of the cloud function in development
+  %raw(`import.meta.env.PROD`) &&
+  (// on iOS the notifications are only allowed in standalone mode
+  !isMobileIOs || %raw(`window.navigator.standalone === true`))
 
 let isSubscribedToNotificationsRx = (auth, firestore, placeId) => {
   open Rxjs
@@ -22,7 +25,7 @@ let isSubscribedToNotificationsRx = (auth, firestore, placeId) => {
 }
 
 @react.component
-let make = (~placeId) => {
+let make = React.memo((~placeId) => {
   if canSubscribe {
     let auth = Reactfire.useAuth()
     let firestore = Reactfire.useFirestore()
@@ -32,32 +35,26 @@ let make = (~placeId) => {
       ~observableId="isSubscribedToNotifications",
       ~source=isSubscribedToNotificationsRx(auth, firestore, placeId),
     )
-    let serviceWorkerRegistration = Reactfire.useObservable(
-      ~observableId="serviceWorkerRegistration",
-      ~source=Rxjs.toObservable(ServiceWorker.serviceWorkerRegistrationSubject),
-      ~config={
-        idField: #uid,
-        suspense: false,
-      },
-    )
-    React.useEffect2(() => {
-      switch (isSubscribedToNotifications.data, serviceWorkerRegistration.data) {
-      | (Some(true), Some(swRegistration)) =>
+    React.useEffect(() => {
+      switch isSubscribedToNotifications.data {
+      | Some(true) =>
         messaging
-        ->Firebase.Messaging.getToken(swRegistration)
+        ->Firebase.Messaging.getToken
         ->Promise.then(updateNotificationToken)
         ->Promise.then(_ => Promise.resolve())
-        ->Promise.catch(error => {
-          let exn = Js.Exn.asJsExn(error)->Option.getExn
-          LogUtils.captureException(exn)
-          Promise.resolve()
-        })
+        ->Promise.catch(
+          error => {
+            let exn = Js.Exn.asJsExn(error)->Option.getExn
+            LogUtils.captureException(exn)
+            Promise.resolve()
+          },
+        )
         ->ignore
       | _ => ()
       }
       None
-    }, (isSubscribedToNotifications.data, serviceWorkerRegistration.data))
+    }, [isSubscribedToNotifications.data])
   }
 
   React.null
-}
+})
