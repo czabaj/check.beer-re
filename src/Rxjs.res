@@ -10,6 +10,7 @@
 type foreign // custom or otherwise
 type subject
 type behaviorsubject
+type replaysubject
 
 // Subject based observables can be emitted to will have use source<int> etc as their source type
 // Custom observables and observables derived from multiple sources will have void source type
@@ -67,6 +68,7 @@ module Subject = {
   type t<'a> = t<subject, source<'a>, 'a>
   @module("rxjs") @new external make: 'a => t<'a> = "Subject"
   @module("rxjs") @new external makeEmpty: unit => t<'a> = "Subject"
+  @send external next: (t<'a>, 'a) => unit = "next"
 }
 
 @send external next: (t<'class, source<'a>, 'b>, 'a) => unit = "next"
@@ -87,6 +89,13 @@ module Subject = {
 module BehaviorSubject = {
   type t<'a> = t<behaviorsubject, source<'a>, 'a>
   @module("rxjs") @new external make: 'a => t<'a> = "BehaviorSubject"
+  @send external next: (t<'a>, 'a) => unit = "next"
+}
+
+module ReplaySubject = {
+  type t<'a> = t<replaysubject, source<'a>, 'a>
+  @module("rxjs") @new external make: (~bufferSize: int=?, ~windowTime: int=?) => t<'a> = "ReplaySubject"
+  @send external next: (t<'a>, 'a) => unit = "next"
 }
 
 external toObservable: t<'c, 's, 'a> => t<foreign, void, 'a> = "%identity"

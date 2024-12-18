@@ -118,6 +118,7 @@ external useFunctions: unit => Firebase.Functions.t = "useFunctions"
 external useObservable: (
   ~observableId: string,
   ~source: Rxjs.t<Rxjs.foreign, Rxjs.void, 'a>,
+  ~config: reactfireOptions<'a>=?,
 ) => observableStatus<'a> = "useObservable"
 
 type signInCheckResult = {user: Null.t<Firebase.User.t>}

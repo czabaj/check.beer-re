@@ -440,7 +440,10 @@ module Messaging = {
   @module("firebase/messaging")
   external getMessaging: FirebaseApp.t => t = "getMessaging"
 
-  type getTokenOptions = {vapidKey: string}
+  type getTokenOptions = {
+    serviceWorkerRegistration?: ServiceWorker.serviceWorkerRegistration,
+    vapidKey: string,
+  }
 
   // Subscribes the Messaging instance to push notifications. Returns a Firebase Cloud Messaging registration token that
   // can be used to send push messages to that Messaging instance. If notification permission isn't already granted,
@@ -449,8 +452,30 @@ module Messaging = {
   @module("firebase/messaging")
   external _getToken: (t, getTokenOptions) => promise<string> = "getToken"
 
-  let getToken = (messaging: t) =>
-    _getToken(messaging, {vapidKey: %raw(`import.meta.env.VITE_FIREBASE_VAPID_KEY`)})
+  let getToken = async (messaging: t) => {
+    let serviceWorkerRegistration = await ServiceWorker.serviceWorkerRegistration
+    await _getToken(
+      messaging,
+      {serviceWorkerRegistration, vapidKey: %raw(`import.meta.env.VITE_FIREBASE_VAPID_KEY`)},
+    )
+  }
+
+  type fcmOptions = {
+    analyticsLabel?: string,
+    link?: string,
+  }
+
+  type messagePayload = {
+    collapseKey: string,
+    data: Js.Dict.t<string>,
+    fcmOptions: fcmOptions,
+    from: string,
+    messageId: string,
+    notification: Js.Dict.t<string>,
+  }
+
+  @module("firebase/messaging")
+  external onMessage: (t, messagePayload => unit) => unit => unit = "onMessage"
 }
 
 module Timestamp = {

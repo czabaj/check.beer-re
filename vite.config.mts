@@ -30,6 +30,11 @@ export default defineConfig(({ mode }) => ({
       },
     })),
     VitePWA({
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
+      filename: "sw.ts",
       manifest: {
         name: "Check Beer",
         short_name: "CheckBeer",
@@ -49,6 +54,8 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       registerType: `autoUpdate`,
+      strategies: `injectManifest`,
+      srcDir: "src/serviceWorker",
       workbox: {
         globPatterns: [`**/*.{js,css,html,png,svg}`],
         // avoid handling the Firebase Auth `__/auth/handler`
