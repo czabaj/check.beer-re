@@ -8,7 +8,7 @@ let make = () => {
   let (view, setView) = React.useState(() => SignIn)
   let (signInWithPasskey, runSignInWithPasskey) = Hooks.usePromise(() => {
     // TODO: upgrade the FirebaseWebAuthn and deploy to "europe-west3"
-    let functions = app->Firebase.Functions.getFunctionsInRegion(`us-central1`)
+    let functions = app->Firebase.Functions.getFunctionsInRegion(#"europe-central2")
     FirebaseWebAuthn.signInWithPasskey(auth, functions)
   })
   let isOnlineStatus = DomUtils.useIsOnline()

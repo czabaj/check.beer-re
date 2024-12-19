@@ -1,16 +1,17 @@
 @module("@firebase-web-authn/browser")
+external createUserWithPasskey: (
+  Firebase.Auth.t,
+  Firebase.Functions.t,
+  string,
+) => promise<Firebase.Auth.userCredential> = "createUserWithPasskey"
+
+@module("@firebase-web-authn/browser")
 external linkWithPasskey: (
   Firebase.Auth.t,
   Firebase.Functions.t,
   string,
 ) => promise<Firebase.Auth.userCredential> = "linkWithPasskey"
 
-@module("@firebase-web-authn/browser")
-external createUserWithPasskey: (
-  Firebase.Auth.t,
-  Firebase.Functions.t,
-  string,
-) => promise<Firebase.Auth.userCredential> = "createUserWithPasskey"
 
 @module("@firebase-web-authn/browser")
 external signInWithPasskey: (

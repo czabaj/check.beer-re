@@ -503,11 +503,15 @@ module StyledFirebaseAuth = {
 module Functions = {
   type t
 
+  // we are currently using just these two, but more can be added if needed
+  // @see https://firebase.google.com/docs/functions/locations
+  type functionLocation = [#"europe-central2" | #"europe-west3"]
+
   @module("firebase/functions")
   external getFunctions: FirebaseApp.t => t = "getFunctions"
 
   @module("firebase/functions")
-  external getFunctionsInRegion: (FirebaseApp.t, string) => t = "getFunctions"
+  external getFunctionsInRegion: (FirebaseApp.t, functionLocation) => t = "getFunctions"
 
   type callResult<'a> = {data: 'a}
   @module("firebase/functions")
