@@ -130,7 +130,6 @@ let make = () => {
             RescriptReactRouter.push("/")
             auth->Firebase.Auth.signOut->ignore
             Js.Global.setTimeout(() => {
-              open Webapi.Dom
               // reload the page for clearing Reactfire observables cache
               // @see https://github.com/FirebaseExtended/reactfire/issues/485#issuecomment-1028575121
               location->Location.reload
@@ -180,6 +179,6 @@ let make = () => {
       </>
     | _ => React.null
     }}
-    <footer className=classes.footer> {React.string("v.\xA0" ++ gitShortSha)} </footer>
+    <footer className={classes.footer}> {React.string("v.\xA0" ++ gitShortSha)} </footer>
   </>
 }

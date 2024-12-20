@@ -18,6 +18,9 @@ type registerSWOptions = {
 @module("virtual:pwa-register")
 external registerSW: registerSWOptions => unit = "registerSW"
 
+@module("virtual:pwa-register")
+external updateSW: unit => unit = "updateSW"
+
 let serviceWorkerRegistration: promise<
   serviceWorkerRegistration,
 > = %raw(`navigator.serviceWorker.ready`)

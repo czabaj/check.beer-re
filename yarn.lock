@@ -3665,6 +3665,18 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.5.2.tgz#db7257d727c891905947bd1c1a99da20e03c2ebd"
   integrity sha512-YAh82Wh4TIrxYLmfGcixwD18oIjyC1pFQC2Y01F2lzV2HTMiYrI0nze0FD0ocB//CKS/7jIUgae+adPqxK5yCQ==
 
+"@tilia/core@^1.1.0":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@tilia/core/-/core-1.2.2.tgz#5f45560ff26bedae7b303955131a37b1e14029c5"
+  integrity sha512-k2Pcw0hsh9hw85w5Jvs32WR2YkaQstxo1mSYS9i1yIo+ANzN0Fsb8kECK9wEIOzEAk21ApQAMKVR9aiu9sQGkw==
+
+"@tilia/react@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@tilia/react/-/react-1.1.0.tgz#96611d02ec127cc6ff6ebecc5b1e06b4060108ac"
+  integrity sha512-3CQ4oDez38ek6M4AwZE2OQoXhy2fuN4axFeH7Tk8IRVAUyyLZmqRP1dkbEAn9IjwN1WKXEYtHB4BB1+2NdGDGQ==
+  dependencies:
+    "@tilia/core" "^1.1.0"
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"

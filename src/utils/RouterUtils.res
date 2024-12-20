@@ -54,8 +54,7 @@ let createAnchorProps = (~replace=false, pathname: string): JsxDOM.domProps => {
 }
 
 let createShareLink = shareLinkId => {
-  open Webapi
-  let origin = Dom.location->Dom.Location.origin
+  let origin = location->Location.origin
   `${origin}/s/${shareLinkId}`
 }
 
