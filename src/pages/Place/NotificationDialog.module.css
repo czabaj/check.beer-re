@@ -1,0 +1,5 @@
+.notificationDialog {
+  & fieldset {
+    grid-template-columns: 1fr auto;
+  }
+}
