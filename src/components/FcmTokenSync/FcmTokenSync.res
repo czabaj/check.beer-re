@@ -1,10 +1,3 @@
-let isMobileIOs: bool = %raw(`navigator.userAgent.match(/(iPhone|iPad)/)`)
-let canSubscribe =
-  // avoid excessive call of the cloud function in development
-  %raw(`import.meta.env.PROD`) &&
-  (// on iOS the notifications are only allowed in standalone mode
-  !isMobileIOs || %raw(`window.navigator.standalone === true`))
-
 let isSubscribedToNotificationsRx = (auth, firestore, placeId) => {
   open Rxjs
   let currentUserRx = Rxfire.user(auth)->op(keepMap(Null.toOption))
@@ -26,7 +19,8 @@ let isSubscribedToNotificationsRx = (auth, firestore, placeId) => {
 
 @react.component
 let make = React.memo((~placeId) => {
-  if canSubscribe {
+  // avoid excessive call of the cloud function in development
+  if %raw(`import.meta.env.PROD`) && NotificationHooks.canSubscribe {
     let auth = Reactfire.useAuth()
     let firestore = Reactfire.useFirestore()
     let messaging = Reactfire.useMessaging()

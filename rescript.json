@@ -2,11 +2,12 @@
   "bs-dependencies": [
     "@rescript/core",
     "@rescript/react",
+    "@tilia/react",
     "rescript-react-intl",
     "rescript-react-update",
     "rescript-webapi"
   ],
-  "bsc-flags": ["-open RescriptCore"],
+  "bsc-flags": ["-open RescriptCore -open Webapi.Dom"],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {

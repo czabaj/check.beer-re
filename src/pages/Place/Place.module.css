@@ -7,6 +7,17 @@
   align-self: center;
 }
 
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  grid-area: more;
+  align-items: center;
+
+  & > button:first-child {
+    gap: 0.25rem;
+  }
+}
+
 li:first-child .detailButton {
   border-start-end-radius: var(--radius-2);
 }

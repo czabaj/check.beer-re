@@ -8,8 +8,6 @@ external polyfillAnchorPositioning: anchorPositioningPolyfillFn = "default"
 
 polyfillAnchorPositioning()->ignore
 
-ServiceWorker.registerSW({})
-
 @react.component
 let make = () => {
   let url = RescriptReactRouter.useUrl()
@@ -31,7 +29,9 @@ let make = () => {
                 let placeId = List.headExn(placeSubPath)
                 let placeIdSub = List.tail(placeSubPath)
                 <>
-                  <FcmTokenSync placeId />
+                  <React.Suspense fallback={React.null}>
+                    <FcmTokenSync placeId />
+                  </React.Suspense>
                   {switch placeIdSub {
                   | Some(list{}) => <Place placeId />
                   | Some(list{"nastaveni"}) => <PlaceSetting placeId />
@@ -52,5 +52,6 @@ let make = () => {
       </FirebaseAuthProvider>
     | _ => <PageNotFound />
     }}
+    <ToastBanner />
   </React.Suspense>
 }

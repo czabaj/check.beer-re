@@ -31,7 +31,7 @@ let share = (data: shareData) => {
   }
 }
 
-@get external matches: Webapi.Dom.Window.mediaQueryList => bool = "matches"
+@get external matches: Window.mediaQueryList => bool = "matches"
 
 let mediaRx = query => {
   open Rxjs
@@ -52,7 +52,7 @@ let isOnlineRx = {
   merge2(
     fromEvent(window, "online")->pipe(map((_, _) => true)),
     fromEvent(window, "offline")->pipe(map((_, _) => false)),
-  )->op(startWith((window->Webapi.Dom.Window.navigator).onLine))
+  )->op(startWith((window->Window.navigator).onLine))
 }
 
 let useIsOnline = () => {

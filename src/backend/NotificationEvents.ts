@@ -17,3 +17,9 @@ export enum NotificationEvent {
    */
   freshKeg = 2,
 }
+
+export type NotificationData = {
+  body: string,
+  title: string,
+  url: string
+}

@@ -29,7 +29,6 @@ let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit, ~onChangePassw
         let unmountThrustDevice = AppStorage.getThrustDevice() !== None
         if initialThrustDevide != unmountThrustDevice {
           // we need to reload the page to re-initialize the Firestore SDK
-          open Webapi.Dom
           location->Location.reload
         }
       },

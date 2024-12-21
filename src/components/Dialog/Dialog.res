@@ -2,7 +2,7 @@ type classesType = {scrollContent: string, root: string}
 
 @module("./Dialog.module.css") external classes: classesType = "default"
 
-type dialogPolyfillModule = {registerDialog: (. Dom.element) => unit}
+type dialogPolyfillModule = {registerDialog: Dom.element => unit}
 @module("dialog-polyfill")
 external dialogPolyfill: dialogPolyfillModule = "default"
 
@@ -17,8 +17,8 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   React.useEffect2(() => {
     switch visibilityDeps {
     | (None, _) => ()
-    | (Some(dialog), true) => dialog->showModal(_)
-    | (Some(dialog), false) => dialog->close(_)
+    | (Some(dialog), true) => dialog->(showModal(_))
+    | (Some(dialog), false) => dialog->(close(_))
     }
     None
   }, visibilityDeps)
@@ -28,22 +28,19 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   let lightDismissibleDeps = (maybeDialogNode, onClickOutside !== None)
   React.useEffect2(() => {
     switch lightDismissibleDeps {
-    | (Some(dialog), true) => {
-        open Webapi.Dom
-        switch dialog->HtmlElement.ofElement {
-        | None => None
-        | Some(dialogElement) => {
-            let handler = event => {
-              let targetIsDialog =
-                event->MouseEvent.target->EventTarget.unsafeAsElement->Element.nodeName === "DIALOG"
-              switch (targetIsDialog, onClickOutsideRef.current) {
-              | (true, Some(handleClickOutside)) => handleClickOutside()
-              | _ => ()
-              }
+    | (Some(dialog), true) => switch dialog->HtmlElement.ofElement {
+      | None => None
+      | Some(dialogElement) => {
+          let handler = event => {
+            let targetIsDialog =
+              event->MouseEvent.target->EventTarget.unsafeAsElement->Element.nodeName === "DIALOG"
+            switch (targetIsDialog, onClickOutsideRef.current) {
+            | (true, Some(handleClickOutside)) => handleClickOutside()
+            | _ => ()
             }
-            dialogElement->HtmlElement.addClickEventListener(handler)
-            Some(() => dialogElement->HtmlElement.removeClickEventListener(handler))
           }
+          dialogElement->HtmlElement.addClickEventListener(handler)
+          Some(() => dialogElement->HtmlElement.removeClickEventListener(handler))
         }
       }
     | _ => None
@@ -57,7 +54,7 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
         switch node->Nullable.toOption {
         | None => None
         | Some(dialogNode) => {
-            dialogPolyfill.registerDialog(. dialogNode)
+            dialogPolyfill.registerDialog(dialogNode)
             Some(dialogNode)
           }
         }

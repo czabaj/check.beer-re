@@ -20,7 +20,10 @@ import type {
   place as Place,
   personsIndex as PersonsIndex,
 } from "../../src/backend/FirestoreModels.gen";
-import { NotificationEvent } from "../../src/backend/NotificationEvents";
+import {
+  type NotificationData,
+  NotificationEvent,
+} from "../../src/backend/NotificationEvents";
 import type {
   notificationEventMessages as NotificationEventMessages,
   updateDeviceTokenMessage as UpdateDeviceTokenMessage,
@@ -200,13 +203,13 @@ const getRegistrationTokens = async (
     .filter(Boolean);
 };
 
-const validateRequest = async ({
+const validateRequest = ({
   currentUserUid,
-  placeDoc,
+  place,
   subscribedUsers,
 }: {
   currentUserUid: string;
-  placeDoc: DocumentReference<Place>;
+  place: DocumentSnapshot<Place>;
   subscribedUsers: string[];
 }) => {
   if (subscribedUsers.length === 0) {
@@ -215,24 +218,23 @@ const validateRequest = async ({
       `There are no subscribed users for the event.`
     );
   }
-  const place = await placeDoc.get();
   if (!place.exists) {
     throw new HttpsError(
       `not-found`,
-      `Place "${placeDoc.path}" does not exist.`
+      `Place "${place.ref.path}" does not exist.`
     );
   }
   const { accounts } = place.data()!;
   if (!accounts[currentUserUid]) {
     throw new HttpsError(
       `permission-denied`,
-      `The current user is not associated with the place "${placeDoc.path}".`
+      `The current user is not associated with the place "${place.ref.path}".`
     );
   }
   if (subscribedUsers.some((uid) => !accounts[uid])) {
     throw new HttpsError(
       `failed-precondition`,
-      `Some of the subscribed users are not associated with the place "${placeDoc.path}".`
+      `Some of the subscribed users are not associated with the place "${place.ref.path}".`
     );
   }
 };
@@ -272,9 +274,10 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
       case NotificationEvent.freeTable: {
         const placeDoc = db.doc(request.data.place) as DocumentReference<Place>;
         const subscribedUsers = request.data.users;
-        await validateRequest({
+        const place = await placeDoc.get();
+        validateRequest({
           currentUserUid: uid,
-          placeDoc,
+          place,
           subscribedUsers,
         });
         const subscribedNotificationTokens = await getRegistrationTokens(
@@ -292,17 +295,14 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
           placeDoc,
           uid
         );
+        const placeData = place.data()!;
         return messaging.sendEachForMulticast({
-          notification: {
-            title: `Ke stolům!`,
-            body: `${currentUserFamiliarName} právě zapsal/a první pivo.`,
-          },
+          data: {
+            body: `${currentUserFamiliarName} právě zapsal/a první pivo ${placeData.name}`,
+            title: `Ke stolu!`,
+            url: `https://check.beer/misto/${placeDoc.id}`,
+          } satisfies NotificationData,
           tokens: subscribedNotificationTokens,
-          webpush: {
-            fcmOptions: {
-              link: `https://check.beer/misto/${placeDoc.id}`,
-            },
-          },
         });
       }
       case NotificationEvent.freshKeg: {
@@ -316,9 +316,10 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
         }
         const placeDoc = kegDoc.parent.parent as DocumentReference<Place>;
         const subscribedUsers = request.data.users;
-        await validateRequest({
+        const place = await placeDoc.get();
+        validateRequest({
           currentUserUid: uid,
-          placeDoc,
+          place,
           subscribedUsers,
         });
         const subscribedNotificationTokens = await getRegistrationTokens(
@@ -333,17 +334,14 @@ export const dispatchNotification = onCall<NotificationEventMessages>(
           return;
         }
         const kegData = keg.data()!;
+        const placeData = place.data()!;
         return messaging.sendEachForMulticast({
-          notification: {
+          data: {
+            body: `${placeData.name} právě vytočili první pivo ze sudu ${kegData.serial}, ${kegData.beer}.`,
             title: `Čerstvé pivo`,
-            body: `Právě bylo vytočeno první pivo ze sudu ${kegData.serial}, ${kegData.beer}.`,
-          },
+            url: `https://check.beer/misto/${placeDoc.id}`,
+          } satisfies NotificationData,
           tokens: subscribedNotificationTokens,
-          webpush: {
-            fcmOptions: {
-              link: `https://check.beer/misto/${placeDoc.id}`,
-            },
-          },
         });
       }
     }

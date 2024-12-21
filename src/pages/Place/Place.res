@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {root: string, toolbar: string}
 
 @module("./Place.module.css") external classes: classesType = "default"
 
@@ -6,6 +6,7 @@ type dialogState =
   | Hidden
   | AddConsumption({personId: string, person: Db.personsAllRecord})
   | AddPerson
+  | NotificationSettings
 
 type userConsumption = {milliliters: int, timestamp: float}
 
@@ -136,14 +137,25 @@ let make = (~placeId) => {
     <FormattedCurrency.Provider value={place.currency}>
       <div className={`${Styles.page.narrow} ${classes.root}`}>
         <PlaceHeader
-          buttonRightSlot={isUserAuthorized(UserRoles.Staff)
-            ? <a
-                {...RouterUtils.createAnchorProps("./nastaveni")}
-                className={Header.classes.buttonRight}>
-                <span> {React.string("⚙️")} </span>
-                <span> {React.string("Nastavení")} </span>
-              </a>
-            : React.null}
+          buttonRightSlot={<div className={classes.toolbar}>
+            {!NotificationHooks.canSubscribe
+              ? React.null
+              : <button
+                  className={Header.classes.buttonRight}
+                  onClick={_ => setDialog(_ => NotificationSettings)}
+                  type_="button">
+                  <span> {React.string("📢")} </span>
+                  <span> {React.string("Notifikace")} </span>
+                </button>}
+            {isUserAuthorized(UserRoles.Staff)
+              ? <a
+                  {...RouterUtils.createAnchorProps("./nastaveni")}
+                  className={Header.classes.buttonRight}>
+                  <span> {React.string("⚙️")} </span>
+                  <span> {React.string("Nastavení")} </span>
+                </a>
+              : React.null}
+          </div>}
           createdTimestamp={place.createdAt}
           placeName={place.name}
         />
@@ -236,6 +248,22 @@ let make = (~placeId) => {
               Db.Person.add(firestore, ~placeId, ~personName=values.name)->ignore
               hideDialog()
             }}
+          />
+        | NotificationSettings =>
+          let currentUserNotificationSubscription =
+            place.accounts->Dict.get(currentUser.uid)->Option.getExn->snd
+          <NotificationDialog
+            currentUserNotificationSubscription
+            currentUserUid={currentUser.uid}
+            onDismiss={hideDialog}
+            onUpdateSubscription={newNotificationSubscription =>
+              Db.Place.updateNotificationSubscription(
+                firestore,
+                ~placeId,
+                ~personUserId=currentUser.uid,
+                ~newSubscription=newNotificationSubscription,
+              )->ignore}
+            place={place}
           />
         }}
       </div>
