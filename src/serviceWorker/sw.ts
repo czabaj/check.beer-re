@@ -12,15 +12,17 @@ import { NavigationRoute, registerRoute } from "workbox-routing";
 import { NetworkFirst } from "workbox-strategies";
 
 import { firebaseConfig } from "../backend/firebaseConfig";
+import type { NotificationData } from "../backend/NotificationEvents";
 
 declare const self: ServiceWorkerGlobalScope;
 
+// Prepared for prompt to update - but currently not used
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
 });
 
+// Handles auto-update @see https://vite-pwa-org.netlify.app/guide/inject-manifest#auto-update-behavior
 self.skipWaiting();
-
 clientsClaim();
 
 const entries = self.__WB_MANIFEST;
@@ -59,12 +61,11 @@ registerRoute(
 const firebaseApp = initializeApp(firebaseConfig);
 const messaging = getMessaging(firebaseApp);
 onBackgroundMessage(messaging, (payload) => {
-  const notificationTitle = payload.notification?.title;
-  if (!notificationTitle) return;
-  self.registration.showNotification(notificationTitle, {
-    body: payload.notification!.body,
+  const data = payload.data as NotificationData;
+  self.registration.showNotification(data.title, {
+    body: data.body,
     icon: "/pwa-192.png",
-    data: { url: payload.fcmOptions?.link || "/" },
+    data: { url: data.url || "/" },
   });
 });
 
