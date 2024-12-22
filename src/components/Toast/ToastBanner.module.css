@@ -6,23 +6,7 @@
     --toastBanner_iconOffset: 1.7rem;
     --toastBanner_paddingBlock: 0.25rem;
     --toastBanner_paddingInline: 0.5rem;
-    & > div {
-      margin-inline-end: max(0px, (100vw - var(--measure)) * 0.5);
-      margin-inline-start: max(
-        0px,
-        (100vw - var(--measure)) * 0.5 - var(--toastBanner_iconOffset)
-      );
-      padding: var(--toastBanner_paddingBlock) var(--toastBanner_paddingInline);
-      padding-inline-start: 2rem;
-      position: relative;
 
-      &::before {
-        content: "ℹ️";
-        inline-size: 1rem;
-        margin-inline-end: 0.5rem;
-        margin-inline-start: calc(-1 * var(--toastBanner_iconOffset));
-      }
-    }
     &[data-variant="error"] {
       --link-text: var(--text-on-danger);
       background-color: var(--surface-danger);
@@ -44,6 +28,27 @@
 
       & > div::before {
         content: "✅";
+      }
+    }
+    &:last-child {
+      padding-block-end: env(safe-area-inset-bottom);
+    }
+
+    & > div {
+      margin-inline-end: max(0px, (100vw - var(--measure)) * 0.5);
+      margin-inline-start: max(
+        0px,
+        (100vw - var(--measure)) * 0.5 - var(--toastBanner_iconOffset)
+      );
+      padding: var(--toastBanner_paddingBlock) var(--toastBanner_paddingInline);
+      padding-inline-start: 2rem;
+      position: relative;
+
+      &::before {
+        content: "ℹ️";
+        inline-size: 1rem;
+        margin-inline-end: 0.5rem;
+        margin-inline-start: calc(-1 * var(--toastBanner_iconOffset));
       }
     }
   }
