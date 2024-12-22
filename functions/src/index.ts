@@ -39,7 +39,7 @@ import {
 const CORS = [
   `https://check.beer`,
   /localhost:\d+$/,
-  /^https:\/\/beerbook2-da255--pr2-vg-web-push-\w+\.web\.app$/,
+  /^https:\/\/beerbook2-da255--pr[\w-]+\.web\.app$/,
 ];
 const REGION = `europe-west3`;
 
