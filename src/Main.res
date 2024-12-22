@@ -1,6 +1,6 @@
 LogUtils.initSentry()
 
-ServiceWorker.registerSW({
+let updateSW = ServiceWorker.registerSW({
   onNeedRefresh: () => {
     Toast.addMessage(
       Info({
@@ -8,9 +8,7 @@ ServiceWorker.registerSW({
         message: <>
           {React.string("Je k dispozici nová verze\xA0\xA0")}
           <button
-            className={`${Styles.link.base}`}
-            onClick={_ => ServiceWorker.updateSW()}
-            type_="button">
+            className={`${Styles.link.base}`} onClick={_ => %raw(`updateSW()`)} type_="button">
             {React.string("Aktualizovat")}
           </button>
         </>,
@@ -22,7 +20,7 @@ ServiceWorker.registerSW({
       Toast.addMessage(
         Info({
           id: "sw-offline-ready",
-          message: React.string("Tato stránka umí fungovat bez internetu"),
+          message: React.string("Po přihlášení se stránka obejde i bez internetu."),
           onClose: () => {
             AppStorage.markSeenOfflineModeReady()
           },

@@ -35,6 +35,9 @@ export default defineConfig(({ mode }) => ({
         type: "module",
       },
       filename: "sw.ts",
+      injectManifest: {
+        globPatterns: [`**/*.{js,css,html,png,svg}`],
+      },
       manifest: {
         name: "Check Beer",
         short_name: "CheckBeer",
@@ -56,11 +59,6 @@ export default defineConfig(({ mode }) => ({
       registerType: `autoUpdate`,
       strategies: `injectManifest`,
       srcDir: "src/serviceWorker",
-      workbox: {
-        globPatterns: [`**/*.{js,css,html,png,svg}`],
-        // avoid handling the Firebase Auth `__/auth/handler`
-        navigateFallbackDenylist: [/__/],
-      },
     }),
   ].filter(Boolean),
   server: {
