@@ -1,7 +1,8 @@
 let isMobileIOs: bool = %raw(`navigator.userAgent.match(/(iPhone|iPad)/)`)
 let canSubscribe =
-  // on iOS the notifications are only allowed in standalone mode
-  !isMobileIOs || %raw(`window.navigator.standalone === true`)
+  %raw(`"Notification" in window`) &&
+  (// on iOS the notifications are only allowed in standalone mode
+  !isMobileIOs || %raw(`window.navigator.standalone === true`))
 
 @genType
 type notificationEventMessages =
@@ -10,6 +11,9 @@ type notificationEventMessages =
 
 @genType
 type updateDeviceTokenMessage = {deviceToken: string}
+
+@val @scope(("window", "Notification"))
+external notificationPermission: [#default | #denied | #granted] = "permission"
 
 let useGetSubscibedUsers = (
   ~currentUserUid: string,
