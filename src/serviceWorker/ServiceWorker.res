@@ -16,7 +16,7 @@ type registerSWOptions = {
 }
 
 @module("virtual:pwa-register")
-external registerSW: registerSWOptions => unit = "registerSW"
+external registerSW: registerSWOptions => unit => unit = "registerSW"
 
 let serviceWorkerRegistration: promise<
   serviceWorkerRegistration,

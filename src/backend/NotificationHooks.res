@@ -1,3 +1,9 @@
+let isMobileIOs: bool = %raw(`navigator.userAgent.match(/(iPhone|iPad)/)`)
+let canSubscribe =
+  %raw(`"Notification" in window`) &&
+  (// on iOS the notifications are only allowed in standalone mode
+  !isMobileIOs || %raw(`window.navigator.standalone === true`))
+
 @genType
 type notificationEventMessages =
   | @as(1) /* FreeTable */ FreeTableMessage({place: string, users: array<string>})
@@ -5,6 +11,9 @@ type notificationEventMessages =
 
 @genType
 type updateDeviceTokenMessage = {deviceToken: string}
+
+@val @scope(("window", "Notification"))
+external notificationPermission: [#default | #denied | #granted] = "permission"
 
 let useGetSubscibedUsers = (
   ~currentUserUid: string,
@@ -64,15 +73,15 @@ let useDispatchFreshKegNotification = (~currentUserUid: string, ~place: Firestor
   }
 }
 
-// let useDispatchTestNotification = (~currentUserUid: string, ~place: FirestoreModels.place) => {
-//   let firestore = Reactfire.useFirestore()
-//   let functions = Reactfire.useFunctions()
-//   let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
-//   () => {
-//     let placeRef = Db.placeDocument(firestore, Db.getUid(place))
-//     dispatchNotification(FreeTableMessage({place: placeRef.path, users: [currentUserUid]}))->ignore
-//   }
-// }
+let useDispatchTestNotification = (~currentUserUid: string, ~place: FirestoreModels.place) => {
+  let firestore = Reactfire.useFirestore()
+  let functions = Reactfire.useFunctions()
+  let dispatchNotification = Firebase.Functions.httpsCallable(functions, "dispatchNotification")
+  () => {
+    let placeRef = Db.placeDocument(firestore, Db.getUid(place))
+    dispatchNotification(FreeTableMessage({place: placeRef.path, users: [currentUserUid]}))->ignore
+  }
+}
 
 let useUpdateNotificationToken = () => {
   let functions = Reactfire.useFunctions()

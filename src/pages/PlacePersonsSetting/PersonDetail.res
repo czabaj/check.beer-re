@@ -306,7 +306,7 @@ let make = (
           })
           switch handler {
           | Clipboard =>
-            Webapi.Dom.window->Webapi.Dom.Window.alert("Pozvánka byla zkopírována do schránky.")
+            window->Window.alert("Pozvánka byla zkopírována do schránky.")
           | _ => ()
           }
         }}

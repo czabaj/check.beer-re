@@ -579,6 +579,19 @@ module Place = {
     let placeDoc = placeDocument(firestore, placeId)
     Firebase.updateDoc(placeDoc, {"createdAt": createdAt, "name": name})
   }
+  let updateNotificationSubscription = async (
+    firestore,
+    ~personUserId,
+    ~newSubscription: int,
+    ~placeId,
+  ) => {
+    let placeRef = placeDocument(firestore, placeId)
+    let place = (await Firebase.getDocFromCache(placeRef)).data({})
+    let (role, _) = place.accounts->Dict.getUnsafe(personUserId)
+    let updateObject = Object.make()
+    updateObject->Object.set(`accounts.${personUserId}`, (role, newSubscription))
+    await Firebase.updateDoc(placeRef, updateObject)
+  }
 }
 
 module Person = {

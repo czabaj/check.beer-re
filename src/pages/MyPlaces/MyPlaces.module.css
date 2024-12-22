@@ -1,6 +1,8 @@
 .footer {
   color: var(--text-3);
+  max-inline-size: var(--measure);
   padding: 0.5rem;
+  margin-inline: auto;
   text-align: right;
 }
 

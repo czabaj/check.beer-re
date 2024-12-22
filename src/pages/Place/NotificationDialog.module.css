@@ -1,0 +1,6 @@
+.notificationDialog {
+  max-inline-size: 40ch;
+  & fieldset {
+    grid-template-columns: 1fr auto;
+  }
+}

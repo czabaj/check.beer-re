@@ -52,10 +52,10 @@
   composes: base;
   --_background: var(--surface-brand);
   --_border: var(--_background);
-  --_text: var(--text-brand-1);
+  --_text: var(--text-on-brand);
   --_active-background: var(--surface-brand);
   --_active-border: hsl(var(--surface-brand-hsl) / 20%);
-  --_active-text: var(--text-brand-1);
+  --_active-text: var(--text-on-brand);
   --_disabled-background: hsl(var(--surface-brand-hsl) / 30%);
   --_disabled-border: hsl(var(--surface-brand-hsl) / 20%);
   --_disabled-text: var(--text-2);
@@ -63,8 +63,8 @@
     var(--surface-brand-hs) calc(var(--surface-brand-l) + 5%)
   );
   --_hover-border: var(--_hover-background);
-  --_hover-text: var(--text-brand-1);
-  --_separator: var(--text-brand-1);
+  --_hover-text: var(--text-on-brand);
+  --_separator: var(--text-on-brand);
 }
 
 .variantDanger {
