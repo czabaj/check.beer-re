@@ -4,10 +4,17 @@ type classesType = {buttonLeft: string, buttonRight: string, root: string}
 
 @react.component
 let make = (~buttonLeftSlot, ~buttonRightSlot, ~className=?, ~headingSlot, ~subheadingSlot) => {
-  <header className={`${classes.root} ${className->Option.getOr("")}`}>
-    <h2> {headingSlot} </h2>
-    <p> {subheadingSlot} </p>
-    {buttonLeftSlot}
-    {buttonRightSlot}
-  </header>
+  let headerRef = React.useRef(Nullable.null)
+  let layout = Hooks.useIsHorizontallyOverflowing(headerRef.current, [`xl`, `sm`])
+  React.cloneElement(
+    <header
+      className={`${classes.root} ${className->Option.getOr("")}`}
+      ref={headerRef->ReactDOM.Ref.domRef}>
+      <h2> {headingSlot} </h2>
+      <p> {subheadingSlot} </p>
+      {buttonLeftSlot}
+      {buttonRightSlot}
+    </header>,
+    {"data-layout": layout},
+  )
 }

@@ -9,6 +9,17 @@
   grid-template-columns: auto 1fr auto;
   margin-block-start: 0.5rem;
   padding: var(--border-size-2);
+
+  &[data-layout="xl"] {
+    & h2 {
+      white-space: nowrap; /* force overflow when title large to trigger layout change */
+    }
+  }
+  &[data-layout="sm"] {
+    & h2 {
+      font-size: 1em;
+    }
+  }
 }
 .buttonLeft {
   border-inline-end: var(--border-size-2) solid var(--surface-1);
