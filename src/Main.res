@@ -1,3 +1,6 @@
+@module("./polyfills.js") external polyfill: unit => unit = "polyfill"
+polyfill()
+
 LogUtils.initSentry()
 
 let updateSWRef = ref(ignore)

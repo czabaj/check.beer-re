@@ -112,7 +112,6 @@ let useIsHorizontallyOverflowing = (element: Nullable.t<Element.t>, layouts: arr
       let testOverflowing = _ => {
         let availableWidth = el->Element.clientWidth
         let contentWidth = el->Element.scrollWidth
-        Js.log({"availableWidth": availableWidth, "contentWidth": contentWidth})
         sendOverflowing(Resized({availableWidth, contentWidth}))
       }
       testOverflowing()
