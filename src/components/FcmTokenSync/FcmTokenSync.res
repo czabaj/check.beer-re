@@ -39,7 +39,10 @@ let make = React.memo((~placeId) => {
         ->Promise.catch(
           error => {
             let exn = Js.Exn.asJsExn(error)->Option.getExn
-            LogUtils.captureException(exn)
+            // ignore the error if the permission is simply blocked
+            if %raw(`exn.code !== "messaging/permission-blocked"`) {
+              LogUtils.captureException(exn)
+            }
             Promise.resolve()
           },
         )
