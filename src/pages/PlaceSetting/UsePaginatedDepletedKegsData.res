@@ -13,7 +13,7 @@ type paginatedAction =
   | InitialLoadSuccess(array<Db.kegConverted>)
   | LoadingError(exn)
 
-let getConstraints = (limit, startAfter) => {
+let getConstraints = (limit, startAfter: option<Db.kegConverted>) => {
   let basicConstraints = [
     Firebase.where("depletedAt", #"!=", null),
     Firebase.orderBy("depletedAt", ~direction=#desc),
@@ -23,7 +23,7 @@ let getConstraints = (limit, startAfter) => {
   ]
   switch startAfter {
   | None => basicConstraints
-  | Some(keg) => basicConstraints->Array.concat([Firebase.startAfter(keg)])
+  | Some(keg) => basicConstraints->Array.concat([Firebase.startAfter(keg.depletedAt->Null.getExn)])
   }
 }
 

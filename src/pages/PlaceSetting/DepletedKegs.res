@@ -1,4 +1,4 @@
-type classesType = {detailButtonCell: string, table: string}
+type classesType = {detailButtonCell: string, fetchMoreButton: string, table: string}
 @module("./DepletedKegs.module.css") external classes: classesType = "default"
 
 @genType @react.component
@@ -90,7 +90,10 @@ let make = (
         {switch maybeFetchMoreDepletedKegs {
         | None => React.null
         | Some(fetchMore) =>
-          <button className={Styles.button.base} onClick={_ => fetchMore()} type_="button">
+          <button
+            className={`${Styles.button.base} ${classes.fetchMoreButton}`}
+            onClick={_ => fetchMore()}
+            type_="button">
             {React.string("Načíst další")}
           </button>
         }}

@@ -9,7 +9,7 @@
 .table thead tr {
   border-block-end: calc(var(--border-size-2) * 2) double var(--border-ink);
 }
-.table tbody tr:nth-child(n+2) {
+.table tbody tr:nth-child(n + 2) {
   border-block-start: var(--border-size-2) solid var(--border-ink);
 }
 .table tr {
@@ -56,6 +56,12 @@
 }
 .table :where(th, td):nth-child(11) {
   grid-area: effectivity;
+}
+
+.fetchMoreButton {
+  display: block;
+  margin-block: 1rem;
+  margin-inline: auto;
 }
 
 @supports (grid-template-columns: subgrid) {
