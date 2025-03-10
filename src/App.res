@@ -1,13 +1,6 @@
 %%raw(`import './styles/index.css'`)
 %%raw(`import '@oddbird/popover-polyfill'`)
 
-type anchorPositioningPolyfillFn = unit => promise<unit>
-
-@module("@oddbird/css-anchor-positioning/fn")
-external polyfillAnchorPositioning: anchorPositioningPolyfillFn = "default"
-
-polyfillAnchorPositioning()->ignore
-
 @react.component
 let make = () => {
   let url = RescriptReactRouter.useUrl()

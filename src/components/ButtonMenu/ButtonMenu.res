@@ -13,6 +13,10 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
   let popoverId = `popover-${nodeId}`
   let anchorId = `anchor-${nodeId}`
   let anchorName = `--button-menu-${nodeId}`
+  React.useEffect0(() => {
+    OddbirdCssAnchorPositioning.polyfillDebounced()
+    None
+  })
   <>
     {React.cloneElement(
       <button
