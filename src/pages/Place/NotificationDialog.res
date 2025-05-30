@@ -33,7 +33,7 @@ let make = (
             <InputWrapper
               inputName="free_table"
               inputSlot={<InputToggle
-                checked={BitwiseUtils.bitAnd(
+                checked={land(
                   currentUserNotificationSubscription,
                   (NotificationEvents.FreeTable :> int),
                 ) !== 0}
@@ -42,11 +42,11 @@ let make = (
                   let checked = target["checked"]
                   onUpdateSubscription(
                     checked
-                      ? BitwiseUtils.bitOr(
+                      ? lor(
                           currentUserNotificationSubscription,
                           (NotificationEvents.FreeTable :> int),
                         )
-                      : BitwiseUtils.bitAnd(
+                      : land(
                           currentUserNotificationSubscription,
                           BitwiseUtils.bitNot((NotificationEvents.FreeTable :> int)),
                         ),
@@ -58,7 +58,7 @@ let make = (
             <InputWrapper
               inputName="fresh_keg"
               inputSlot={<InputToggle
-                checked={BitwiseUtils.bitAnd(
+                checked={land(
                   currentUserNotificationSubscription,
                   (NotificationEvents.FreshKeg :> int),
                 ) !== 0}
@@ -67,11 +67,11 @@ let make = (
                   let checked = target["checked"]
                   onUpdateSubscription(
                     checked
-                      ? BitwiseUtils.bitOr(
+                      ? lor(
                           currentUserNotificationSubscription,
                           (NotificationEvents.FreshKeg :> int),
                         )
-                      : BitwiseUtils.bitAnd(
+                      : land(
                           currentUserNotificationSubscription,
                           BitwiseUtils.bitNot((NotificationEvents.FreshKeg :> int)),
                         ),

@@ -24,10 +24,7 @@ let useGetSubscibedUsers = (
     place.accounts
     ->Dict.toArray
     ->Array.filterMap(((uid, (_, notificationSubscription))) => {
-      if (
-        uid === currentUserUid ||
-          BitwiseUtils.bitAnd(notificationSubscription, (event :> int)) === 0
-      ) {
+      if uid === currentUserUid || land(notificationSubscription, (event :> int)) === 0 {
         None
       } else {
         Some(uid)
