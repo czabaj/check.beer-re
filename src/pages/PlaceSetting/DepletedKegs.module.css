@@ -1,3 +1,7 @@
+.section > div {
+  overflow: unset;
+}
+
 .table {
   --cell-inline-padding: var(--padding-inline, 8px);
 
@@ -7,8 +11,12 @@
   display: contents;
 }
 .table thead tr {
+  background-color: var(--surface-2);
   border-block-end: calc(var(--border-size-2) * 2) double var(--border-ink);
+  position: sticky;
+  top: env(safe-area-inset-top);
 }
+
 .table tbody tr:nth-child(n + 2) {
   border-block-start: var(--border-size-2) solid var(--border-ink);
 }

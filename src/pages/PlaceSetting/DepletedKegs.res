@@ -1,4 +1,9 @@
-type classesType = {detailButtonCell: string, fetchMoreButton: string, table: string}
+type classesType = {
+  detailButtonCell: string,
+  fetchMoreButton: string,
+  section: string,
+  table: string,
+}
 @module("./DepletedKegs.module.css") external classes: classesType = "default"
 
 @genType @react.component
@@ -7,7 +12,10 @@ let make = (
   ~maybeDepletedKegs: option<array<Db.kegConverted>>,
 ) => {
   <SectionWithHeader
-    buttonsSlot={React.null} headerId="depleted_kegs" headerSlot={React.string("Dopité sudy")}>
+    className={classes.section}
+    buttonsSlot={React.null}
+    headerId="depleted_kegs"
+    headerSlot={React.string("Dopité sudy")}>
     {switch maybeDepletedKegs {
     | None =>
       <p className=SectionWithHeader.classes.emptyMessage>
