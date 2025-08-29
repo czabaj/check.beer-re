@@ -4,7 +4,7 @@
   box-shadow: var(--shadow-3);
   inset: unset;
   padding-block: 0.5rem;
-  position-try-options: flip-block, flip-inline, flip-block flip-inline;
+  position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
   right: anchor(right);
   top: anchor(bottom);
 }

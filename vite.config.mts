@@ -4,7 +4,7 @@
 import createReScriptPlugin from "@jihchi/vite-plugin-rescript";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import createReactPlugin from "@vitejs/plugin-react";
-import { defineConfig, splitVendorChunkPlugin } from "vite";
+import { defineConfig } from "vite";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
 
@@ -22,7 +22,6 @@ export default defineConfig(({ mode }) => ({
         org: "vaclav",
         project: "check-beer",
       }),
-    splitVendorChunkPlugin(),
     ViteEjsPlugin((viteConfig) => ({
       env: {
         mode,

@@ -28,7 +28,8 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   let lightDismissibleDeps = (maybeDialogNode, onClickOutside !== None)
   React.useEffect2(() => {
     switch lightDismissibleDeps {
-    | (Some(dialog), true) => switch dialog->HtmlElement.ofElement {
+    | (Some(dialog), true) =>
+      switch dialog->HtmlElement.ofElement {
       | None => None
       | Some(dialogElement) => {
           let handler = event => {
@@ -59,6 +60,7 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
           }
         }
       )
+      None
     })}>
     {children}
   </dialog>

@@ -13,30 +13,27 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
   let popoverId = `popover-${nodeId}`
   let anchorId = `anchor-${nodeId}`
   let anchorName = `--button-menu-${nodeId}`
-  React.useEffect0(() => {
-    OddbirdCssAnchorPositioning.polyfillDebounced()
-    None
-  })
+
   <>
     {React.cloneElement(
       <button
         ?className
         id=anchorId
-        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("anchorName", anchorName)}
+        style={{}->ReactDOM.Style.unsafeAddProp("anchorName", anchorName)}
         ?title
         type_="button">
         {children}
       </button>,
       {
-        "popovertarget": popoverId,
-        "popovertargetaction": "toggle",
+        "popoverTarget": popoverId,
+        "popoverTargetAction": "toggle",
       },
     )}
     {React.cloneElement(
       <div
         className={classes.popover}
         id={popoverId}
-        style={ReactDOM.Style.make()->ReactDOM.Style.unsafeAddProp("positionAnchor", anchorName)}>
+        style={{}->ReactDOM.Style.unsafeAddProp("positionAnchor", anchorName)}>
         <nav>
           <ul>
             {menuItems
@@ -53,7 +50,6 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
         </nav>
       </div>,
       {
-        "anchor": anchorId,
         "popover": "",
       },
     )}

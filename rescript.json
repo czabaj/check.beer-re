@@ -5,7 +5,8 @@
     "@tilia/react",
     "rescript-react-intl",
     "rescript-react-update",
-    "rescript-webapi"
+    "rescript-webapi",
+    "tilia"
   ],
   "bsc-flags": ["-open RescriptCore -open Webapi.Dom"],
   "gentypeconfig": {

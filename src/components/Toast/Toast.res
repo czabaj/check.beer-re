@@ -8,7 +8,7 @@ type toast =
 
 type state = {mutable toasts: array<toast>}
 
-let tree = Tilia.make({
+let tree = Tilia.tilia({
   toasts: [],
 })
 

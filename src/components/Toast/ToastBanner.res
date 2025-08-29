@@ -7,8 +7,8 @@ let closeButtonPlaceholder = React.string(String.repeat("\xA0", String.length(bu
 
 @react.component
 let make = React.memo(() => {
-  let toastTree = Tilia.use(Toast.tree)
-  switch toastTree.toasts {
+  TiliaReact.useTilia()
+  switch Toast.tree.toasts {
   | [] => React.null
   | messages =>
     <div className=classes.toastBanner>
