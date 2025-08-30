@@ -118,8 +118,7 @@ let make = () => {
     {switch (fromHomepage, pageDataStatus.data) {
     | (true, Some(_, [onePlaceOnly])) =>
       let singlePlaceLocation = RouterUtils.resolveRelativePath(`./${Db.getUid(onePlaceOnly)}`)
-      RescriptReactRouter.replace(singlePlaceLocation)
-      React.null
+      <Redirect to=singlePlaceLocation />
     | (_, Some(currentUser, usersPlaces)) =>
       let userDisplayName = currentUser.displayName->Null.getExn
       <>
