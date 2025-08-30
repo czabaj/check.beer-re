@@ -24,7 +24,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Init
         run: |
-          echo "VITE_GIT_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+          echo "VITE_GIT_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - run: yarn install --frozen-lockfile && yarn build && yarn install --cwd functions --frozen-lockfile
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
