@@ -45,6 +45,7 @@ let make = (
       ->Promise.catch(error => {
         let errorMessage = switch FirebaseError.toFirebaseError(error) {
         | FirebaseError.InvalidPassword => wrongPasswordMessage
+        | FirebaseError.TooManyRequests => "Příliš mnoho pokusů o přihlášení. Zkuste to prosím později."
         | _ =>
           let exn = Js.Exn.asJsExn(error)->Option.getExn
           LogUtils.captureException(exn)
