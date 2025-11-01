@@ -83,7 +83,6 @@ let make = (
   ~formatConsumption,
   ~isUserAuthorized,
   ~onAddConsumption,
-  ~onAddPerson,
   ~onTogglePersonVisibility,
   ~personEntries: array<(string, Db.personsAllRecord)>,
   ~recentConsumptionsByUser,
@@ -94,11 +93,6 @@ let make = (
   }, (personEntries, showAll))
   <SectionWithHeader
     buttonsSlot={<>
-      {isUserAuthorized(UserRoles.Staff)
-        ? <button className={`${Styles.button.base}`} type_="button" onClick={_ => onAddPerson()}>
-            {React.string("Nový host")}
-          </button>
-        : React.null}
       {React.cloneElement(
         <label
           className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}>

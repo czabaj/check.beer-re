@@ -5,7 +5,6 @@ type classesType = {root: string, toolbar: string}
 type dialogState =
   | Hidden
   | AddConsumption({personId: string, person: Db.personsAllRecord})
-  | AddPerson
   | NotificationSettings
 
 type userConsumption = {milliliters: int, timestamp: float}
@@ -164,7 +163,6 @@ let make = (~placeId) => {
             currentUserUid={currentUser.uid}
             formatConsumption
             isUserAuthorized
-            onAddPerson={() => setDialog(_ => AddPerson)}
             onAddConsumption={((personId, person)) =>
               setDialog(_ => AddConsumption({personId, person}))}
             onTogglePersonVisibility={((personId, person): (string, Db.personsAllRecord)) => {
@@ -221,33 +219,6 @@ let make = (~placeId) => {
             unfinishedConsumptions={unfinishedConsumptionsByUser
             ->Map.get(personId)
             ->Option.getOr([])}
-          />
-        | AddPerson =>
-          let (active, inactive) =
-            personEntries->Belt.Array.partition(((_, {preferredTap})) => preferredTap !== None)
-          let existingActive = active->Array.map(((_, {name})) => name)
-          let existingInactive = inactive->Array.map(((_, {name})) => name)
-          <PersonAddPlace
-            existingActive
-            existingInactive
-            onDismiss={hideDialog}
-            onMoveToActive={personName => {
-              let (personId, person) =
-                inactive
-                ->Array.find(((_, {name})) => name === personName)
-                ->Option.getExn
-              let firstTap = place.taps->Js.Dict.keys->Array.getUnsafe(0)
-              Db.PersonsIndex.update(
-                firestore,
-                ~placeId,
-                ~personsChanges=[(personId, {...person, preferredTap: Some(firstTap)})],
-              )->ignore
-              hideDialog()
-            }}
-            onSubmit={values => {
-              Db.Person.add(firestore, ~placeId, ~personName=values.name)->ignore
-              hideDialog()
-            }}
           />
         | NotificationSettings =>
           let currentUserNotificationSubscription =
