@@ -9,7 +9,7 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~va
     let unused =
       persons
       ->Map.entries
-      ->Iterator.toArray
+      ->Array.fromIterator
       ->Array.filter(((personId, _)) => value->Dict.get(personId) === None)
     let sum = entries->Array.reduce(0, (acc, (_, amount)) => acc + amount)
     (entries, unused, sum)
