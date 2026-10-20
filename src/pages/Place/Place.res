@@ -226,7 +226,7 @@ let make = (~placeId) => {
           />
         | NotificationSettings =>
           let currentUserNotificationSubscription =
-            place.accounts->Dict.get(currentUser.uid)->Option.getExn->snd
+            place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow->Pair.second
           <NotificationDialog
             currentUserNotificationSubscription
             currentUserUid={currentUser.uid}

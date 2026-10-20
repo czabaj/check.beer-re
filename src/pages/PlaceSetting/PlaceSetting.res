@@ -80,8 +80,8 @@ let make = (~placeId) => {
                 place.accounts
                 ->Dict.toArray
                 ->Array.find(((_, (role, _))) => role === ownerRoleInt)
-                ->Option.getExn
-                ->fst
+                ->Option.getOrThrow
+                ->Pair.first
               let placeOwnerPersonId =
                 personsAll
                 ->Array.find(((_, person)) =>
@@ -90,8 +90,8 @@ let make = (~placeId) => {
                   | _ => false
                   }
                 )
-                ->Option.getExn
-                ->fst
+                ->Option.getOrThrow
+                ->Pair.first
               Dict.fromArray([(placeOwnerPersonId, price)])
             }
             Firebase.addDoc(

@@ -14,7 +14,7 @@ let make = () => {
   let isOnlineStatus = DomUtils.useIsOnline()
   let isOnline = isOnlineStatus.data
   let supportsWebAuthn = DomUtils.useSuportsPlatformWebauthn()
-  let webAuthn = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)->fst
+  let webAuthn = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)->Pair.first
   let webAuthnReady = supportsWebAuthn && webAuthn === Some("1")
   let startWebAuthnAutomatically = React.useRef(isOnline === Some(true))
   React.useEffect0(() => {

@@ -262,7 +262,7 @@ let make = (
         })
         <AddFinancialTransactions
           initialCounterParty={highestBalanceNonCurrentPerson
-          ->Option.map(fst)
+          ->Option.map(Pair.first)
           ->Option.getOr("")}
           onDismiss={hideDialog}
           onSubmit={values => {

@@ -28,7 +28,7 @@ let make = (
 ) => {
   let consumptionsByTimestampDesc = React.useMemo1(() => {
     let consumptionEntries = keg.consumptions->Dict.toArray
-    consumptionEntries->Array.sort((a, b) => fst(b)->String.localeCompare(fst(a)))
+    consumptionEntries->Array.sort((a, b) => Pair.first(b)->String.localeCompare(Pair.first(a)))
     consumptionEntries
   }, [keg.consumptions])
   let firstConsumption = Db.kegFirstConsumptionTimestamp(keg)

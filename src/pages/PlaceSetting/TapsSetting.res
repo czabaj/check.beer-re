@@ -37,7 +37,7 @@ let make = (
   )
   let sortedTapEntries = React.useMemo1(() => {
     let tapsEntries = place.taps->Dict.toArray
-    tapsEntries->Array.sort((a, b) => a->fst->String.localeCompare(b->fst))
+    tapsEntries->Array.sort((a, b) => a->Pair.first->String.localeCompare(b->Pair.first))
     tapsEntries
   }, [place.taps])
 

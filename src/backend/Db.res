@@ -468,7 +468,7 @@ module Place = {
           accounts: Dict.fromArray([
             (userId, ((UserRoles.Owner :> int), (NotificationEvents.Unsubscribed :> int))),
           ]),
-          consumptionSymbols: Js.Nullable.Null,
+          consumptionSymbols: Nullable.null,
           createdAt: now,
           currency: "CZK",
           name: placeName,

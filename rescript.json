@@ -10,10 +10,6 @@
   "compiler-flags": ["-open Webapi.Dom"],
   "gentypeconfig": {
     "language": "typescript",
-    "shims": {
-      "Js": "Js",
-      "Map": "Map"
-    },
     "generatedFileExtension": ".gen.tsx",
     "module": "esmodule",
     "moduleResolution": "node",

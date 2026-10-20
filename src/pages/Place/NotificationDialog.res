@@ -33,7 +33,7 @@ let make = (
             <InputWrapper
               inputName="free_table"
               inputSlot={<InputToggle
-                checked={land(
+                checked={Int.bitwiseAnd(
                   currentUserNotificationSubscription,
                   (NotificationEvents.FreeTable :> int),
                 ) !== 0}
@@ -42,13 +42,13 @@ let make = (
                   let checked = target["checked"]
                   onUpdateSubscription(
                     checked
-                      ? lor(
+                      ? Int.bitwiseOr(
                           currentUserNotificationSubscription,
                           (NotificationEvents.FreeTable :> int),
                         )
-                      : land(
+                      : Int.bitwiseAnd(
                           currentUserNotificationSubscription,
-                          BitwiseUtils.bitNot((NotificationEvents.FreeTable :> int)),
+                          Int.bitwiseNot((NotificationEvents.FreeTable :> int)),
                         ),
                   )
                 }}
@@ -58,7 +58,7 @@ let make = (
             <InputWrapper
               inputName="fresh_keg"
               inputSlot={<InputToggle
-                checked={land(
+                checked={Int.bitwiseAnd(
                   currentUserNotificationSubscription,
                   (NotificationEvents.FreshKeg :> int),
                 ) !== 0}
@@ -67,13 +67,13 @@ let make = (
                   let checked = target["checked"]
                   onUpdateSubscription(
                     checked
-                      ? lor(
+                      ? Int.bitwiseOr(
                           currentUserNotificationSubscription,
                           (NotificationEvents.FreshKeg :> int),
                         )
-                      : land(
+                      : Int.bitwiseAnd(
                           currentUserNotificationSubscription,
-                          BitwiseUtils.bitNot((NotificationEvents.FreshKeg :> int)),
+                          Int.bitwiseNot((NotificationEvents.FreshKeg :> int)),
                         ),
                   )
                 }}
