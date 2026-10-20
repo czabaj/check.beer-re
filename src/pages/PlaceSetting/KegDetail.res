@@ -27,7 +27,7 @@ let make = (
   ~onNextKeg,
 ) => {
   let consumptionsByTimestampDesc = React.useMemo1(() => {
-    let consumptionEntries = keg.consumptions->Js.Dict.entries
+    let consumptionEntries = keg.consumptions->Dict.toArray
     consumptionEntries->Array.sort((a, b) => fst(b)->String.localeCompare(fst(a)))
     consumptionEntries
   }, [keg.consumptions])
@@ -39,7 +39,7 @@ let make = (
   let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
     place.taps
-    ->Js.Dict.entries
+    ->Dict.toArray
     ->Array.find(((_, maybeKegRef)) =>
       maybeKegRef
       ->Null.toOption
@@ -195,7 +195,7 @@ let make = (
             {consumptionsByTimestampDesc
             ->Array.map(((timestampStr, consumption)) => {
               let person = personsAllById->Dict.getUnsafe(consumption.person.id)
-              let createdData = timestampStr->Float.fromString->Option.getExn->Date.fromTime
+              let createdData = timestampStr->Float.fromString->Option.getOrThrow->Date.fromTime
               <tr key={timestampStr}>
                 <th scope="row"> {React.string(person.name)} </th>
                 <td>

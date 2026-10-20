@@ -33,7 +33,7 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~va
         {valueEntries
         ->Array.map(((personId, amount)) => {
           <tr key={personId}>
-            <th scope="row"> {React.string(persons->Map.get(personId)->Option.getExn)} </th>
+            <th scope="row"> {React.string(persons->Map.get(personId)->Option.getOrThrow)} </th>
             <td>
               <input
                 min="0"

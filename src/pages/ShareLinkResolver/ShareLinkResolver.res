@@ -15,9 +15,7 @@ module Pure = {
       {switch (data, onAccept) {
       | (Some(shareLink, place), Some(handleAccept)) =>
         let role =
-          UserRoles.roleFromInt(shareLink.role)
-          ->Option.map(UserRoles.roleI18n)
-          ->Option.getExn
+          UserRoles.roleFromInt(shareLink.role)->Option.map(UserRoles.roleI18n)->Option.getOrThrow
         <>
           <p>
             {React.string(`Dovolujeme si vás pozvat do výčeního místa `)}

@@ -47,9 +47,9 @@ let make = (
         | FirebaseError.InvalidPassword => wrongPasswordMessage
         | FirebaseError.TooManyRequests => "Příliš mnoho pokusů o přihlášení. Zkuste to prosím později."
         | _ =>
-          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          let exn = JsExn.fromException(error)->Option.getOrThrow
           LogUtils.captureException(exn)
-          switch Js.Exn.message(exn) {
+          switch JsExn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }

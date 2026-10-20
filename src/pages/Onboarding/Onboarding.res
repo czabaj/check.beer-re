@@ -19,7 +19,7 @@ let make = (~children, ~user: Firebase.User.t) => {
     }
   }, (supportsWebAuthn, thrustDevice, user.displayName, webAuthn))
   let (setupWebAuthn, runSetupWebAuthn) = Hooks.usePromise(async () => {
-    let email = user.email->Null.getExn
+    let email = user.email->Null.getOrThrow
     try {
       // TODO: upgrade the FirebaseWebAuthn and deploy to "europe-west3"
       let functions = app->Firebase.Functions.getFunctionsInRegion(#"europe-central2")
@@ -32,11 +32,11 @@ let make = (~children, ~user: Firebase.User.t) => {
       | FirebaseWebAuthn.NoOperationNeeded =>
         // Device set-up already, just mark it as done in the storage
         setWebAuthn(Some("1"))
-      | Js.Exn.Error(exn) => {
+      | JsExn(exn) => {
           LogUtils.captureException(exn)
-          raise(error)
+          throw(error)
         }
-      | _ => raise(error)
+      | _ => throw(error)
       }
     }
   })

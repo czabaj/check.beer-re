@@ -34,7 +34,7 @@ exception NoOperationNeeded
 
 let toFirebaseWebAuthnError = exn => {
   switch exn {
-  | Exn.Error(obj) =>
+  | JsExn(obj) =>
     switch ErrorUtils.code(obj) {
     | Some("firebaseWebAuthn/cancelled") => CancelledByUser
     | Some("firebaseWebAuthn/invalid") => InvalidFunctionResponse

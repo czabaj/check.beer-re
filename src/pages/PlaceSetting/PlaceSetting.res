@@ -24,13 +24,13 @@ let make = (~placeId) => {
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
   | Some((place, personsAll, chargedKegs, currentUser)) =>
-    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let kegsOnTapUids =
       place.taps
-      ->Js.Dict.values
+      ->Dict.valuesToArray
       ->Belt.Array.keepMap(maybeKegReference =>
-        maybeKegReference->Js.Null.toOption->Option.map(ref => ref.id)
+        maybeKegReference->Null.toOption->Option.map(ref => ref.id)
       )
     let (tappedChargedKegs, untappedChargedKegs) =
       chargedKegs->Belt.Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
@@ -92,13 +92,13 @@ let make = (~placeId) => {
                 )
                 ->Option.getExn
                 ->fst
-              Js.Dict.fromArray([(placeOwnerPersonId, price)])
+              Dict.fromArray([(placeOwnerPersonId, price)])
             }
             Firebase.addDoc(
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
-                consumptions: Js.Dict.empty(),
+                consumptions: Dict.make(),
                 createdAt: Firebase.Timestamp.now(),
                 donors: resolvedDonors,
                 depletedAt: Null.null,
@@ -168,7 +168,7 @@ let make = (~placeId) => {
             }}
             onNextKeg={_ => handleCycle(true)}
             onPreviousKeg={_ => handleCycle(false)}
-            personsAllById={personsAll->Js.Dict.fromArray}
+            personsAllById={personsAll->Dict.fromArray}
             place
           />
         }

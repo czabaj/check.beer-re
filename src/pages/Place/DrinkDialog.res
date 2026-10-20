@@ -41,11 +41,11 @@ let make = (
   ~onDeleteConsumption,
   ~onDismiss,
   ~onSubmit,
-  ~tapsWithKegs: Js.Dict.t<Db.kegConverted>,
+  ~tapsWithKegs: dict<Db.kegConverted>,
   ~unfinishedConsumptions: array<Db.userConsumption>,
 ) => {
   let tapsOptions = React.useMemo1(() => {
-    let tapsEntries = tapsWithKegs->Js.Dict.entries
+    let tapsEntries = tapsWithKegs->Dict.toArray
     tapsEntries->Array.map(((tapName, keg)) => {
       {
         text: <>
@@ -120,7 +120,7 @@ let make = (
                 render={field => {
                   let handleChange = event => {
                     let value =
-                      ReactEvent.Form.target(event)["value"]->Int.fromString->Option.getExn
+                      ReactEvent.Form.target(event)["value"]->Int.fromString->Option.getOrThrow
                     field.handleChange(value)
                     form.submit()
                   }

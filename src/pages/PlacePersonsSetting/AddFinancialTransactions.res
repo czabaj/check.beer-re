@@ -37,7 +37,7 @@ let make = (
   let form = Form.use(
     ~initialState={amount: "", note: "", person: initialCounterParty},
     ~onSubmit=({state}) => {
-      let amountFloat = state.values.amount->Float.fromString->Option.getExn
+      let amountFloat = state.values.amount->Float.fromString->Option.getOrThrow
       let amountMinor = amountFloat *. minorUnit
       onSubmit({
         amount: amountMinor->Int.fromFloat,

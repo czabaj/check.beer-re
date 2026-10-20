@@ -15,7 +15,7 @@ module Pure = {
     ~onSettingsClick,
     ~usersPlaces: array<FirestoreModels.place>,
   ) => {
-    let userDisplayName = currentUser.displayName->Null.getExn
+    let userDisplayName = currentUser.displayName->Null.getOrThrow
     let sinceDate = currentUser.metadata.creationTime->Date.fromString
     <div className=Styles.page.narrow>
       <Header
@@ -125,7 +125,7 @@ let make = () => {
       let singlePlaceLocation = RouterUtils.resolveRelativePath(`./${Db.getUid(onePlaceOnly)}`)
       <Redirect to=singlePlaceLocation />
     | (_, Some(currentUser, usersPlaces)) =>
-      let userDisplayName = currentUser.displayName->Null.getExn
+      let userDisplayName = currentUser.displayName->Null.getOrThrow
       <>
         <Pure
           currentUser
@@ -133,7 +133,7 @@ let make = () => {
           onSignOut={() => {
             RescriptReactRouter.push("/")
             auth->Firebase.Auth.signOut->ignore
-            Js.Global.setTimeout(() => {
+            setTimeout(() => {
               // reload the page for clearing Reactfire observables cache
               // @see https://github.com/FirebaseExtended/reactfire/issues/485#issuecomment-1028575121
               location->Location.reload
@@ -160,11 +160,11 @@ let make = () => {
           />
         | EditUser =>
           <EditUser
-            connectedEmail={currentUser.email->Null.getExn}
+            connectedEmail={currentUser.email->Null.getOrThrow}
             initialName={userDisplayName}
             onChangePassword={async values => {
               let credential = Firebase.Auth.EmailAuthProvider.credential(
-                ~email=currentUser.email->Null.getExn,
+                ~email=currentUser.email->Null.getOrThrow,
                 ~password=values.oldPassword,
               )
               let _ = await Firebase.Auth.reauthenticateWithCredential(currentUser, credential)

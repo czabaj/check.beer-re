@@ -43,7 +43,7 @@ module FormFields = {
 
 let emptyState: FormFields.state = {
   beer: "",
-  donors: Js.Dict.empty(),
+  donors: Dict.make(),
   milliliters: 0,
   ownerIsDonor: true,
   price: 0,
@@ -98,7 +98,8 @@ module FormComponent = {
                 if lensState.ownerIsDonor {
                   Valid
                 } else {
-                  let donorsSum = lensState.donors->Js.Dict.values->Array.reduce(0, (a, b) => a + b)
+                  let donorsSum =
+                    lensState.donors->Dict.valuesToArray->Array.reduce(0, (a, b) => a + b)
                   let kegPrice = lensState.price
                   if kegPrice > 0 && kegPrice != donorsSum {
                     Error("Cena sudu se neshoduje s příspěvky vkladatelů")

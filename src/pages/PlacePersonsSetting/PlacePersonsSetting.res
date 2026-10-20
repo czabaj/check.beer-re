@@ -29,7 +29,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       let kegByDonor = Map.make()
       chargedKegs->Array.forEach(keg => {
         keg.donors
-        ->Js.Dict.entries
+        ->Dict.toArray
         ->Array.forEach(
           ((personId, amount)) => {
             let transaction: FirestoreModels.financialTransaction = {
@@ -78,10 +78,10 @@ let make = (~placeId) => {
       pendingTransactionsByUser,
       currentUser,
     )) =>
-    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     if !isUserAuthorized(UserRoles.Admin) {
-      Exn.raiseError(`Insufficient permissions to view this page`)
+      JsError.throwWithMessage(`Insufficient permissions to view this page`)
     }
     <FormattedCurrency.Provider value={place.currency}>
       <div className=Styles.page.narrow>

@@ -411,7 +411,7 @@ let op: (
 let keepSome: operatorFunction<'class, 'source, option<'a>, 'a> = xs =>
   xs
   ->op(filter(Option.isSome))
-  ->op(map((a, _) => Option.getExn(a)))
+  ->op(map((a, _) => Option.getOrThrow(a)))
 
 let keepMap: ('a => option<'b>) => operatorFunction<'class, 'source, 'a, 'b> = f =>
   xs =>

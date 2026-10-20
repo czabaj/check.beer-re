@@ -36,11 +36,11 @@ module MessagingProvider = {
   let make = React.Context.provider(messagingContext)
 }
 
-let useMessaging = () => React.useContext(messagingContext)->Option.getExn
+let useMessaging = () => React.useContext(messagingContext)->Option.getOrThrow
 
 type observableStatus<'a> = {
   data: option<'a>,
-  error: option<Js.Exn.t>,
+  error: option<JsExn.t>,
   firstValuePromise: promise<unit>,
   hasEmmited: bool,
   isComplete: bool,

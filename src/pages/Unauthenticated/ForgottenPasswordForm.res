@@ -27,9 +27,9 @@ let make = (~initialEmail, ~isOnline, ~onGoBack, ~onSubmit) => {
       ->Promise.catch(error => {
         switch FirebaseError.toFirebaseError(error) {
         | _ =>
-          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          let exn = JsExn.fromException(error)->Option.getOrThrow
           LogUtils.captureException(exn)
-          let errorMessage = switch Js.Exn.message(exn) {
+          let errorMessage = switch JsExn.message(exn) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }

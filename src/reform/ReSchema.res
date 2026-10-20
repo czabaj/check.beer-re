@@ -172,7 +172,7 @@ module Make = (Lenses: Lenses) => {
       let value = Lenses.get(values, field)
       (
         Field(field),
-        Js.Re.test_(ReSchemaRegExp.email, value)
+        RegExp.test(ReSchemaRegExp.email, value)
           ? Valid
           : Error(error->Belt.Option.getWithDefault(i18n.email(~value))),
       )
@@ -189,7 +189,7 @@ module Make = (Lenses: Lenses) => {
       let value = Lenses.get(values, field)
       (
         Field(field),
-        Js.Re.test_(Js.Re.fromString(matches), value)
+        RegExp.test(RegExp.fromString(matches), value)
           ? Valid
           : Error(error->Belt.Option.getWithDefault(i18n.stringRegExp(~value, ~pattern=matches))),
       )
@@ -197,7 +197,7 @@ module Make = (Lenses: Lenses) => {
       let value = Lenses.get(values, field)
       (
         Field(field),
-        Js.String.length(value) >= min
+        String.length(value) >= min
           ? Valid
           : Error(error->Belt.Option.getWithDefault(i18n.stringMin(~value, ~min))),
       )
@@ -205,7 +205,7 @@ module Make = (Lenses: Lenses) => {
       let value = Lenses.get(values, field)
       (
         Field(field),
-        Js.String.length(value) <= max
+        String.length(value) <= max
           ? Valid
           : Error(error->Belt.Option.getWithDefault(i18n.stringMax(~value, ~max))),
       )

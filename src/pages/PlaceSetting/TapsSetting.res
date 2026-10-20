@@ -36,7 +36,7 @@ let make = (
     [tappedChargedKegs],
   )
   let sortedTapEntries = React.useMemo1(() => {
-    let tapsEntries = place.taps->Js.Dict.entries
+    let tapsEntries = place.taps->Dict.toArray
     tapsEntries->Array.sort((a, b) => a->fst->String.localeCompare(b->fst))
     tapsEntries
   }, [place.taps])
@@ -57,7 +57,7 @@ let make = (
         ->Array.map(((tapName, maybeKegReference)) => {
           let tappedKeg =
             maybeKegReference
-            ->Js.Null.toOption
+            ->Null.toOption
             ->Option.flatMap(kegRef => tappedKegsById->Dict.get(kegRef.id))
 
           <li key={tapName}>
@@ -124,7 +124,7 @@ let make = (
     | Hidden => React.null
     | AddTap =>
       <TapAddNew
-        existingNames={place.taps->Js.Dict.keys}
+        existingNames={place.taps->Dict.keysToArray}
         onDismiss={hideDialog}
         onSubmit={async values => {
           Db.Place.tapAdd(firestore, ~placeId, ~tapName=values.name)->ignore
@@ -141,7 +141,7 @@ let make = (
       />
     | RenameTap(tapName) =>
       <TapRename
-        existingNames={place.taps->Js.Dict.keys}
+        existingNames={place.taps->Dict.keysToArray}
         initialName=tapName
         onDismiss={hideDialog}
         onSubmit={values => {

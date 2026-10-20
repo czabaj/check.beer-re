@@ -40,8 +40,8 @@ let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit, ~onChangePassw
       onSubmit(state.values)
       ->Promise.catch(error => {
         let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
+        | JsExn(e) =>
+          switch JsExn.message(e) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }

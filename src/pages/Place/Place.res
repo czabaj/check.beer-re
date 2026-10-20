@@ -45,7 +45,7 @@ let pageDataRx = (auth, firestore, placeId) => {
           ->Option.map(keg => (tap, keg))
         )
         ->Dict.fromArray
-      | _ => Js.Dict.empty()
+      | _ => Dict.make()
       }
     }),
   )
@@ -129,7 +129,7 @@ let make = (~placeId) => {
       ~currentUserUid=currentUser.uid,
       ~place,
     )
-    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
 
@@ -169,7 +169,9 @@ let make = (~placeId) => {
               setDialog(_ => AddConsumption({personId, person}))}
             onTogglePersonVisibility={((personId, person): (string, Db.personsAllRecord)) => {
               let preferredTap =
-                person.preferredTap->Option.isSome ? None : place.taps->Js.Dict.keys->Array.get(0)
+                person.preferredTap->Option.isSome
+                  ? None
+                  : place.taps->Dict.keysToArray->Array.get(0)
               Db.PersonsIndex.update(
                 firestore,
                 ~placeId,
@@ -215,7 +217,7 @@ let make = (~placeId) => {
             personName={person.name}
             preferredTap={switch person.preferredTap {
             | Some(tap) => tap
-            | None => place.taps->Js.Dict.keys->Array.getUnsafe(0)
+            | None => place.taps->Dict.keysToArray->Array.getUnsafe(0)
             }}
             tapsWithKegs
             unfinishedConsumptions={unfinishedConsumptionsByUser

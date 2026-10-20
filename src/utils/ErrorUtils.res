@@ -1,1 +1,1 @@
-let code: Exn.t => option<string> = %raw("e => e?.code")
+let code: JsExn.t => option<string> = %raw("e => e?.code")

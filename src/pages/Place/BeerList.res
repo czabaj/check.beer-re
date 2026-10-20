@@ -22,7 +22,7 @@ module PersonCell = {
     ~onAddConsumption,
     ~personName,
   ) => {
-    let rootNodeRef = React.useRef(Js.Nullable.null)
+    let rootNodeRef = React.useRef(Nullable.null)
     let consumptionsStr =
       consumptions
       ->Array.map(c => formatConsumption(c.milliliters))

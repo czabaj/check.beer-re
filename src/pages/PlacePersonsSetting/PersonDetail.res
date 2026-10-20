@@ -182,7 +182,7 @@ let make = (
               {pending
               ->Array.map(pendingTransaction => {
                 let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
-                <tr className={classes.unclosed} key={createdDate->Js.Date.getTime->Float.toString}>
+                <tr className={classes.unclosed} key={createdDate->Date.getTime->Float.toString}>
                   <td>
                     <FormattedDateTime value={createdDate} />
                   </td>
@@ -202,7 +202,7 @@ let make = (
               {transactions
               ->Array.map(finalTransaction => {
                 let createdDate = finalTransaction.createdAt->Firebase.Timestamp.toDate
-                <tr key={createdDate->Js.Date.getTime->Float.toString}>
+                <tr key={createdDate->Date.getTime->Float.toString}>
                   <td>
                     <FormattedDateTime value={createdDate} />
                   </td>

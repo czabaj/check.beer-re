@@ -15,7 +15,7 @@ let make = (~buttonRightSlot, ~className=?, ~createdTimestamp, ~placeName) => {
       id="Place.established"
       defaultMessage={"Založeno {time}"}
       values={{
-        "time": <time dateTime={createdDate->Js.Date.toISOString}>
+        "time": <time dateTime={createdDate->Date.toISOString}>
           <ReactIntl.FormattedDate value={createdDate} />
         </time>,
       }}

@@ -39,7 +39,7 @@ updateSWRef :=
 open Reactfire
 
 ReactDOM.querySelector("#root")
-->Option.getExn
+->Option.getOrThrow
 ->ReactDOM.Client.createRoot
 ->ReactDOM.Client.Root.render(
   <React.StrictMode>

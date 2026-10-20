@@ -26,7 +26,7 @@ let make = (
     <tbody>
       {unfinishedConsumptions
       ->Array.map(consumption => {
-        let createdAt = consumption.createdAt->Js.Date.toISOString
+        let createdAt = consumption.createdAt->Date.toISOString
         <tr key={createdAt}>
           <th scope="row"> {React.string(consumption.beer)} </th>
           <td>

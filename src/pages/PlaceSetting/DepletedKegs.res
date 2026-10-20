@@ -72,12 +72,15 @@ let make = (
                 </td>
                 <td>
                   <ReactIntl.FormattedDate
-                    value={Db.kegFirstConsumptionTimestamp(keg)->Option.getExn->Date.fromTime}
+                    value={Db.kegFirstConsumptionTimestamp(keg)->Option.getOrThrow->Date.fromTime}
                   />
                 </td>
                 <td>
                   <ReactIntl.FormattedDate
-                    value={keg.depletedAt->Null.toOption->Option.getExn->Firebase.Timestamp.toDate}
+                    value={keg.depletedAt
+                    ->Null.toOption
+                    ->Option.getOrThrow
+                    ->Firebase.Timestamp.toDate}
                   />
                 </td>
                 <td>
