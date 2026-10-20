@@ -7,7 +7,7 @@
   padding-block-start: 0.17em;
 }
 
-:global(.inputWrapper) :where(input, select) {
+:global(.inputWrapper) :where(input:not([type="checkbox"], [type="radio"]), select) {
   width: 100%;
   block-size: 1.75em;
   padding-inline: 0.25em;

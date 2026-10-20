@@ -7,9 +7,11 @@
   border-radius: var(--radius-round);
   box-sizing: content-box;
   color: inherit;
+  flex-shrink: 0;
   font-size: inherit;
   height: var(--toggle-height);
   margin: auto;
+  padding: 0;
   position: relative;
   transition: background var(--transition-fast);
   vertical-align: text-bottom;
@@ -34,5 +36,5 @@
   background: #009578;
 }
 .inputToggle:checked::before {
-  transform: translateX(calc(var(--toggle-width) - var(--toggle-height) / 2));
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-height)));
 }
