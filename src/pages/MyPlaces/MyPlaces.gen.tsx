@@ -5,7 +5,7 @@
 
 import * as MyPlacesJS from './MyPlaces.bs.js';
 
-import type {Mouse_t as JsxEventU_Mouse_t} from './JsxEventU.gen';
+import type {Mouse_t as JsxEvent_Mouse_t} from './JsxEvent.gen';
 
 import type {User_t as Firebase_User_t} from '../../../src/backend/Firebase.gen';
 
@@ -23,7 +23,7 @@ export const Pure_make: React.ComponentType<{
   readonly currentUser: Firebase_User_t; 
   readonly onPlaceAdd: () => void; 
   readonly onSignOut: () => void; 
-  readonly onSettingsClick: (_1:JsxEventU_Mouse_t) => void; 
+  readonly onSettingsClick: (_1:JsxEvent_Mouse_t) => void; 
   readonly usersPlaces: FirestoreModels_place[]
 }> = MyPlacesJS.Pure.make as any;
 
@@ -31,6 +31,6 @@ export const Pure: { make: React.ComponentType<{
   readonly currentUser: Firebase_User_t; 
   readonly onPlaceAdd: () => void; 
   readonly onSignOut: () => void; 
-  readonly onSettingsClick: (_1:JsxEventU_Mouse_t) => void; 
+  readonly onSettingsClick: (_1:JsxEvent_Mouse_t) => void; 
   readonly usersPlaces: FirestoreModels_place[]
 }> } = MyPlacesJS.Pure as any;

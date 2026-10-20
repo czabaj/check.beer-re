@@ -44,12 +44,12 @@ type observableStatus<'a> = {
   firstValuePromise: promise<unit>,
   hasEmmited: bool,
   isComplete: bool,
-  status: @string [#error | #loading | #success],
+  status: [#error | #loading | #success],
 }
 
 type reactfireOptions<'a> = {
   // force usage of fieldId
-  idField: @string [#uid],
+  idField: [#uid],
   initialData?: 'a,
   suspense?: bool,
 }

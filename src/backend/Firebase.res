@@ -9,7 +9,7 @@ module FirebaseApp = {
 module Analytics = {
   type t
 
-  type eventName = @string
+  type eventName =
   [
     | #add_payment_info
     | #add_shipping_info
@@ -143,7 +143,7 @@ external limit: int => queryConstraint = "limit"
 @module("firebase/firestore")
 external startAfter: 'a => queryConstraint = "startAfter"
 
-type snapshotOptions = {serverTimestamps?: @string [#estimate | #previous | #none]}
+type snapshotOptions = {serverTimestamps?: [#estimate | #previous | #none]}
 
 @module("firebase/firestore")
 external deleteField: unit => 'a = "deleteField"
@@ -290,7 +290,6 @@ module Auth = {
 
   type authCredential
 
-  @string
   type operationType = [#link | #reauthenticate | #signIn]
 
   type userCredential = {

@@ -34,17 +34,15 @@ let void: t<'class, 'source, 'b> => unit = _ => ()
 
 module Observer = {
   type t<'a> = t<foreign, source<'a>, void>
-  @deriving(abstract)
   type make<'a> = {
-    @optional next: 'a => unit,
-    @optional error: err => unit,
-    @optional complete: unit => unit,
+    next?: 'a => unit,
+    error?: err => unit,
+    complete?: unit => unit,
   }
 
   external toT: make<'a> => t<'a> = "%identity"
 
-  let make = (~next=?, ~error=?, ~complete=?, ()) =>
-    make(~next?, ~error?, ~complete?, ())->toT
+  let make = (~next=?, ~error=?, ~complete=?, ()) => {?next, ?error, ?complete}->toT
 }
 
 module Subscriber = {

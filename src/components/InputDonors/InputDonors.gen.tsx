@@ -5,10 +5,6 @@
 
 import * as InputDonorsJS from './InputDonors.bs.js';
 
-import type {t as Dict_t} from './Dict.gen';
-
-import type {t as Map_t} from './Map.gen';
-
 export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly errorMessage?: errorMessage; 
   readonly legendSlot?: legendSlot; 
@@ -20,7 +16,7 @@ export type props<errorMessage,legendSlot,persons,value,onChange> = {
 export const make: React.ComponentType<{
   readonly errorMessage?: string; 
   readonly legendSlot?: JSX.Element; 
-  readonly persons: Map_t<string,string>; 
-  readonly value: Dict_t<number>; 
-  readonly onChange: (_1:Dict_t<number>) => void
+  readonly persons: Map<string,string>; 
+  readonly value: {[id: string]: number}; 
+  readonly onChange: (_1:{[id: string]: number}) => void
 }> = InputDonorsJS.make as any;

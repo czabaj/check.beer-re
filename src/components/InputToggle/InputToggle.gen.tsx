@@ -5,7 +5,7 @@
 
 import * as InputToggleJS from './InputToggle.bs.js';
 
-import type {Form_t as JsxEventU_Form_t} from './JsxEventU.gen';
+import type {Form_t as JsxEvent_Form_t} from './JsxEvent.gen';
 
 export type props<ariaDescribedby,ariaInvalid,checked,id,name,onChange> = {
   readonly ariaDescribedby?: ariaDescribedby; 
@@ -26,5 +26,5 @@ export const make: React.ComponentType<{
   readonly checked: boolean; 
   readonly id?: string; 
   readonly name?: string; 
-  readonly onChange: (_1:JsxEventU_Form_t) => void
+  readonly onChange: (_1:JsxEvent_Form_t) => void
 }> = InputToggleJS.make as any;

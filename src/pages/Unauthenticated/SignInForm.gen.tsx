@@ -5,8 +5,6 @@
 
 import * as SignInFormJS from './SignInForm.bs.js';
 
-import type {t as Promise_t} from './Promise.gen';
-
 export type FormFields_state = { readonly email: string; readonly password: string };
 
 export type props<isOnline,loadingOverlay,onForgottenPassword,onSignInWithGoogle,onSignInWithPasskey,onSignInWithPassword,onSignUp> = {
@@ -25,6 +23,6 @@ export const make: React.ComponentType<{
   readonly onForgottenPassword: (_1:string) => void; 
   readonly onSignInWithGoogle: () => void; 
   readonly onSignInWithPasskey: (undefined | (() => void)); 
-  readonly onSignInWithPassword: (_1:FormFields_state) => Promise_t<void>; 
+  readonly onSignInWithPassword: (_1:FormFields_state) => Promise<void>; 
   readonly onSignUp: () => void
 }> = SignInFormJS.make as any;

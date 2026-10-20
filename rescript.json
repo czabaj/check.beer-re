@@ -1,6 +1,5 @@
 {
-  "bs-dependencies": [
-    "@rescript/core",
+  "dependencies": [
     "@rescript/react",
     "@tilia/react",
     "rescript-react-intl",
@@ -8,7 +7,7 @@
     "rescript-webapi",
     "tilia"
   ],
-  "bsc-flags": ["-open RescriptCore -open Webapi.Dom"],
+  "compiler-flags": ["-open Webapi.Dom"],
   "gentypeconfig": {
     "language": "typescript",
     "shims": {
@@ -24,8 +23,7 @@
     }
   },
   "jsx": {
-    "version": 4,
-    "mode": "automatic"
+    "version": 4
   },
   "name": "check.beer",
   "package-specs": [
