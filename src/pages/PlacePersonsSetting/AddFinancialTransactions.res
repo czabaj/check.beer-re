@@ -58,7 +58,8 @@ let make = (
   )
 
   <DialogForm
-    formId="addFinancialTransaction" heading="Platba mezi účastníky" onDismiss visible=true>
+    formId="addFinancialTransaction" heading="Platba mezi účastníky" onDismiss visible=true
+  >
     <p>
       <b> {React.string(personName)} </b>
       {React.string(` předává peníze.`)}
@@ -73,7 +74,8 @@ let make = (
                 inputError=?field.error
                 inputName="amount"
                 inputSlot={<select
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}
+                >
                   <option disabled={true} value=""> {React.string("Příjemce platby")} </option>
                   {personsAll
                   ->Belt.Array.keepMap(((pId, p)) =>

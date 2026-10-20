@@ -9,7 +9,8 @@ let make = (~buttonLeftSlot, ~buttonRightSlot, ~className=?, ~headingSlot, ~subh
   React.cloneElement(
     <header
       className={`${classes.root} ${className->Option.getOr("")}`}
-      ref={headerRef->ReactDOM.Ref.domRef}>
+      ref={headerRef->ReactDOM.Ref.domRef}
+    >
       <h2> {headingSlot} </h2>
       <p> {subheadingSlot} </p>
       {buttonLeftSlot}

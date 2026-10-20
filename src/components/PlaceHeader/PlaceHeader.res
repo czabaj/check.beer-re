@@ -3,7 +3,8 @@ let make = (~buttonRightSlot, ~className=?, ~createdTimestamp, ~placeName) => {
   let createdDate = createdTimestamp->Firebase.Timestamp.toDate
   <Header
     buttonLeftSlot={<a
-      {...RouterUtils.createAnchorProps("../")} className={Header.classes.buttonLeft}>
+      {...RouterUtils.createAnchorProps("../")} className={Header.classes.buttonLeft}
+    >
       <span> {React.string("↩️")} </span>
       <span> {React.string("Zpět")} </span>
     </a>}

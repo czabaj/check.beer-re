@@ -37,7 +37,8 @@ let make = (
             <button
               className={`${classes.deleteButton} ${Styles.button.sizeExtraSmall}`}
               onClick={_ => onDeleteConsumption(consumption)}
-              type_="button">
+              type_="button"
+            >
               {React.string("🗑️ Smáznout")}
             </button>
           </td>

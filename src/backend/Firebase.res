@@ -9,8 +9,7 @@ module FirebaseApp = {
 module Analytics = {
   type t
 
-  type eventName =
-  [
+  type eventName = [
     | #add_payment_info
     | #add_shipping_info
     | #add_to_cart

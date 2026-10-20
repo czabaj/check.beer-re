@@ -20,12 +20,14 @@ module Pure = {
     <div className=Styles.page.narrow>
       <Header
         buttonLeftSlot={<button
-          className={Header.classes.buttonLeft} onClick={_ => onSignOut()} type_="button">
+          className={Header.classes.buttonLeft} onClick={_ => onSignOut()} type_="button"
+        >
           <span> {React.string("🚴‍♂️")} </span>
           <span> {React.string("Odhlásit")} </span>
         </button>}
         buttonRightSlot={<button
-          className={Header.classes.buttonRight} onClick={onSettingsClick} type_="button">
+          className={Header.classes.buttonRight} onClick={onSettingsClick} type_="button"
+        >
           <span> {React.string("⚙️")} </span>
           <span> {React.string("Nastavení")} </span>
         </button>}
@@ -43,12 +45,14 @@ module Pure = {
       <main>
         <SectionWithHeader
           buttonsSlot={<button
-            className={Styles.button.base} onClick={_ => onPlaceAdd()} type_="button">
+            className={Styles.button.base} onClick={_ => onPlaceAdd()} type_="button"
+          >
             {React.string("Nové místo")}
           </button>}
           headerId="my_places"
           headerSlot={React.string("Moje místa")}
-          noBackground={true}>
+          noBackground={true}
+        >
           {switch usersPlaces {
           | [] =>
             <p className=SectionWithHeader.classes.emptyMessage>
@@ -68,7 +72,8 @@ module Pure = {
                   <li key={stringId}>
                     <a
                       {...RouterUtils.createAnchorProps(`./${stringId}`)}
-                      className={Styles.utility.breakout}>
+                      className={Styles.utility.breakout}
+                    >
                       {React.string(place.name)}
                     </a>
                     <span>

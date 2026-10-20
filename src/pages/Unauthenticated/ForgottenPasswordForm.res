@@ -11,7 +11,7 @@ module FormFields = {
     type value. (state, field<value>, value) => state =
     (_state, field, value) =>
       switch field {
-      | Email => { email: value}
+      | Email => {email: value}
       }
 }
 

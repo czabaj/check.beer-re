@@ -142,14 +142,16 @@ let make = (~placeId) => {
               : <button
                   className={Header.classes.buttonRight}
                   onClick={_ => setDialog(_ => NotificationSettings)}
-                  type_="button">
+                  type_="button"
+                >
                   <span> {React.string("📢")} </span>
                   <span> {React.string("Notifikace")} </span>
                 </button>}
             {isUserAuthorized(UserRoles.Staff)
               ? <a
                   {...RouterUtils.createAnchorProps("./nastaveni")}
-                  className={Header.classes.buttonRight}>
+                  className={Header.classes.buttonRight}
+                >
                   <span> {React.string("⚙️")} </span>
                   <span> {React.string("Nastavení")} </span>
                 </a>

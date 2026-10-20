@@ -44,7 +44,8 @@ let make = (~onConfirm, ~onDismiss, ~placeName) => {
     formId="place_delete"
     heading="Odstranění místa"
     onDismiss={onDismiss}
-    visible=true>
+    visible=true
+  >
     <Form.Provider value=Some(form)>
       <p> {React.string(`Pokud si přejete smazat místo, napište jeho název a potvrďte. `)} </p>
       <p className={Styles.messageBar.variantDanger} role="alert">

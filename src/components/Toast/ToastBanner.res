@@ -29,7 +29,8 @@ let make = React.memo(() => {
                 <button
                   className={`${Styles.link.base} ${classes.buttonClose}`}
                   onClick={_ => Toast.removeMessage(id)}
-                  type_="button">
+                  type_="button"
+                >
                   {React.string(buttonCloseText)}
                 </button>
               </div>

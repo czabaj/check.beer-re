@@ -117,7 +117,8 @@ module FormComponent = {
           <form
             className={classes.form}
             id="add_keg"
-            onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+            onSubmit={ReForm.Helpers.handleSubmit(form.submit)}
+          >
             <fieldset className={`reset ${Styles.fieldset.grid}`}>
               <Form.Field
                 field=Beer

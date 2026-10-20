@@ -43,11 +43,13 @@ let make = (
 
   <SectionWithHeader
     buttonsSlot={<button
-      className={Styles.button.base} onClick={_ => setDialog(_ => AddTap)} type_="button">
+      className={Styles.button.base} onClick={_ => setDialog(_ => AddTap)} type_="button"
+    >
       {React.string("Přidat pípu")}
     </button>}
     headerId="taps_setting"
-    headerSlot={React.string("Pípy")}>
+    headerSlot={React.string("Pípy")}
+  >
     <ul className={classes.list}>
       {
         let tapsCount = sortedTapEntries->Array.length
@@ -75,14 +77,16 @@ let make = (
                   disabled={!hasKegsToTap}
                   className={Styles.button.variantPrimary}
                   onClick={_ => setDialog(_ => TapKegOn(tapName))}
-                  type_="button">
+                  type_="button"
+                >
                   {React.string("Narazit")}
                 </button>
               | Some(_) =>
                 <button
                   className={Styles.button.variantDanger}
                   onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
-                  type_="button">
+                  type_="button"
+                >
                   {React.string("Odrazit")}
                 </button>
               }}
@@ -99,7 +103,8 @@ let make = (
                     label: "Smazat",
                     onClick: _ => setDialog(_ => DeleteTap(tapName)),
                   },
-                ]}>
+                ]}
+              >
                 {React.string("⋯")}
               </ButtonMenu>
             </div>

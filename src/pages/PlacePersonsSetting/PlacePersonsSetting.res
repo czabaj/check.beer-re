@@ -91,16 +91,17 @@ let make = (~placeId) => {
         <main>
           <SectionWithHeader
             buttonsSlot={<button
-              className={Styles.button.base}
-              type_="button"
-              onClick={_ => setDialog(_ => AddPerson)}>
+              className={Styles.button.base} type_="button" onClick={_ => setDialog(_ => AddPerson)}
+            >
               {React.string("Přidat hosta")}
             </button>}
             headerId="persons_accounts"
-            headerSlot={React.string("Účetnictví")}>
+            headerSlot={React.string("Účetnictví")}
+          >
             <table
               ariaLabelledby="persons_accounts"
-              className={`${Styles.table.stretch} ${classes.table}`}>
+              className={`${Styles.table.stretch} ${classes.table}`}
+            >
               <thead>
                 <tr>
                   <th scope="col"> {React.string("Host")} </th>

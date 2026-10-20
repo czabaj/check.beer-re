@@ -89,7 +89,8 @@ let make = (~connectedEmail, ~initialName, ~onDismiss, ~onSubmit, ~onChangePassw
             <button
               className={`${Styles.button.base} ${Styles.fieldset.gridSpan}`}
               onClick={_ => setDialogState(_ => ChangePassword)}
-              type_="button">
+              type_="button"
+            >
               {React.string("Změnit heslo")}
             </button>
             <InputThrustDevice />

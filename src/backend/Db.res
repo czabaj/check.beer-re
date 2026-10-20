@@ -79,12 +79,12 @@ type personsIndexConverted = {all: Js.Dict.t<personsAllRecord>}
 let personsIndexConverter: Firebase.dataConverter<personsIndex, personsIndexConverted> = {
   fromFirestore: (snapshot, options) => {
     let {all} = snapshot.data(options)
-    let allWithRecord = all->(Js.Dict.map(personsAllTupleToRecord, _))
+    let allWithRecord = all->Js.Dict.map(personsAllTupleToRecord, _)
     {all: allWithRecord}
   },
   toFirestore: (place, _) => {
     let {all} = place
-    let allWithTuple = all->(Js.Dict.map(personsAllRecordToTuple, _))
+    let allWithTuple = all->Js.Dict.map(personsAllRecordToTuple, _)
     {all: allWithTuple}
   },
 }
@@ -302,7 +302,7 @@ module Keg = {
     )
     let personsIndexRef = personsIndexDocument(firestore, placeId)
     let personsIndex = (await Firebase.getDocFromCache(personsIndexRef)).data({})
-    let personRecord = personsIndex.all->Dict.getUnsafe(personId)->(personsAllTupleToRecord(_))
+    let personRecord = personsIndex.all->Dict.getUnsafe(personId)->personsAllTupleToRecord(_)
     let personsIndexUpdateData = Object.make()
     personsIndexUpdateData->Object.set(
       `all.${personId}`,

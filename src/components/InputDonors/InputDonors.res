@@ -59,7 +59,8 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~va
                   onChange(newValue)
                 }}
                 title="Odebrat vkladatele"
-                type_="button">
+                type_="button"
+              >
                 {React.string("❌")}
               </button>
             </td>
@@ -80,7 +81,8 @@ let make = (~errorMessage=?, ~legendSlot=?, ~persons: Map.t<string, string>, ~va
                   onChange(newValue)
                 }
               }}
-              value="">
+              value=""
+            >
               <option disabled={true} value=""> {React.string("Přidat vkladatele")} </option>
               {unusedPersons
               ->Array.map(((personId, name)) =>

@@ -78,7 +78,8 @@ let make = (~onDismiss, ~onSubmit) => {
       <form
         className={Styles.stack.base}
         id="change_password"
-        onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+        onSubmit={ReForm.Helpers.handleSubmit(form.submit)}
+      >
         <fieldset className={`reset ${Styles.fieldset.grid}`} disabled={submitting}>
           <Form.Field
             field=OldPassword

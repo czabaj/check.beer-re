@@ -30,7 +30,8 @@ module Pure = {
               className={Styles.button.variantPrimary}
               disabled=?loading
               onClick={_ => handleAccept()}
-              type_="button">
+              type_="button"
+            >
               {React.string("Přijmout pozvání")}
             </button>
           </div>

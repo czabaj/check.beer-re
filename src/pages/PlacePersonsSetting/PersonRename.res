@@ -36,8 +36,7 @@ let make = (~existingNames: array<string>, ~initialName, ~onDismiss, ~onSubmit) 
     },
     ~schema={
       open Validators
-      schema([
-        custom(({name}) => {
+      schema([custom(({name}) => {
           switch name->String.trim {
           | "" => Error("Jméno je povinné")
           | trimmed if trimmed->String.length > maxNameLength =>
@@ -46,8 +45,7 @@ let make = (~existingNames: array<string>, ~initialName, ~onDismiss, ~onSubmit) 
             Error("Takové jméno již evidujeme")
           | _ => Valid
           }
-        }, Name),
-      ])
+        }, Name)])
     },
     ~validationStrategy=OnDemand,
     (),

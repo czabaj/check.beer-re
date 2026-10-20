@@ -13,9 +13,8 @@ updateSWRef :=
           message: <>
             {React.string("Je k dispozici nová verze\xA0\xA0")}
             <button
-              className={`${Styles.link.base}`}
-              onClick={_ => updateSWRef.contents()}
-              type_="button">
+              className={`${Styles.link.base}`} onClick={_ => updateSWRef.contents()} type_="button"
+            >
               {React.string("Aktualizovat")}
             </button>
           </>,
@@ -49,7 +48,8 @@ ReactDOM.querySelector("#root")
         locale="cs"
         onError={err => {
           %raw(`process.env.NODE_ENV === 'development' && err.code !== "MISSING_TRANSLATION" && console.error(err)`)
-        }}>
+        }}
+      >
         <App />
       </ReactIntl.IntlProvider>
     </FirebaseAppProvider>

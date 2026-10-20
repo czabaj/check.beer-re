@@ -21,10 +21,7 @@ let make = (
         <h3> {React.string(header)} </h3>
         {headerSlot->Option.getOr(React.null)}
       </div>
-      <button
-        className={Styles.button.iconOnly}
-        onClick={_ => onDismiss()}
-        title="Zavřít dialog">
+      <button className={Styles.button.iconOnly} onClick={_ => onDismiss()} title="Zavřít dialog">
         {React.string("✖️")}
       </button>
     </header>
@@ -34,14 +31,13 @@ let make = (
         className={Styles.button.base}
         disabled={!hasPrevious}
         onClick={_ => onPrevious()}
-        type_="button">
+        type_="button"
+      >
         {React.string("⬅️ Předchozí")}
       </button>
       <button
-        className={Styles.button.base}
-        disabled={!hasNext}
-        onClick={_ => onNext()}
-        type_="button">
+        className={Styles.button.base} disabled={!hasNext} onClick={_ => onNext()} type_="button"
+      >
         {React.string("Následující ➡️")}
       </button>
     </footer>

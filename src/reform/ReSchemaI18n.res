@@ -10,7 +10,7 @@ type t = {
   stringRegExp: (~value: string, ~pattern: string) => string,
   stringMin: (~value: string, ~min: int) => string,
   stringMax: (~value: string, ~max: int) => string,
-};
+}
 
 let default = {
   false_: () => "This value should be false",
@@ -31,4 +31,4 @@ let default = {
     "This value must be at least " ++ string_of_int(min) ++ " characters",
   stringMax: (~value as _value, ~max) =>
     "This value must be at most " ++ string_of_int(max) ++ " characters",
-};
+}

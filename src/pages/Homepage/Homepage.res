@@ -30,7 +30,8 @@ let make = () => {
                 flushSync(navigate)
               })
             }
-          })}>
+          })}
+        >
           {React.string("Otevřít")}
         </a>
       </main>

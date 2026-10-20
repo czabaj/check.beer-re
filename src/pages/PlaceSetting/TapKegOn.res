@@ -55,7 +55,8 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
               <InputWrapper
                 inputName="keg"
                 inputSlot={<select
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}
+                >
                   {options
                   ->Array.map(({text, value}) =>
                     <option key={value} value={value}> {text} </option>

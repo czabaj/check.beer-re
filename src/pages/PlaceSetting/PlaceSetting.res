@@ -42,7 +42,8 @@ let make = (~placeId) => {
             ? <button
                 className={Header.classes.buttonRight}
                 onClick={_ => setDialog(_ => BasicInfoEdit)}
-                type_="button">
+                type_="button"
+              >
                 <span> {React.string("✏️")} </span>
                 <span> {React.string("Změnit")} </span>
               </button>

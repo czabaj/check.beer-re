@@ -6,14 +6,14 @@ let make = (~chargedKegsValue, ~isUserAuthorized, ~personsCount) => {
   <SectionWithHeader
     buttonsSlot={isUserAuthorized(UserRoles.Admin)
       ? <a
-          {...RouterUtils.createAnchorProps("./osob")}
-          className={Styles.button.base}
-          type_="button">
+          {...RouterUtils.createAnchorProps("./osob")} className={Styles.button.base} type_="button"
+        >
           {React.string("Osobní účty")}
         </a>
       : React.null}
     headerId="accounting_overview"
-    headerSlot={React.string("Účetnictví")}>
+    headerSlot={React.string("Účetnictví")}
+  >
     <dl className={classes.descriptionList}>
       <dt> {React.string("Počet hostů")} </dt>
       <dd>

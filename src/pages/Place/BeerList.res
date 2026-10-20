@@ -95,7 +95,8 @@ let make = (
     buttonsSlot={<>
       {React.cloneElement(
         <label
-          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}>
+          className={`${classes.labelShowAll} ${Styles.button.base} ${Styles.button.iconOnly} ${Styles.button.variantStealth}`}
+        >
           {React.string("👁️")}
           <span className={Styles.utility.srOnly}> {React.string("Zobrazit všechny hosty")} </span>
           <input
@@ -114,7 +115,8 @@ let make = (
     </>}
     className={`${classes.root} ${showAll ? classes.showAll : ""}`}
     headerId="active_persons"
-    headerSlot={React.string("Lístek")}>
+    headerSlot={React.string("Lístek")}
+  >
     {!showAll && personsToShow->Array.length === 0
       ? <p className={`${SectionWithHeader.classes.emptyMessage} ${classes.emptyMessage}`}>
           <span> {React.string("Všichni jsou schovaní, koukni na ně přes očičko")} </span>

@@ -124,7 +124,8 @@ let make = (
                     <button
                       className={Styles.link.base}
                       onClick={_ => onForgottenPassword(form.values.email)}
-                      type_="button">
+                      type_="button"
+                    >
                       {React.string(`Obnovte heslo přes e${HtmlEntities.nbhp}mail.`)}
                     </button>
                   </>
@@ -157,7 +158,8 @@ let make = (
             // TODO: takes too long and might fail if there is no passphrase
             // there is no API to check if the passphrase exists
             handleSignInWithPasskey()}
-          type_="button">
+          type_="button"
+        >
           {React.string("Přihlásit otiskem")}
         </button>
       }}

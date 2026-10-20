@@ -12,7 +12,6 @@ external linkWithPasskey: (
   string,
 ) => promise<Firebase.Auth.userCredential> = "linkWithPasskey"
 
-
 @module("@firebase-web-authn/browser")
 external signInWithPasskey: (
   Firebase.Auth.t,

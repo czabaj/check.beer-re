@@ -34,14 +34,15 @@ module Provider = {
   let make = context->React.Context.provider
 }
 
-let formatAccounting = value => (~formattedNumber: string) => {
-  let negative = value < 0
-  React.cloneElement(
-    <span />,
-    {
-      "className": classes.accounting,
-      "children": formattedNumber,
-      "data-negative": negative->string_of_bool,
-    },
-  )
-}
+let formatAccounting = value =>
+  (~formattedNumber: string) => {
+    let negative = value < 0
+    React.cloneElement(
+      <span />,
+      {
+        "className": classes.accounting,
+        "children": formattedNumber,
+        "data-negative": negative->string_of_bool,
+      },
+    )
+  }

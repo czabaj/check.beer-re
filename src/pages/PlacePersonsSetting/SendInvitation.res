@@ -51,7 +51,8 @@ let make = (~onDismiss, ~onSubmit) => {
                       roleString->Int.fromString->Option.flatMap(roleFromInt)->Option.getExn
                     field.handleChange(role)
                   }}
-                  value={(field.value :> int)->Int.toString}>
+                  value={(field.value :> int)->Int.toString}
+                >
                   {roleOptions
                   ->Array.map(role => {
                     let label = role->roleI18n

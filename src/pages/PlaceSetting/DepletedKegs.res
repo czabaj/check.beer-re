@@ -15,7 +15,8 @@ let make = (
     className={classes.section}
     buttonsSlot={React.null}
     headerId="depleted_kegs"
-    headerSlot={React.string("Dopité sudy")}>
+    headerSlot={React.string("Dopité sudy")}
+  >
     {switch maybeDepletedKegs {
     | None =>
       <p className=SectionWithHeader.classes.emptyMessage>
@@ -101,7 +102,8 @@ let make = (
           <button
             className={`${Styles.button.base} ${classes.fetchMoreButton}`}
             onClick={_ => fetchMore()}
-            type_="button">
+            type_="button"
+          >
             {React.string("Načíst další")}
           </button>
         }}
