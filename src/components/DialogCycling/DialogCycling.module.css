@@ -5,6 +5,12 @@
   border-bottom: 1px solid var(--surface-1);
 }
 
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .root > footer {
   display: flex;
   flex-direction: row;

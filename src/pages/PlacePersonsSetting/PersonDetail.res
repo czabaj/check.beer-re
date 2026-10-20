@@ -6,6 +6,7 @@ type dialogState =
   | AddTransaction
   | ChangeRole(UserRoles.role)
   | ConfirmDeletePerson
+  | Rename
   | SendInvitation
 
 let byCreatedDesc = (
@@ -15,6 +16,7 @@ let byCreatedDesc = (
 
 @react.component
 let make = (
+  ~canRename,
   ~hasNext,
   ~hasPrevious,
   ~onDeletePerson,
@@ -49,6 +51,17 @@ let make = (
       hasNext
       hasPrevious
       header={person.name}
+      headerSlot=?{canRename
+        ? Some(
+            <button
+              className={Styles.button.iconOnly}
+              onClick={_ => setDialog(_ => Rename)}
+              title="Přejmenovat"
+              type_="button">
+              {React.string("✏️")}
+            </button>,
+          )
+        : None}
       onDismiss
       onNext=onNextPerson
       onPrevious=onPreviousPerson
@@ -292,6 +305,24 @@ let make = (
           {React.string(` z aplikace. Nemá žádnou historii konzumací ani účetní transakci. Chcete pokračovat?`)}
         </p>
       </DialogConfirmation>
+    | Rename =>
+      <PersonRename
+        existingNames={personsAll->Array.filterMap(((id, p)) =>
+          id === personId ? None : Some(p.name)
+        )}
+        initialName={person.name}
+        onDismiss={hideDialog}
+        onSubmit={({name}) => {
+          if name !== person.name {
+            Db.PersonsIndex.update(
+              firestore,
+              ~placeId,
+              ~personsChanges=[(personId, {...person, name})],
+            )->ignore
+          }
+          hideDialog()
+        }}
+      />
     | SendInvitation =>
       <SendInvitation
         onDismiss={hideDialog}

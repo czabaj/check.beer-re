@@ -1,4 +1,4 @@
-type classesType = {root: string}
+type classesType = {heading: string, root: string}
 
 @module("./DialogCycling.module.css") external classes: classesType = "default"
 
@@ -9,6 +9,7 @@ let make = (
   ~hasNext,
   ~hasPrevious,
   ~header,
+  ~headerSlot=?,
   ~onDismiss,
   ~onNext,
   ~onPrevious,
@@ -16,7 +17,10 @@ let make = (
 ) => {
   <Dialog className={`${classes.root} ${className->Option.getOr("")}`} visible>
     <header>
-      <h3> {React.string(header)} </h3>
+      <div className={classes.heading}>
+        <h3> {React.string(header)} </h3>
+        {headerSlot->Option.getOr(React.null)}
+      </div>
       <button
         className={Styles.button.iconOnly}
         onClick={_ => onDismiss()}

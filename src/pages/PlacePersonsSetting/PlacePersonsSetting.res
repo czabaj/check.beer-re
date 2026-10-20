@@ -5,7 +5,7 @@ type classesType = {table: string}
 type dialogState =
   | Hidden
   | AddPerson
-  | PersonDetail({personId: string, person: Db.personsAllRecord})
+  | PersonDetail(string)
 
 let pageDataRx = (auth, firestore, placeId) => {
   open Rxjs
@@ -114,7 +114,7 @@ let make = (~placeId) => {
                 ->Array.map(((personId, person)) => {
                   /* TODO: tr.onClick is not accessible, but breakout buttons not work since <tr> cannot have relative
                    positioning in Safari @see https://github.com/w3c/csswg-drafts/issues/1899 */
-                  <tr key=personId onClick={_ => setDialog(_ => PersonDetail({personId, person}))}>
+                  <tr key=personId onClick={_ => setDialog(_ => PersonDetail(personId))}>
                     <th scope="row"> {React.string(person.name)} </th>
                     <td>
                       <FormattedRelativeTime
@@ -143,29 +143,34 @@ let make = (~placeId) => {
         </main>
         {switch dialogState {
         | Hidden => React.null
-        | PersonDetail({personId, person}) =>
+        | PersonDetail(personId) =>
           let currentIdx = personsAll->Array.findIndex(((id, _)) => id === personId)
           if currentIdx === -1 {
             // Possibly, the person was deleted on the backend best to close the dialog
             hideDialog()
             React.null
           } else {
+            let (_, person) = personsAll->Array.getUnsafe(currentIdx)
+            let isPersonOwner =
+              person.userId
+              ->Null.toOption
+              ->Option.flatMap(userId => place.accounts->Dict.get(userId))
+              ->Option.mapOr(false, ((role, _)) => role === (UserRoles.Owner :> int))
+            let canRename = !isPersonOwner || isUserAuthorized(UserRoles.Owner)
             let hasNext = currentIdx < Array.length(personsAll) - 1
             let hasPrevious = currentIdx > 0
             let handleCycle = increase => {
               let allowed = increase ? hasNext : hasPrevious
               if allowed {
                 let nextIdx = currentIdx + (increase ? 1 : -1)
-                let (nextPersonId, nextPerson) = personsAll->Belt.Array.getExn(nextIdx)
-                setDialog(_ => PersonDetail({
-                  person: nextPerson,
-                  personId: nextPersonId,
-                }))
+                let (nextPersonId, _) = personsAll->Belt.Array.getExn(nextIdx)
+                setDialog(_ => PersonDetail(nextPersonId))
               }
             }
             let unfinishedConsumptions =
               unfinishedConsumptionsByUser->Map.get(personId)->Option.getOr([])
             <PersonDetail
+              canRename
               hasNext
               hasPrevious
               onDeletePerson={_ => {
