@@ -1,6 +1,6 @@
 ---
 id: nureg7
-status: in_progress
+status: closed
 type: chore
 created: 2026-10-21T08:27:24Z
 ---

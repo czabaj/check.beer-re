@@ -1,6 +1,6 @@
 ---
 id: towuf8
-status: in_progress
+status: closed
 type: chore
 created: 2026-10-21T09:15:10Z
 ---

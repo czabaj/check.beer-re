@@ -3091,12 +3091,12 @@
   resolved "https://registry.yarnpkg.com/@rescript/linux-x64/-/linux-x64-12.3.1.tgz#5976706f187d04b51001c4af98f25df5deb79921"
   integrity sha512-CfAJ3q/y/GSwrSJCLdCdyLWWdb7kTZkl2vjC+mSAw3pMqknEyCbt4ukS64Xn8PrqxVGHIs+kdefEphU7dt77xA==
 
-"@rescript/react@^0.14.0":
-  version "0.14.0"
-  resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.14.0.tgz#f5733c2db6b103913a99f0f7c1a1db9d8e85509b"
-  integrity sha512-ncOHWK7ujQmff+QMYKRmtwETvJVolzkwRpDa0MFenEXdUz9ZYywNbq+xH9F9RDQeSwC3/4s9JeUQVyTu4fMpHw==
+"@rescript/react@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@rescript/react/-/react-0.15.0.tgz#9e493205b5e96c7091e28924860b5abda39fdb96"
+  integrity sha512-qDrrgxYzxRL/pjug617u5Q4+aqEfV5g+GQnd+eCWb0XqPrKucaDzN5rirDUZPg8UrqU/AvCP8Ev5cFd+MJx88A==
 
-"@rescript/runtime@12.3.1":
+"@rescript/runtime@12.3.1", "@rescript/runtime@^12.3.1":
   version "12.3.1"
   resolved "https://registry.yarnpkg.com/@rescript/runtime/-/runtime-12.3.1.tgz#216df5c465ac591a48169842452df8e07978a16e"
   integrity sha512-yTM0iTl6owyA37UEtPAZR0A3G1kFffJWb+UE6+rcG/N2kxYQnuSlNDfVvsry7l8O+o/ME6QE7Zt7efjCDGM3xg==
@@ -7027,12 +7027,12 @@ react-docgen@^7.0.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.2"
 
-react-dom@^19.0.0:
-  version "19.0.0"
-  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.0.0.tgz#43446f1f01c65a4cd7f7588083e686a6726cfb57"
-  integrity sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==
+react-dom@^19.2.3:
+  version "19.3.1"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-19.3.1.tgz#b384c53cfcbe9c2a5d09d863b98455de9d68afe2"
+  integrity sha512-Y0bARz53lhEC1NMCASs0/j+faB/zqt3R8hpvg1e8+61ZVJ4UL0UdC4cBbXfZMcIuhrfgeILTLe+ZeBCavQPtKQ==
   dependencies:
-    scheduler "^0.25.0"
+    scheduler "^0.28.0"
 
 react-intl@^7.1.6:
   version "7.1.6"
@@ -7075,10 +7075,10 @@ react-refresh@^0.17.0:
   dependencies:
     loose-envify "^1.1.0"
 
-react@^19.0.0:
-  version "19.0.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-19.0.0.tgz#6e1969251b9f108870aa4bff37a0ce9ddfaaabdd"
-  integrity sha512-V8AVnmPIICiWpGfm6GLzCR/W5FXLchHop40W4nXBmdlEceh16rCN8O8LNWm5bh5XUX91fh7KpA+W0TgMKmgTpQ==
+react@^19.2.3:
+  version "19.3.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-19.3.1.tgz#26e9523fc36ea06be5050ebb780249a133260ad7"
+  integrity sha512-QNhWdt7nrgVWWQG58QuGsAR3jv3Hbe4mb4vz7w2csnHavciZJgda1CPNaldF6eVxv90ud3jUXpKlHL69gO38yw==
 
 reactfire@^4.2.3:
   version "4.2.3"
@@ -7182,10 +7182,10 @@ rescript-react-intl@^3.0.0:
   resolved "https://registry.yarnpkg.com/rescript-react-intl/-/rescript-react-intl-3.0.0.tgz#7833afe4286c90ac1660a81fd605e7e7bbfb6e92"
   integrity sha512-LhjxFbkuXkpJiYr42Alt+647Z/pYKZlMRn+VHJ1JDvsHZ9MMaWdBVFc08E5NfKdS+1EXTUI/LEMw8jWfvu8hRw==
 
-rescript-react-update@~6.0.0:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/rescript-react-update/-/rescript-react-update-6.0.1.tgz#9a6decef7f0314472638c62f8c2c3efb3c71d33a"
-  integrity sha512-ek8nx2L6/ZXWZw/G7QpLhbUolcFnB94xWBj1Twp1s2mWrXlcS8aSU9+VEgW6ZJCY8EBPQfQuFBqDggIsDL57yw==
+rescript-react-update@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/rescript-react-update/-/rescript-react-update-6.1.0.tgz#cbaf146bd50ea981134703eb233e33138856fd32"
+  integrity sha512-nsfSB8mkmYvNuLzj3ERvVCePwx758hId+PGp/GDyCNiN+wNQSrQ0iqbv3nprTepx35HBLanCkHAFmi7zhMajCA==
 
 rescript-webapi@^0.10.0:
   version "0.10.0"
@@ -7347,10 +7347,10 @@ scheduler@^0.23.2:
   dependencies:
     loose-envify "^1.1.0"
 
-scheduler@^0.25.0:
-  version "0.25.0"
-  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.25.0.tgz#336cd9768e8cceebf52d3c80e3dcf5de23e7e015"
-  integrity sha512-xFVuu11jh+xcO7JOAGJNOXld8/TcEHK/4CituBUeUb5hqxJLj9YuemAEuvm9gQ/+pgXYfbQuqAkiYu+u7YEsNA==
+scheduler@^0.28.0:
+  version "0.28.0"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.28.0.tgz#03d3ca348aeaf8b7502f64468f217b27523f9695"
+  integrity sha512-juorfCmIkIw8tT+p5BXSm6PJjQF/ycEYmKyzURCIt/RaZIhL+PulbQ9Yu2z1HdOJDdqDTlxA1+xKBmHXJsczAw==
 
 semver@^6.3.1:
   version "6.3.1"
