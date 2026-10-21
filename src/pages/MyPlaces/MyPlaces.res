@@ -36,7 +36,7 @@ module Pure = {
           id="Place.established"
           defaultMessage={"Již od {time}"}
           values={{
-            "time": <time dateTime={sinceDate->Date.toISOString}>
+            "time": <time key="time" dateTime={sinceDate->Date.toISOString}>
               <ReactIntl.FormattedDate value={sinceDate} />
             </time>,
           }}
