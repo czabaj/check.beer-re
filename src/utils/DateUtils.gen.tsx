@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DateUtilsJS from './DateUtils.bs.js';
+import * as DateUtilsJS from './DateUtils.bs.jsx';
 
 export const hourInMilliseconds: number = DateUtilsJS.hourInMilliseconds as any;
 

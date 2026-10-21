@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as SignUpFormJS from './SignUpForm.bs.js';
+import * as SignUpFormJS from './SignUpForm.bs.jsx';
 
 export type submitValues = { readonly email: string; readonly password: string };
 

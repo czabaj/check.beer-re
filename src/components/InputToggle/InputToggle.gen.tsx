@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as InputToggleJS from './InputToggle.bs.js';
+import * as InputToggleJS from './InputToggle.bs.jsx';
 
 import type {Form_t as JsxEvent_Form_t} from './JsxEvent.gen';
 

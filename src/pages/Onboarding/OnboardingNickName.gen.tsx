@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as OnboardingNickNameJS from './OnboardingNickName.bs.js';
+import * as OnboardingNickNameJS from './OnboardingNickName.bs.jsx';
 
 export type FormFields_state = { readonly name: string };
 

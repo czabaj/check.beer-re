@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.bs.js';
+import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.bs.jsx';
 
 export type FormFields_state = { readonly email: string };
 

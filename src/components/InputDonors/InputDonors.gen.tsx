@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as InputDonorsJS from './InputDonors.bs.js';
+import * as InputDonorsJS from './InputDonors.bs.jsx';
 
 export type props<errorMessage,legendSlot,persons,value,onChange> = {
   readonly errorMessage?: errorMessage; 

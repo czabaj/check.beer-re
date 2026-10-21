@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as BeerListJS from './BeerList.bs.js';
+import * as BeerListJS from './BeerList.bs.jsx';
 
 import type {personsAllRecord as Db_personsAllRecord} from '../../../src/backend/Db.gen';
 

@@ -43,7 +43,7 @@ module FormFields = {
 
 let emptyState: FormFields.state = {
   beer: "",
-  donors: Dict.make(),
+  donors: dict{},
   milliliters: 0,
   ownerIsDonor: true,
   price: 0,

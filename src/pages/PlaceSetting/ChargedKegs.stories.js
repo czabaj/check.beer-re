@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-import { make } from "./ChargedKegs.bs.js";
+import { make } from "./ChargedKegs.bs.jsx";
 
 let uid = 0;
 const getKegMock = (consumptionLevel) => {

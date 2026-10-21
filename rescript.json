@@ -19,7 +19,8 @@
     }
   },
   "jsx": {
-    "version": 4
+    "version": 4,
+    "preserve": true
   },
   "name": "check.beer",
   "package-specs": [
@@ -34,5 +35,5 @@
       "subdirs": true
     }
   ],
-  "suffix": ".bs.js"
+  "suffix": ".bs.jsx"
 }

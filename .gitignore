@@ -10,6 +10,7 @@ dist-ssr
 /lib/
 *.res.js
 *.bs.js
+*.bs.jsx
 
 # Firebase
 firebase-debug.log

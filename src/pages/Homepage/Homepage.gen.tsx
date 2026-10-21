@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as HomepageJS from './Homepage.bs.js';
+import * as HomepageJS from './Homepage.bs.jsx';
 
 export type props = {};
 

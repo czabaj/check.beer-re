@@ -45,7 +45,7 @@ let pageDataRx = (auth, firestore, placeId) => {
           ->Option.map(keg => (tap, keg))
         )
         ->Dict.fromArray
-      | _ => Dict.make()
+      | _ => dict{}
       }
     }),
   )

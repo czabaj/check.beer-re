@@ -98,7 +98,7 @@ let make = (~placeId) => {
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
-                consumptions: Dict.make(),
+                consumptions: dict{},
                 createdAt: Firebase.Timestamp.now(),
                 donors: resolvedDonors,
                 depletedAt: Null.null,

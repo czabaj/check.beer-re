@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DbJS from './Db.bs.js';
+import * as DbJS from './Db.bs.jsx';
 
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 

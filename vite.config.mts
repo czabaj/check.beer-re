@@ -65,7 +65,7 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     include: [
-      //"tests/**/*_test.bs.js",
+      //"tests/**/*_test.bs.jsx",
       "src/**/*.test.ts",
     ],
     globals: true,

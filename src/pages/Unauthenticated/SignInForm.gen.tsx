@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as SignInFormJS from './SignInForm.bs.js';
+import * as SignInFormJS from './SignInForm.bs.jsx';
 
 export type FormFields_state = { readonly email: string; readonly password: string };
 
