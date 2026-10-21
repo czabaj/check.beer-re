@@ -41,13 +41,13 @@ module Make = (Lenses: Lenses) => {
 
     type schema = array<t>
 
-    let schema = validations => validations->Belt.Array.concatMany
+    let schema = validations => validations->Array.flat
 
     let mergeValidators = validations => {
-      validations->Belt.Array.reduce([], (rules, (rule, apply)) =>
+      validations->Array.reduce([], (rules, (rule, apply)) =>
         switch rule {
         | None => rules
-        | Some(rule) => rules->Belt.Array.concat([rule->apply])
+        | Some(rule) => rules->Array.concat([rule->apply])
         }
       )
     }
@@ -132,41 +132,27 @@ module Make = (Lenses: Lenses) => {
     switch validator {
     | Validation.True({field, error}) =>
       let value = Lenses.get(values, field)
-      (Field(field), value ? Valid : Error(error->Belt.Option.getWithDefault(i18n.true_())))
+      (Field(field), value ? Valid : Error(error->Option.getOr(i18n.true_())))
     | Validation.False({field, error}) =>
       let value = Lenses.get(values, field)
-      (
-        Field(field),
-        value == false ? Valid : Error(error->Belt.Option.getWithDefault(i18n.false_())),
-      )
+      (Field(field), value == false ? Valid : Error(error->Option.getOr(i18n.false_())))
     | Validation.IntMin({field, min, error}) =>
       let value = Lenses.get(values, field)
-      (
-        Field(field),
-        value >= min ? Valid : Error(error->Belt.Option.getWithDefault(i18n.intMin(~value, ~min))),
-      )
+      (Field(field), value >= min ? Valid : Error(error->Option.getOr(i18n.intMin(~value, ~min))))
     | Validation.IntMax({field, max, error}) =>
       let value = Lenses.get(values, field)
 
-      (
-        Field(field),
-        value <= max ? Valid : Error(error->Belt.Option.getWithDefault(i18n.intMax(~value, ~max))),
-      )
+      (Field(field), value <= max ? Valid : Error(error->Option.getOr(i18n.intMax(~value, ~max))))
     | Validation.FloatMin({field, min, error}) =>
       let value = Lenses.get(values, field)
-      (
-        Field(field),
-        value >= min
-          ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.floatMin(~value, ~min))),
-      )
+      (Field(field), value >= min ? Valid : Error(error->Option.getOr(i18n.floatMin(~value, ~min))))
     | Validation.FloatMax({field, max, error}) =>
       let value = Lenses.get(values, field)
       (
         Field(field),
         Lenses.get(values, field) <= max
           ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.floatMax(~value, ~max))),
+          : Error(error->Option.getOr(i18n.floatMax(~value, ~max))),
       )
     | Validation.Email({field, error}) =>
       let value = Lenses.get(values, field)
@@ -174,24 +160,19 @@ module Make = (Lenses: Lenses) => {
         Field(field),
         RegExp.test(ReSchemaRegExp.email, value)
           ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.email(~value))),
+          : Error(error->Option.getOr(i18n.email(~value))),
       )
     | Validation.NoValidation({field}) => (Field(field), Valid)
     | Validation.StringNonEmpty({field, error}) =>
       let value = Lenses.get(values, field)
-      (
-        Field(field),
-        value === ""
-          ? Error(error->Belt.Option.getWithDefault(i18n.stringNonEmpty(~value)))
-          : Valid,
-      )
+      (Field(field), value === "" ? Error(error->Option.getOr(i18n.stringNonEmpty(~value))) : Valid)
     | Validation.StringRegExp({field, matches, error}) =>
       let value = Lenses.get(values, field)
       (
         Field(field),
         RegExp.test(RegExp.fromString(matches), value)
           ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.stringRegExp(~value, ~pattern=matches))),
+          : Error(error->Option.getOr(i18n.stringRegExp(~value, ~pattern=matches))),
       )
     | Validation.StringMin({field, min, error}) =>
       let value = Lenses.get(values, field)
@@ -199,7 +180,7 @@ module Make = (Lenses: Lenses) => {
         Field(field),
         String.length(value) >= min
           ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.stringMin(~value, ~min))),
+          : Error(error->Option.getOr(i18n.stringMin(~value, ~min))),
       )
     | Validation.StringMax({field, max, error}) =>
       let value = Lenses.get(values, field)
@@ -207,13 +188,13 @@ module Make = (Lenses: Lenses) => {
         Field(field),
         String.length(value) <= max
           ? Valid
-          : Error(error->Belt.Option.getWithDefault(i18n.stringMax(~value, ~max))),
+          : Error(error->Option.getOr(i18n.stringMax(~value, ~max))),
       )
     | Validation.Custom({field, predicate}) => (Field(field), predicate(values))
     }
 
   let getFieldValidator = (~validators, ~fieldName) =>
-    validators->Belt.Array.getBy(validator =>
+    validators->Array.find(validator =>
       switch validator {
       | Validation.False({field}) => Field(field) == fieldName
       | Validation.True({field}) => Field(field) == fieldName
@@ -232,7 +213,7 @@ module Make = (Lenses: Lenses) => {
     )
 
   let getFieldValidators = (~validators, ~fieldName) =>
-    validators->Belt.Array.keep(validator =>
+    validators->Array.filter(validator =>
       switch validator {
       | Validation.False({field}) => Field(field) == fieldName
       | Validation.True({field}) => Field(field) == fieldName
@@ -257,8 +238,8 @@ module Make = (Lenses: Lenses) => {
     schema: Validation.schema,
   ) => {
     getFieldValidators(~validators=schema, ~fieldName=field)
-    ->Belt.Array.map(validator => validateField(~validator, ~values, ~i18n))
-    ->Belt.Array.getBy(validation => {
+    ->Array.map(validator => validateField(~validator, ~values, ~i18n))
+    ->Array.find(validation => {
       switch validation {
       | (_, Error(_)) => true
       | _ => false
@@ -267,24 +248,23 @@ module Make = (Lenses: Lenses) => {
   }
 
   let validateFields = (~fields, ~values, ~i18n, schema: Validation.schema) => {
-    Belt.Array.map(fields, field =>
-      getFieldValidator(~validators=schema, ~fieldName=field)->Belt.Option.map(validator =>
+    Array.map(fields, field =>
+      getFieldValidator(~validators=schema, ~fieldName=field)->Option.map(validator =>
         validateField(~validator, ~values, ~i18n)
       )
     )
   }
 
   let validate = (~i18n=ReSchemaI18n.default, values: Lenses.state, schema: Validation.schema) => {
-    let validationList =
-      schema->Belt.Array.map(validator => validateField(~validator, ~values, ~i18n))
+    let validationList = schema->Array.map(validator => validateField(~validator, ~values, ~i18n))
 
-    let errors = validationList->Belt.Array.keepMap(((field, fieldState)) =>
+    let errors = validationList->Array.filterMap(((field, fieldState)) =>
       switch fieldState {
       | Error(string) => Some((field, string))
       | _ => None
       }
     )
 
-    Belt.Array.length(errors) > 0 ? Errors(errors) : Valid
+    Array.length(errors) > 0 ? Errors(errors) : Valid
   }
 }

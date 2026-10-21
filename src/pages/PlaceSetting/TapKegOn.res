@@ -22,7 +22,7 @@ type selectOption = {text: React.element, value: string}
 
 @react.component
 let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegConverted>) => {
-  let options = untappedChargedKegs->Belt.Array.map(keg => {
+  let options = untappedChargedKegs->Array.map(keg => {
     {
       text: <>
         {React.string(`${keg.serialFormatted} ${keg.beer} (`)}

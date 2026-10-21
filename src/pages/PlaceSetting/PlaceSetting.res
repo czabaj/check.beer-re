@@ -29,11 +29,11 @@ let make = (~placeId) => {
     let kegsOnTapUids =
       place.taps
       ->Dict.valuesToArray
-      ->Belt.Array.keepMap(maybeKegReference =>
+      ->Array.filterMap(maybeKegReference =>
         maybeKegReference->Null.toOption->Option.map(ref => ref.id)
       )
     let (tappedChargedKegs, untappedChargedKegs) =
-      chargedKegs->Belt.Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
+      chargedKegs->Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
 
     <FormattedCurrency.Provider value={place.currency}>
       <div className={Styles.page.narrow}>
@@ -142,12 +142,12 @@ let make = (~placeId) => {
             let allowed = increase ? hasNext : hasPrevious
             if allowed {
               let nextIdx = currentIdx + (increase ? 1 : -1)
-              let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid
+              let nextKegId = chargedKegs->Array.get(nextIdx)->Option.getOrThrow->Db.getUid
               setDialog(_ => KegDetail(nextKegId))
             }
           }
           let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
-          let keg = chargedKegs->Belt.Array.getExn(currentIdx)
+          let keg = chargedKegs->Array.get(currentIdx)->Option.getOrThrow
           <KegDetail
             formatConsumption
             hasNext

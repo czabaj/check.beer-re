@@ -598,7 +598,7 @@ module Person = {
   let add = async (firestore, ~placeId, ~personName) => {
     let placeSnapshot = await Firebase.getDocFromCache(placeDocument(firestore, placeId))
     let place = placeSnapshot.data({})
-    let firstTap = place.taps->Dict.keysToArray->Belt.Array.getExn(0)
+    let firstTap = place.taps->Dict.keysToArray->Array.get(0)->Option.getOrThrow
     let now = Firebase.Timestamp.now()
     let personDoc = Firebase.seedDoc(placePersonsCollection(firestore, placeId))
     let newPerson: FirestoreModels.person = {

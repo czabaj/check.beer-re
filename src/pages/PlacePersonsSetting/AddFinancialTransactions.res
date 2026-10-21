@@ -78,7 +78,7 @@ let make = (
                 >
                   <option disabled={true} value=""> {React.string("Příjemce platby")} </option>
                   {personsAll
-                  ->Belt.Array.keepMap(((pId, p)) =>
+                  ->Array.filterMap(((pId, p)) =>
                     pId === personId
                       ? None
                       : Some(<option key=pId value=pId> {React.string(p.name)} </option>)

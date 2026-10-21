@@ -164,7 +164,7 @@ let make = (~placeId) => {
               let allowed = increase ? hasNext : hasPrevious
               if allowed {
                 let nextIdx = currentIdx + (increase ? 1 : -1)
-                let (nextPersonId, _) = personsAll->Belt.Array.getExn(nextIdx)
+                let (nextPersonId, _) = personsAll->Array.get(nextIdx)->Option.getOrThrow
                 setDialog(_ => PersonDetail(nextPersonId))
               }
             }
