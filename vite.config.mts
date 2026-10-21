@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       devOptions: {
         enabled: true,
+        navigateFallback: "index.html",
         type: "module",
       },
       filename: "sw.ts",
