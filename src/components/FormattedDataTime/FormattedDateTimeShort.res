@@ -1,15 +1,13 @@
 @react.component
 let make = (~value) => {
-  let now = Js.Date.make()
-  let todayEOD = Js.Date.makeWithYMD(
-    ~year=Js.Date.getFullYear(now),
-    ~month=Js.Date.getMonth(now),
-    ~date=Js.Date.getDate(now) +. 1.0,
-    (),
+  let now = Date.make()
+  let todayEOD = Date.makeWithYMD(
+    ~year=Date.getFullYear(now),
+    ~month=Date.getMonth(now),
+    ~day=Date.getDate(now) + 1,
   )
-  let differenceInDays = Js.Math.floor_int(
-    (todayEOD->Js.Date.getTime -. value->Js.Date.getTime) /.
-      DateUtils.dayInMilliseconds->Float.fromInt,
+  let differenceInDays = Math.Int.floor(
+    (todayEOD->Date.getTime -. value->Date.getTime) /. DateUtils.dayInMilliseconds->Float.fromInt,
   )
   switch differenceInDays {
   | 0 => <ReactIntl.FormattedTime hour=#numeric minute=#numeric value />

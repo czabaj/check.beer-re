@@ -14,7 +14,7 @@ let make = () => {
   let isOnlineStatus = DomUtils.useIsOnline()
   let isOnline = isOnlineStatus.data
   let supportsWebAuthn = DomUtils.useSuportsPlatformWebauthn()
-  let webAuthn = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)->fst
+  let webAuthn = AppStorage.useLocalStorage(AppStorage.keyWebAuthn)->Pair.first
   let webAuthnReady = supportsWebAuthn && webAuthn === Some("1")
   let startWebAuthnAutomatically = React.useRef(isOnline === Some(true))
   React.useEffect0(() => {
@@ -50,7 +50,7 @@ let make = () => {
       onSignInWithGoogle={() => {
         signInWithRedirect(auth, FederatedAuthProvider.googleAuthProvider())
         ->Promise.catch(error => {
-          let exn = Js.Exn.asJsExn(error)->Option.getExn
+          let exn = JsExn.fromException(error)->Option.getOrThrow
           LogUtils.captureException(exn)
           Promise.reject(error)
         })

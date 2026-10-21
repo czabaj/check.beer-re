@@ -52,10 +52,11 @@ let make = (~currentRole, ~onDismiss, ~onSubmit, ~personName) => {
                   onChange={event => {
                     let roleString = ReactEvent.Form.target(event)["value"]
                     let role =
-                      roleString->Int.fromString->Option.flatMap(roleFromInt)->Option.getExn
+                      roleString->Int.fromString->Option.flatMap(roleFromInt)->Option.getOrThrow
                     field.handleChange(role)
                   }}
-                  value={(field.value :> int)->Int.toString}>
+                  value={(field.value :> int)->Int.toString}
+                >
                   {roleOptions
                   ->Array.map(role => {
                     let label = role->roleI18n

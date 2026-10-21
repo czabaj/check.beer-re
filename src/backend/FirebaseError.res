@@ -1,4 +1,4 @@
-let isFirebaseError = exn => Exn.name(exn) === Some("FirebaseError")
+let isFirebaseError = exn => JsExn.name(exn) === Some("FirebaseError")
 
 exception EmailChangeNeedsVerification
 exception EmailExists
@@ -10,7 +10,7 @@ exception WeakPassword
 
 let toFirebaseError = exn => {
   switch exn {
-  | Exn.Error(obj) =>
+  | JsExn(obj) =>
     !isFirebaseError(obj)
       ? exn
         // This is just a very small subset of all possible errors

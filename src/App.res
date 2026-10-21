@@ -19,7 +19,7 @@ let make = () => {
             | Some(list{}) =>
               <MyPlaces />
             | Some(placeSubPath) => {
-                let placeId = List.headExn(placeSubPath)
+                let placeId = List.headOrThrow(placeSubPath)
                 let placeIdSub = List.tail(placeSubPath)
                 <>
                   <React.Suspense fallback={React.null}>

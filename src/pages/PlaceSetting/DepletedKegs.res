@@ -15,7 +15,8 @@ let make = (
     className={classes.section}
     buttonsSlot={React.null}
     headerId="depleted_kegs"
-    headerSlot={React.string("Dopité sudy")}>
+    headerSlot={React.string("Dopité sudy")}
+  >
     {switch maybeDepletedKegs {
     | None =>
       <p className=SectionWithHeader.classes.emptyMessage>
@@ -71,12 +72,15 @@ let make = (
                 </td>
                 <td>
                   <ReactIntl.FormattedDate
-                    value={Db.kegFirstConsumptionTimestamp(keg)->Option.getExn->Date.fromTime}
+                    value={Db.kegFirstConsumptionTimestamp(keg)->Option.getOrThrow->Date.fromTime}
                   />
                 </td>
                 <td>
                   <ReactIntl.FormattedDate
-                    value={keg.depletedAt->Null.toOption->Option.getExn->Firebase.Timestamp.toDate}
+                    value={keg.depletedAt
+                    ->Null.toOption
+                    ->Option.getOrThrow
+                    ->Firebase.Timestamp.toDate}
                   />
                 </td>
                 <td>
@@ -101,7 +105,8 @@ let make = (
           <button
             className={`${Styles.button.base} ${classes.fetchMoreButton}`}
             onClick={_ => fetchMore()}
-            type_="button">
+            type_="button"
+          >
             {React.string("Načíst další")}
           </button>
         }}

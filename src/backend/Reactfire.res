@@ -36,20 +36,20 @@ module MessagingProvider = {
   let make = React.Context.provider(messagingContext)
 }
 
-let useMessaging = () => React.useContext(messagingContext)->Option.getExn
+let useMessaging = () => React.useContext(messagingContext)->Option.getOrThrow
 
 type observableStatus<'a> = {
   data: option<'a>,
-  error: option<Js.Exn.t>,
+  error: option<JsExn.t>,
   firstValuePromise: promise<unit>,
   hasEmmited: bool,
   isComplete: bool,
-  status: @string [#error | #loading | #success],
+  status: [#error | #loading | #success],
 }
 
 type reactfireOptions<'a> = {
   // force usage of fieldId
-  idField: @string [#uid],
+  idField: [#uid],
   initialData?: 'a,
   suspense?: bool,
 }

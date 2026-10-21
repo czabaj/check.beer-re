@@ -21,7 +21,8 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
         id=anchorId
         style={{}->ReactDOM.Style.unsafeAddProp("anchorName", anchorName)}
         ?title
-        type_="button">
+        type_="button"
+      >
         {children}
       </button>,
       {
@@ -33,14 +34,16 @@ let make = (~children, ~className=?, ~menuItems, ~title=?) => {
       <div
         className={classes.popover}
         id={popoverId}
-        style={{}->ReactDOM.Style.unsafeAddProp("positionAnchor", anchorName)}>
+        style={{}->ReactDOM.Style.unsafeAddProp("positionAnchor", anchorName)}
+      >
         <nav>
           <ul>
             {menuItems
             ->Array.mapWithIndex((item, idx) =>
               <li key={idx->Int.toString}>
                 <button
-                  disabled={item.disabled->Option.getOr(false)} onClick=item.onClick type_="button">
+                  disabled={item.disabled->Option.getOr(false)} onClick=item.onClick type_="button"
+                >
                   {React.string(item.label)}
                 </button>
               </li>

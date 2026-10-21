@@ -3,13 +3,11 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as BeerListJS from './BeerList.bs.js';
+import * as BeerListJS from './BeerList.bs.jsx';
 
 import type {personsAllRecord as Db_personsAllRecord} from '../../../src/backend/Db.gen';
 
 import type {role as UserRoles_role} from '../../../src/backend/UserRoles.gen';
-
-import type {t as Map_t} from './Map.gen';
 
 import type {userConsumption as Db_userConsumption} from '../../../src/backend/Db.gen';
 
@@ -30,5 +28,5 @@ export const make: React.ComponentType<{
   readonly onAddConsumption: (_1:[string, Db_personsAllRecord]) => void; 
   readonly onTogglePersonVisibility: (_1:[string, Db_personsAllRecord]) => void; 
   readonly personEntries: Array<[string, Db_personsAllRecord]>; 
-  readonly recentConsumptionsByUser: Map_t<string,Db_userConsumption[]>
+  readonly recentConsumptionsByUser: Map<string,Db_userConsumption[]>
 }> = BeerListJS.make as any;

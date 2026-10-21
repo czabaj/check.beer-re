@@ -8,7 +8,8 @@ let make = (~chargedKegs: array<Db.kegConverted>, ~onAddNewKeg, ~onKegDetail) =>
       {React.string("Přidat sud")}
     </button>}
     headerId="charged_kegs_setting"
-    headerSlot={React.string("Sudy na skladě")}>
+    headerSlot={React.string("Sudy na skladě")}
+  >
     {switch chargedKegs {
     | [] =>
       <div className={classes.emptyTableMessage}>

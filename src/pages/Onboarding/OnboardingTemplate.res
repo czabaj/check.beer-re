@@ -4,9 +4,7 @@ type classesType = {root: string}
 
 @react.component
 let make = (~children, ~loadingOverlay=?) => {
-  <div
-    ariaHidden=?loadingOverlay
-    className={`${Styles.page.centered} ${classes.root}`}>
+  <div ariaHidden=?loadingOverlay className={`${Styles.page.centered} ${classes.root}`}>
     <h1 className=Styles.utility.srOnly> {React.string("Check.beer")} </h1>
     {children}
   </div>

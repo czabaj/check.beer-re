@@ -12,7 +12,6 @@ external linkWithPasskey: (
   string,
 ) => promise<Firebase.Auth.userCredential> = "linkWithPasskey"
 
-
 @module("@firebase-web-authn/browser")
 external signInWithPasskey: (
   Firebase.Auth.t,
@@ -35,7 +34,7 @@ exception NoOperationNeeded
 
 let toFirebaseWebAuthnError = exn => {
   switch exn {
-  | Exn.Error(obj) =>
+  | JsExn(obj) =>
     switch ErrorUtils.code(obj) {
     | Some("firebaseWebAuthn/cancelled") => CancelledByUser
     | Some("firebaseWebAuthn/invalid") => InvalidFunctionResponse

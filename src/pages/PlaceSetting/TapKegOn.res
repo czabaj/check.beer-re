@@ -22,7 +22,7 @@ type selectOption = {text: React.element, value: string}
 
 @react.component
 let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegConverted>) => {
-  let options = untappedChargedKegs->Belt.Array.map(keg => {
+  let options = untappedChargedKegs->Array.map(keg => {
     {
       text: <>
         {React.string(`${keg.serialFormatted} ${keg.beer} (`)}
@@ -55,7 +55,8 @@ let make = (~onDismiss, ~onSubmit, ~tapName, ~untappedChargedKegs: array<Db.kegC
               <InputWrapper
                 inputName="keg"
                 inputSlot={<select
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}
+                >
                   {options
                   ->Array.map(({text, value}) =>
                     <option key={value} value={value}> {text} </option>

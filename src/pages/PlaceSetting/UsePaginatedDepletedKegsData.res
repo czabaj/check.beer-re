@@ -23,7 +23,8 @@ let getConstraints = (limit, startAfter: option<Db.kegConverted>) => {
   ]
   switch startAfter {
   | None => basicConstraints
-  | Some(keg) => basicConstraints->Array.concat([Firebase.startAfter(keg.depletedAt->Null.getExn)])
+  | Some(keg) =>
+    basicConstraints->Array.concat([Firebase.startAfter(keg.depletedAt->Null.getOrThrow)])
   }
 }
 
@@ -114,7 +115,7 @@ let use = (~limit=20, placeId) => {
         pending: false,
       })
     | _ => {
-        Js.log2("unhandled state and action", {"state": state, "action": action})
+        Console.log2("unhandled state and action", {"state": state, "action": action})
         ReactUpdate.NoUpdate
       }
     }

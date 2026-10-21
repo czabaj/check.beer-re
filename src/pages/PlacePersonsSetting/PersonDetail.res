@@ -57,7 +57,8 @@ let make = (
               className={Styles.button.iconOnly}
               onClick={_ => setDialog(_ => Rename)}
               title="Přejmenovat"
-              type_="button">
+              type_="button"
+            >
               {React.string("✏️")}
             </button>,
           )
@@ -65,7 +66,8 @@ let make = (
       onDismiss
       onNext=onNextPerson
       onPrevious=onPreviousPerson
-      visible={true}>
+      visible={true}
+    >
       <section ariaLabel="Základní údaje">
         <dl className={Styles.descriptionList.inline}>
           <div>
@@ -99,7 +101,8 @@ let make = (
           <button
             className={Styles.link.base}
             onClick={_ => setDialog(_ => SendInvitation)}
-            type_="button">
+            type_="button"
+          >
             {React.string(`Poslat pozvánku`)}
           </button>
         </p>
@@ -115,7 +118,8 @@ let make = (
               <button
                 className={Styles.link.base}
                 onClick={_ => setDialog(_ => ChangeRole(role))}
-                type_="button">
+                type_="button"
+              >
                 {React.string(`změnit oprávnění`)}
               </button>
               {React.string(`)`)}
@@ -132,7 +136,8 @@ let make = (
           <button
             className={Styles.link.base}
             onClick={_ => setDialog(_ => ConfirmDeletePerson)}
-            type_="button">
+            type_="button"
+          >
             {React.string("zcela odebrat z aplikace")}
           </button>
           {React.string(". S účetním záznamem to později již není možné ☝️")}
@@ -146,7 +151,8 @@ let make = (
             <button
               className={Styles.button.base}
               onClick={_ => setDialog(_ => AddTransaction)}
-              type_="button">
+              type_="button"
+            >
               {React.string("Nová platba")}
             </button>,
             personsAll->Array.length < 2
@@ -163,7 +169,8 @@ let make = (
           transactions->Array.sort(byCreatedDesc)
           <table
             ariaLabelledby="financial_transactions"
-            className={`${classes.tableTransactions} ${Styles.table.inDialog}`}>
+            className={`${classes.tableTransactions} ${Styles.table.inDialog}`}
+          >
             <thead>
               <tr>
                 <th scope="col"> {React.string("Datum")} </th>
@@ -175,7 +182,7 @@ let make = (
               {pending
               ->Array.map(pendingTransaction => {
                 let createdDate = pendingTransaction.createdAt->Firebase.Timestamp.toDate
-                <tr className={classes.unclosed} key={createdDate->Js.Date.getTime->Float.toString}>
+                <tr className={classes.unclosed} key={createdDate->Date.getTime->Float.toString}>
                   <td>
                     <FormattedDateTime value={createdDate} />
                   </td>
@@ -195,7 +202,7 @@ let make = (
               {transactions
               ->Array.map(finalTransaction => {
                 let createdDate = finalTransaction.createdAt->Firebase.Timestamp.toDate
-                <tr key={createdDate->Js.Date.getTime->Float.toString}>
+                <tr key={createdDate->Date.getTime->Float.toString}>
                   <td>
                     <FormattedDateTime value={createdDate} />
                   </td>
@@ -255,7 +262,7 @@ let make = (
         })
         <AddFinancialTransactions
           initialCounterParty={highestBalanceNonCurrentPerson
-          ->Option.map(fst)
+          ->Option.map(Pair.first)
           ->Option.getOr("")}
           onDismiss={hideDialog}
           onSubmit={values => {
@@ -298,7 +305,8 @@ let make = (
           onDeletePerson()
         }}
         onDismiss={hideDialog}
-        visible=true>
+        visible=true
+      >
         <p>
           {React.string(`Chystáte se odstranit osobu `)}
           <b> {React.string(person.name)} </b>
@@ -336,8 +344,7 @@ let make = (
             url,
           })
           switch handler {
-          | Clipboard =>
-            window->Window.alert("Pozvánka byla zkopírována do schránky.")
+          | Clipboard => window->Window.alert("Pozvánka byla zkopírována do schránky.")
           | _ => ()
           }
         }}

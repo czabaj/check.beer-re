@@ -3,9 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.bs.js';
-
-import type {t as Promise_t} from './Promise.gen';
+import * as ForgottenPasswordFormJS from './ForgottenPasswordForm.bs.jsx';
 
 export type FormFields_state = { readonly email: string };
 
@@ -20,5 +18,5 @@ export const make: React.ComponentType<{
   readonly initialEmail: string; 
   readonly isOnline: (undefined | boolean); 
   readonly onGoBack: () => void; 
-  readonly onSubmit: (_1:FormFields_state) => Promise_t<void>
+  readonly onSubmit: (_1:FormFields_state) => Promise<void>
 }> = ForgottenPasswordFormJS.make as any;

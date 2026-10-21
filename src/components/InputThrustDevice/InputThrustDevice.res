@@ -17,7 +17,7 @@ let make = () => {
       onChange={event => {
         let target = event->ReactEvent.Form.target
         let checked = target["checked"]
-        setThrustDevice(. checked ? Some(`1`) : None)
+        setThrustDevice(checked ? Some(`1`) : None)
       }}
     />
   </div>

@@ -1,4 +1,4 @@
-/// <reference types="vitest" />
+/// <reference types="vitest/config" />
 /// <reference types="vite/client" />
 
 import createReScriptPlugin from "@jihchi/vite-plugin-rescript";
@@ -31,6 +31,7 @@ export default defineConfig(({ mode }) => ({
     VitePWA({
       devOptions: {
         enabled: true,
+        navigateFallback: "index.html",
         type: "module",
       },
       filename: "sw.ts",
@@ -65,7 +66,7 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     include: [
-      //"tests/**/*_test.bs.js",
+      //"tests/**/*_test.bs.jsx",
       "src/**/*.test.ts",
     ],
     globals: true,

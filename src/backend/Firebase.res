@@ -9,8 +9,7 @@ module FirebaseApp = {
 module Analytics = {
   type t
 
-  type eventName = @string
-  [
+  type eventName = [
     | #add_payment_info
     | #add_shipping_info
     | #add_to_cart
@@ -143,7 +142,7 @@ external limit: int => queryConstraint = "limit"
 @module("firebase/firestore")
 external startAfter: 'a => queryConstraint = "startAfter"
 
-type snapshotOptions = {serverTimestamps?: @string [#estimate | #previous | #none]}
+type snapshotOptions = {serverTimestamps?: [#estimate | #previous | #none]}
 
 @module("firebase/firestore")
 external deleteField: unit => 'a = "deleteField"
@@ -246,10 +245,10 @@ external writeBatch: firestore => WriteBatch.t = "writeBatch"
 
 module User = {
   type userInfo = {
-    displayName: Js.null<string>,
-    email: Js.null<string>,
-    phoneNumber: Js.null<string>,
-    photoURL: Js.null<string>,
+    displayName: Null.t<string>,
+    email: Null.t<string>,
+    phoneNumber: Null.t<string>,
+    photoURL: Null.t<string>,
     providerId: string,
     uid: string,
   }
@@ -264,12 +263,12 @@ module User = {
     lastSignInTime: string,
   }
   type t = {
-    displayName: Js.null<string>,
-    email: Js.null<string>,
+    displayName: Null.t<string>,
+    email: Null.t<string>,
     emailVerified: bool,
     isAnonymous: bool,
     metadata: metadata,
-    photoURL: Js.null<string>,
+    photoURL: Null.t<string>,
     providerData: array<userInfo>,
     uid: string,
   }
@@ -281,7 +280,7 @@ module User = {
 module Auth = {
   type t = {
     app: FirebaseApp.t,
-    currentUser: Js.null<User.t>,
+    currentUser: Null.t<User.t>,
     name: string,
   }
 
@@ -290,12 +289,11 @@ module Auth = {
 
   type authCredential
 
-  @string
   type operationType = [#link | #reauthenticate | #signIn]
 
   type userCredential = {
     operationType: operationType,
-    providerId: Js.null<string>,
+    providerId: Null.t<string>,
     user: User.t,
   }
 
@@ -467,11 +465,11 @@ module Messaging = {
 
   type messagePayload = {
     collapseKey: string,
-    data: Js.Dict.t<string>,
+    data: dict<string>,
     fcmOptions: fcmOptions,
     from: string,
     messageId: string,
-    notification: Js.Dict.t<string>,
+    notification: dict<string>,
   }
 
   @module("firebase/messaging")
@@ -484,11 +482,11 @@ module Timestamp = {
   @new @module("firebase/firestore")
   external make: (~seconds: float, ~nanoseconds: float) => t = "Timestamp"
   @send
-  external toDate: t => Js.Date.t = "toDate"
+  external toDate: t => Date.t = "toDate"
   @send
   external toMillis: t => float = "toMillis"
   @module("firebase/firestore") @scope("Timestamp")
-  external fromDate: Js.Date.t => t = "fromDate"
+  external fromDate: Date.t => t = "fromDate"
   @module("firebase/firestore") @scope("Timestamp")
   external fromMillis: float => t = "fromMillis"
   @module("firebase/firestore") @scope("Timestamp")

@@ -10,14 +10,10 @@ let make = (~children, ~className=?, ~heading, ~onConfirm, ~onDismiss, ~visible)
     </header>
     {children}
     <footer>
-      <button
-        className={Styles.button.variantPrimary}
-        onClick={_ => onConfirm()}
-        type_="submit">
+      <button className={Styles.button.variantPrimary} onClick={_ => onConfirm()} type_="submit">
         {React.string("Provést")}
       </button>
-      <button
-        className={Styles.button.base} type_="button" onClick={_ => onDismiss()}>
+      <button className={Styles.button.base} type_="button" onClick={_ => onDismiss()}>
         {React.string("Zrušit")}
       </button>
     </footer>

@@ -43,7 +43,7 @@ module FormFields = {
 
 let emptyState: FormFields.state = {
   beer: "",
-  donors: Js.Dict.empty(),
+  donors: dict{},
   milliliters: 0,
   ownerIsDonor: true,
   price: 0,
@@ -98,7 +98,8 @@ module FormComponent = {
                 if lensState.ownerIsDonor {
                   Valid
                 } else {
-                  let donorsSum = lensState.donors->Js.Dict.values->Array.reduce(0, (a, b) => a + b)
+                  let donorsSum =
+                    lensState.donors->Dict.valuesToArray->Array.reduce(0, (a, b) => a + b)
                   let kegPrice = lensState.price
                   if kegPrice > 0 && kegPrice != donorsSum {
                     Error("Cena sudu se neshoduje s příspěvky vkladatelů")
@@ -117,7 +118,8 @@ module FormComponent = {
           <form
             className={classes.form}
             id="add_keg"
-            onSubmit={ReForm.Helpers.handleSubmit(form.submit)}>
+            onSubmit={ReForm.Helpers.handleSubmit(form.submit)}
+          >
             <fieldset className={`reset ${Styles.fieldset.grid}`}>
               <Form.Field
                 field=Beer

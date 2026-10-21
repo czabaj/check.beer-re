@@ -36,18 +36,20 @@ let make = (
     [tappedChargedKegs],
   )
   let sortedTapEntries = React.useMemo1(() => {
-    let tapsEntries = place.taps->Js.Dict.entries
-    tapsEntries->Array.sort((a, b) => a->fst->String.localeCompare(b->fst))
+    let tapsEntries = place.taps->Dict.toArray
+    tapsEntries->Array.sort((a, b) => a->Pair.first->String.localeCompare(b->Pair.first))
     tapsEntries
   }, [place.taps])
 
   <SectionWithHeader
     buttonsSlot={<button
-      className={Styles.button.base} onClick={_ => setDialog(_ => AddTap)} type_="button">
+      className={Styles.button.base} onClick={_ => setDialog(_ => AddTap)} type_="button"
+    >
       {React.string("Přidat pípu")}
     </button>}
     headerId="taps_setting"
-    headerSlot={React.string("Pípy")}>
+    headerSlot={React.string("Pípy")}
+  >
     <ul className={classes.list}>
       {
         let tapsCount = sortedTapEntries->Array.length
@@ -55,7 +57,7 @@ let make = (
         ->Array.map(((tapName, maybeKegReference)) => {
           let tappedKeg =
             maybeKegReference
-            ->Js.Null.toOption
+            ->Null.toOption
             ->Option.flatMap(kegRef => tappedKegsById->Dict.get(kegRef.id))
 
           <li key={tapName}>
@@ -75,14 +77,16 @@ let make = (
                   disabled={!hasKegsToTap}
                   className={Styles.button.variantPrimary}
                   onClick={_ => setDialog(_ => TapKegOn(tapName))}
-                  type_="button">
+                  type_="button"
+                >
                   {React.string("Narazit")}
                 </button>
               | Some(_) =>
                 <button
                   className={Styles.button.variantDanger}
                   onClick={_ => Db.Place.tapKegOff(firestore, ~placeId, ~tapName)->ignore}
-                  type_="button">
+                  type_="button"
+                >
                   {React.string("Odrazit")}
                 </button>
               }}
@@ -99,7 +103,8 @@ let make = (
                     label: "Smazat",
                     onClick: _ => setDialog(_ => DeleteTap(tapName)),
                   },
-                ]}>
+                ]}
+              >
                 {React.string("⋯")}
               </ButtonMenu>
             </div>
@@ -119,7 +124,7 @@ let make = (
     | Hidden => React.null
     | AddTap =>
       <TapAddNew
-        existingNames={place.taps->Js.Dict.keys}
+        existingNames={place.taps->Dict.keysToArray}
         onDismiss={hideDialog}
         onSubmit={async values => {
           Db.Place.tapAdd(firestore, ~placeId, ~tapName=values.name)->ignore
@@ -136,7 +141,7 @@ let make = (
       />
     | RenameTap(tapName) =>
       <TapRename
-        existingNames={place.taps->Js.Dict.keys}
+        existingNames={place.taps->Dict.keysToArray}
         initialName=tapName
         onDismiss={hideDialog}
         onSubmit={values => {

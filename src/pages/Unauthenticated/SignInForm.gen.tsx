@@ -3,9 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as SignInFormJS from './SignInForm.bs.js';
-
-import type {t as Promise_t} from './Promise.gen';
+import * as SignInFormJS from './SignInForm.bs.jsx';
 
 export type FormFields_state = { readonly email: string; readonly password: string };
 
@@ -25,6 +23,6 @@ export const make: React.ComponentType<{
   readonly onForgottenPassword: (_1:string) => void; 
   readonly onSignInWithGoogle: () => void; 
   readonly onSignInWithPasskey: (undefined | (() => void)); 
-  readonly onSignInWithPassword: (_1:FormFields_state) => Promise_t<void>; 
+  readonly onSignInWithPassword: (_1:FormFields_state) => Promise<void>; 
   readonly onSignUp: () => void
 }> = SignInFormJS.make as any;

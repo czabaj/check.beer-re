@@ -3,7 +3,8 @@ let make = (~buttonRightSlot, ~className=?, ~createdTimestamp, ~placeName) => {
   let createdDate = createdTimestamp->Firebase.Timestamp.toDate
   <Header
     buttonLeftSlot={<a
-      {...RouterUtils.createAnchorProps("../")} className={Header.classes.buttonLeft}>
+      {...RouterUtils.createAnchorProps("../")} className={Header.classes.buttonLeft}
+    >
       <span> {React.string("↩️")} </span>
       <span> {React.string("Zpět")} </span>
     </a>}
@@ -14,7 +15,7 @@ let make = (~buttonRightSlot, ~className=?, ~createdTimestamp, ~placeName) => {
       id="Place.established"
       defaultMessage={"Založeno {time}"}
       values={{
-        "time": <time dateTime={createdDate->Js.Date.toISOString}>
+        "time": <time key="time" dateTime={createdDate->Date.toISOString}>
           <ReactIntl.FormattedDate value={createdDate} />
         </time>,
       }}

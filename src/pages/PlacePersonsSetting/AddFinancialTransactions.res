@@ -37,7 +37,7 @@ let make = (
   let form = Form.use(
     ~initialState={amount: "", note: "", person: initialCounterParty},
     ~onSubmit=({state}) => {
-      let amountFloat = state.values.amount->Float.fromString->Option.getExn
+      let amountFloat = state.values.amount->Float.fromString->Option.getOrThrow
       let amountMinor = amountFloat *. minorUnit
       onSubmit({
         amount: amountMinor->Int.fromFloat,
@@ -58,7 +58,8 @@ let make = (
   )
 
   <DialogForm
-    formId="addFinancialTransaction" heading="Platba mezi účastníky" onDismiss visible=true>
+    formId="addFinancialTransaction" heading="Platba mezi účastníky" onDismiss visible=true
+  >
     <p>
       <b> {React.string(personName)} </b>
       {React.string(` předává peníze.`)}
@@ -73,10 +74,11 @@ let make = (
                 inputError=?field.error
                 inputName="amount"
                 inputSlot={<select
-                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}>
+                  onChange={ReForm.Helpers.handleChange(field.handleChange)} value={field.value}
+                >
                   <option disabled={true} value=""> {React.string("Příjemce platby")} </option>
                   {personsAll
-                  ->Belt.Array.keepMap(((pId, p)) =>
+                  ->Array.filterMap(((pId, p)) =>
                     pId === personId
                       ? None
                       : Some(<option key=pId value=pId> {React.string(p.name)} </option>)

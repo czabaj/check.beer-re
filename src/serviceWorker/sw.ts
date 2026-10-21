@@ -25,11 +25,7 @@ self.addEventListener("message", (event) => {
 self.skipWaiting();
 clientsClaim();
 
-const entries = self.__WB_MANIFEST;
-if (import.meta.env.DEV) {
-  entries.push({ url: "/", revision: Math.random().toString() });
-}
-precacheAndRoute(entries);
+precacheAndRoute(self.__WB_MANIFEST);
 
 cleanupOutdatedCaches();
 
@@ -51,6 +47,8 @@ if (import.meta.env.PROD) {
 
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL("index.html"), {
+    // in dev, only "index.html" is precached @see https://vite-pwa-org.netlify.app/guide/inject-manifest#development
+    allowlist: import.meta.env.DEV ? [/^\/$/] : undefined,
     denylist: [
       /__\/auth\//, // exclude webmanifest: has its own cache
       /^\/manifest-(.*).webmanifest$/,

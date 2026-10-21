@@ -3,9 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DbJS from './Db.bs.js';
-
-import type {Dict_key as Js_Dict_key} from '../../src/shims/Js.shim';
+import * as DbJS from './Db.bs.jsx';
 
 import type {Timestamp_t as Firebase_Timestamp_t} from './Firebase.gen';
 
@@ -20,8 +18,6 @@ import type {firestore as Firebase_firestore} from './Firebase.gen';
 import type {personsAllItem as FirestoreModels_personsAllItem} from './FirestoreModels.gen';
 
 import type {place as FirestoreModels_place} from './FirestoreModels.gen';
-
-import type {t as Map_t} from './Map.gen';
 
 export type personsAllRecord = {
   readonly balance: number; 
@@ -61,6 +57,6 @@ export const placeDocument: (firestore:Firebase_firestore, placeId:string) => Fi
 
 export const personsAllRecordToTuple: (param:personsAllRecord) => FirestoreModels_personsAllItem = DbJS.personsAllRecordToTuple as any;
 
-export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] = DbJS.Keg.finalizeGetUpdateObjects as any;
+export const Keg_finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map<string,{ readonly transactions: {} }>, {}, {}] = DbJS.Keg.finalizeGetUpdateObjects as any;
 
-export const Keg: { finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map_t<Js_Dict_key,{ readonly transactions: {} }>, {}, {}] } = DbJS.Keg as any;
+export const Keg: { finalizeGetUpdateObjects: (keg:kegConverted, place:FirestoreModels_place, personsIndex:personsIndexConverted) => [{ readonly depletedAt: Firebase_Timestamp_t }, Map<string,{ readonly transactions: {} }>, {}, {}] } = DbJS.Keg as any;

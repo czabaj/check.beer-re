@@ -16,8 +16,8 @@ let share = (data: shareData) => {
     navigatorShare(data)
     ->Promise.catch(err => {
       switch err {
-      | Js.Exn.Error(obj) =>
-        switch Exn.name(obj) {
+      | JsExn(obj) =>
+        switch JsExn.name(obj) {
         | Some("AbortError") => Promise.resolve()
         | _ => Promise.reject(err)
         }
@@ -26,8 +26,7 @@ let share = (data: shareData) => {
     })
     ->Promise.then(() => Promise.resolve(Share))
   } catch {
-  | Js.Exn.Error(_) =>
-    navigatorWriteToClipboard(data.url)->Promise.then(() => Promise.resolve(Clipboard))
+  | JsExn(_) => navigatorWriteToClipboard(data.url)->Promise.then(() => Promise.resolve(Clipboard))
   }
 }
 
@@ -74,6 +73,6 @@ let useSuportsPlatformWebauthn = () => {
   | Some(result) => result
   | None =>
     // throw promise which triggers a Suspense
-    raise(supportsPlatformWebAuthn->TypeUtils.any)
+    throw(supportsPlatformWebAuthn->TypeUtils.any)
   }
 }

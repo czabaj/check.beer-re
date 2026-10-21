@@ -29,7 +29,7 @@ let pageDataRx = (auth, firestore, placeId) => {
       let kegByDonor = Map.make()
       chargedKegs->Array.forEach(keg => {
         keg.donors
-        ->Js.Dict.entries
+        ->Dict.toArray
         ->Array.forEach(
           ((personId, amount)) => {
             let transaction: FirestoreModels.financialTransaction = {
@@ -78,10 +78,10 @@ let make = (~placeId) => {
       pendingTransactionsByUser,
       currentUser,
     )) =>
-    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     if !isUserAuthorized(UserRoles.Admin) {
-      Exn.raiseError(`Insufficient permissions to view this page`)
+      JsError.throwWithMessage(`Insufficient permissions to view this page`)
     }
     <FormattedCurrency.Provider value={place.currency}>
       <div className=Styles.page.narrow>
@@ -91,16 +91,17 @@ let make = (~placeId) => {
         <main>
           <SectionWithHeader
             buttonsSlot={<button
-              className={Styles.button.base}
-              type_="button"
-              onClick={_ => setDialog(_ => AddPerson)}>
+              className={Styles.button.base} type_="button" onClick={_ => setDialog(_ => AddPerson)}
+            >
               {React.string("Přidat hosta")}
             </button>}
             headerId="persons_accounts"
-            headerSlot={React.string("Účetnictví")}>
+            headerSlot={React.string("Účetnictví")}
+          >
             <table
               ariaLabelledby="persons_accounts"
-              className={`${Styles.table.stretch} ${classes.table}`}>
+              className={`${Styles.table.stretch} ${classes.table}`}
+            >
               <thead>
                 <tr>
                   <th scope="col"> {React.string("Host")} </th>
@@ -163,7 +164,7 @@ let make = (~placeId) => {
               let allowed = increase ? hasNext : hasPrevious
               if allowed {
                 let nextIdx = currentIdx + (increase ? 1 : -1)
-                let (nextPersonId, _) = personsAll->Belt.Array.getExn(nextIdx)
+                let (nextPersonId, _) = personsAll->Array.get(nextIdx)->Option.getOrThrow
                 setDialog(_ => PersonDetail(nextPersonId))
               }
             }

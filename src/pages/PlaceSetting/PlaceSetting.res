@@ -24,16 +24,16 @@ let make = (~placeId) => {
   let hideDialog = _ => setDialog(_ => Hidden)
   switch pageDataStatus.data {
   | Some((place, personsAll, chargedKegs, currentUser)) =>
-    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getExn
+    let (currentUserRole, _) = place.accounts->Dict.get(currentUser.uid)->Option.getOrThrow
     let isUserAuthorized = UserRoles.isAuthorized(currentUserRole, ...)
     let kegsOnTapUids =
       place.taps
-      ->Js.Dict.values
-      ->Belt.Array.keepMap(maybeKegReference =>
-        maybeKegReference->Js.Null.toOption->Option.map(ref => ref.id)
+      ->Dict.valuesToArray
+      ->Array.filterMap(maybeKegReference =>
+        maybeKegReference->Null.toOption->Option.map(ref => ref.id)
       )
     let (tappedChargedKegs, untappedChargedKegs) =
-      chargedKegs->Belt.Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
+      chargedKegs->Array.partition(keg => kegsOnTapUids->Array.includes(Db.getUid(keg)))
 
     <FormattedCurrency.Provider value={place.currency}>
       <div className={Styles.page.narrow}>
@@ -42,7 +42,8 @@ let make = (~placeId) => {
             ? <button
                 className={Header.classes.buttonRight}
                 onClick={_ => setDialog(_ => BasicInfoEdit)}
-                type_="button">
+                type_="button"
+              >
                 <span> {React.string("✏️")} </span>
                 <span> {React.string("Změnit")} </span>
               </button>
@@ -79,8 +80,8 @@ let make = (~placeId) => {
                 place.accounts
                 ->Dict.toArray
                 ->Array.find(((_, (role, _))) => role === ownerRoleInt)
-                ->Option.getExn
-                ->fst
+                ->Option.getOrThrow
+                ->Pair.first
               let placeOwnerPersonId =
                 personsAll
                 ->Array.find(((_, person)) =>
@@ -89,15 +90,15 @@ let make = (~placeId) => {
                   | _ => false
                   }
                 )
-                ->Option.getExn
-                ->fst
-              Js.Dict.fromArray([(placeOwnerPersonId, price)])
+                ->Option.getOrThrow
+                ->Pair.first
+              Dict.fromArray([(placeOwnerPersonId, price)])
             }
             Firebase.addDoc(
               Db.placeKegsCollection(firestore, placeId),
               {
                 beer,
-                consumptions: Js.Dict.empty(),
+                consumptions: dict{},
                 createdAt: Firebase.Timestamp.now(),
                 donors: resolvedDonors,
                 depletedAt: Null.null,
@@ -141,12 +142,12 @@ let make = (~placeId) => {
             let allowed = increase ? hasNext : hasPrevious
             if allowed {
               let nextIdx = currentIdx + (increase ? 1 : -1)
-              let nextKegId = chargedKegs->Belt.Array.getExn(nextIdx)->Db.getUid
+              let nextKegId = chargedKegs->Array.get(nextIdx)->Option.getOrThrow->Db.getUid
               setDialog(_ => KegDetail(nextKegId))
             }
           }
           let formatConsumption = BackendUtils.getFormatConsumption(place.consumptionSymbols)
-          let keg = chargedKegs->Belt.Array.getExn(currentIdx)
+          let keg = chargedKegs->Array.get(currentIdx)->Option.getOrThrow
           <KegDetail
             formatConsumption
             hasNext
@@ -167,7 +168,7 @@ let make = (~placeId) => {
             }}
             onNextKeg={_ => handleCycle(true)}
             onPreviousKeg={_ => handleCycle(false)}
-            personsAllById={personsAll->Js.Dict.fromArray}
+            personsAllById={personsAll->Dict.fromArray}
             place
           />
         }

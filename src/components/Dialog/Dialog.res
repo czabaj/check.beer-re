@@ -17,8 +17,8 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
   React.useEffect2(() => {
     switch visibilityDeps {
     | (None, _) => ()
-    | (Some(dialog), true) => dialog->(showModal(_))
-    | (Some(dialog), false) => dialog->(close(_))
+    | (Some(dialog), true) => dialog->showModal
+    | (Some(dialog), false) => dialog->close
     }
     None
   }, visibilityDeps)
@@ -61,7 +61,8 @@ let make = (~children, ~className=?, ~onClickOutside=?, ~visible) => {
         }
       )
       None
-    })}>
+    })}
+  >
     {children}
   </dialog>
 }

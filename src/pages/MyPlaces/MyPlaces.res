@@ -15,17 +15,19 @@ module Pure = {
     ~onSettingsClick,
     ~usersPlaces: array<FirestoreModels.place>,
   ) => {
-    let userDisplayName = currentUser.displayName->Null.getExn
+    let userDisplayName = currentUser.displayName->Null.getOrThrow
     let sinceDate = currentUser.metadata.creationTime->Date.fromString
     <div className=Styles.page.narrow>
       <Header
         buttonLeftSlot={<button
-          className={Header.classes.buttonLeft} onClick={_ => onSignOut()} type_="button">
+          className={Header.classes.buttonLeft} onClick={_ => onSignOut()} type_="button"
+        >
           <span> {React.string("🚴‍♂️")} </span>
           <span> {React.string("Odhlásit")} </span>
         </button>}
         buttonRightSlot={<button
-          className={Header.classes.buttonRight} onClick={onSettingsClick} type_="button">
+          className={Header.classes.buttonRight} onClick={onSettingsClick} type_="button"
+        >
           <span> {React.string("⚙️")} </span>
           <span> {React.string("Nastavení")} </span>
         </button>}
@@ -34,7 +36,7 @@ module Pure = {
           id="Place.established"
           defaultMessage={"Již od {time}"}
           values={{
-            "time": <time dateTime={sinceDate->Date.toISOString}>
+            "time": <time key="time" dateTime={sinceDate->Date.toISOString}>
               <ReactIntl.FormattedDate value={sinceDate} />
             </time>,
           }}
@@ -43,12 +45,14 @@ module Pure = {
       <main>
         <SectionWithHeader
           buttonsSlot={<button
-            className={Styles.button.base} onClick={_ => onPlaceAdd()} type_="button">
+            className={Styles.button.base} onClick={_ => onPlaceAdd()} type_="button"
+          >
             {React.string("Nové místo")}
           </button>}
           headerId="my_places"
           headerSlot={React.string("Moje místa")}
-          noBackground={true}>
+          noBackground={true}
+        >
           {switch usersPlaces {
           | [] =>
             <p className=SectionWithHeader.classes.emptyMessage>
@@ -68,7 +72,8 @@ module Pure = {
                   <li key={stringId}>
                     <a
                       {...RouterUtils.createAnchorProps(`./${stringId}`)}
-                      className={Styles.utility.breakout}>
+                      className={Styles.utility.breakout}
+                    >
                       {React.string(place.name)}
                     </a>
                     <span>
@@ -120,7 +125,7 @@ let make = () => {
       let singlePlaceLocation = RouterUtils.resolveRelativePath(`./${Db.getUid(onePlaceOnly)}`)
       <Redirect to=singlePlaceLocation />
     | (_, Some(currentUser, usersPlaces)) =>
-      let userDisplayName = currentUser.displayName->Null.getExn
+      let userDisplayName = currentUser.displayName->Null.getOrThrow
       <>
         <Pure
           currentUser
@@ -128,7 +133,7 @@ let make = () => {
           onSignOut={() => {
             RescriptReactRouter.push("/")
             auth->Firebase.Auth.signOut->ignore
-            Js.Global.setTimeout(() => {
+            setTimeout(() => {
               // reload the page for clearing Reactfire observables cache
               // @see https://github.com/FirebaseExtended/reactfire/issues/485#issuecomment-1028575121
               location->Location.reload
@@ -155,11 +160,11 @@ let make = () => {
           />
         | EditUser =>
           <EditUser
-            connectedEmail={currentUser.email->Null.getExn}
+            connectedEmail={currentUser.email->Null.getOrThrow}
             initialName={userDisplayName}
             onChangePassword={async values => {
               let credential = Firebase.Auth.EmailAuthProvider.credential(
-                ~email=currentUser.email->Null.getExn,
+                ~email=currentUser.email->Null.getOrThrow,
                 ~password=values.oldPassword,
               )
               let _ = await Firebase.Auth.reauthenticateWithCredential(currentUser, credential)

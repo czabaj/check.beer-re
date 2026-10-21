@@ -26,21 +26,22 @@ let resolveRelativePath = pathname => {
   }
 }
 
-let handleLinkClick = handler => event => {
-  if (
-    ReactEvent.Mouse.isDefaultPrevented(event) ||
-    ReactEvent.Mouse.button(event) != 0 ||
-    ReactEvent.Mouse.metaKey(event) ||
-    ReactEvent.Mouse.altKey(event) ||
-    ReactEvent.Mouse.ctrlKey(event) ||
-    ReactEvent.Mouse.shiftKey(event)
-  ) {
-    ()
-  } else {
-    ReactEvent.Mouse.preventDefault(event)
-    handler()
+let handleLinkClick = handler =>
+  event => {
+    if (
+      ReactEvent.Mouse.isDefaultPrevented(event) ||
+      ReactEvent.Mouse.button(event) != 0 ||
+      ReactEvent.Mouse.metaKey(event) ||
+      ReactEvent.Mouse.altKey(event) ||
+      ReactEvent.Mouse.ctrlKey(event) ||
+      ReactEvent.Mouse.shiftKey(event)
+    ) {
+      ()
+    } else {
+      ReactEvent.Mouse.preventDefault(event)
+      handler()
+    }
   }
-}
 
 let createLinkClickHandler = (~replace=false, pathname) => {
   handleLinkClick(() =>

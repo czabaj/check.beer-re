@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as DrinkDialogJS from './DrinkDialog.bs.js';
+import * as DrinkDialogJS from './DrinkDialog.bs.jsx';
 
 import type {kegConverted as Db_kegConverted} from '../../../src/backend/Db.gen';
 

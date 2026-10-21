@@ -3,9 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as SignUpFormJS from './SignUpForm.bs.js';
-
-import type {t as Promise_t} from './Promise.gen';
+import * as SignUpFormJS from './SignUpForm.bs.jsx';
 
 export type submitValues = { readonly email: string; readonly password: string };
 
@@ -17,6 +15,6 @@ export type props<isOnline,onSubmit,onGoBack> = {
 
 export const make: React.ComponentType<{
   readonly isOnline: (undefined | boolean); 
-  readonly onSubmit: (_1:submitValues) => Promise_t<void>; 
+  readonly onSubmit: (_1:submitValues) => Promise<void>; 
   readonly onGoBack: () => void
 }> = SignUpFormJS.make as any;

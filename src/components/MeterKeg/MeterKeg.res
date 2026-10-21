@@ -10,7 +10,8 @@ let make = (~ariaLabel=?, ~ariaLabelledby=?, ~keg: Db.kegConverted) => {
         max={volume->Int.toString}
         min="0"
         title={formattedNumber}
-        value={(volume - keg.consumptionsSum)->Int.toString}>
+        value={(volume - keg.consumptionsSum)->Int.toString}
+      >
         {React.string(formattedNumber)}
       </meter>}
   </FormattedVolume>

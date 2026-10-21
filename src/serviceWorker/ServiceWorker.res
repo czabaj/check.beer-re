@@ -12,7 +12,7 @@ type registerSWOptions = {
    * @param registration The service worker registration if available.
    */
   onRegisteredSW?: (string, option<serviceWorkerRegistration>) => unit,
-  onRegisterError?: Exn.t => unit,
+  onRegisterError?: JsExn.t => unit,
 }
 
 @module("virtual:pwa-register")

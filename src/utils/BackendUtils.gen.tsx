@@ -3,7 +3,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
-import * as BackendUtilsJS from './BackendUtils.bs.js';
+import * as BackendUtilsJS from './BackendUtils.bs.jsx';
 
 import type {consumptionSymbols as FirestoreModels_consumptionSymbols} from '../../src/backend/FirestoreModels.gen';
 

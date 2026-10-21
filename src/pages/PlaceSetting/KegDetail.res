@@ -27,8 +27,8 @@ let make = (
   ~onNextKeg,
 ) => {
   let consumptionsByTimestampDesc = React.useMemo1(() => {
-    let consumptionEntries = keg.consumptions->Js.Dict.entries
-    consumptionEntries->Array.sort((a, b) => fst(b)->String.localeCompare(fst(a)))
+    let consumptionEntries = keg.consumptions->Dict.toArray
+    consumptionEntries->Array.sort((a, b) => Pair.first(b)->String.localeCompare(Pair.first(a)))
     consumptionEntries
   }, [keg.consumptions])
   let firstConsumption = Db.kegFirstConsumptionTimestamp(keg)
@@ -39,7 +39,7 @@ let make = (
   let kegName = `${keg.serialFormatted} ${keg.beer}`
   let maybeTapName =
     place.taps
-    ->Js.Dict.entries
+    ->Dict.toArray
     ->Array.find(((_, maybeKegRef)) =>
       maybeKegRef
       ->Null.toOption
@@ -58,7 +58,8 @@ let make = (
       onDismiss
       onNext=onNextKeg
       onPrevious=onPreviousKeg
-      visible=true>
+      visible=true
+    >
       <dl className={Styles.descriptionList.inline}>
         <div>
           <dt> {React.string("objem")} </dt>
@@ -152,7 +153,8 @@ let make = (
               className={Styles.button.variantDanger}
               disabled={consumptionsByTimestampDesc->Array.length === 0}
               onClick={_ => setDialog(_ => ConfirmFinalize)}
-              type_="button">
+              type_="button"
+            >
               {React.string("Odepsat ze skladu a rozúčtovat")}
             </button>
           </div>}
@@ -168,7 +170,8 @@ let make = (
               <button
                 className={Styles.link.base}
                 onClick={_ => setDialog(_ => ConfirmDelete)}
-                type_="button">
+                type_="button"
+              >
                 {React.string("odebrat z aplikace")}
               </button>
               {React.string(".")}
@@ -192,7 +195,7 @@ let make = (
             {consumptionsByTimestampDesc
             ->Array.map(((timestampStr, consumption)) => {
               let person = personsAllById->Dict.getUnsafe(consumption.person.id)
-              let createdData = timestampStr->Float.fromString->Option.getExn->Date.fromTime
+              let createdData = timestampStr->Float.fromString->Option.getOrThrow->Date.fromTime
               <tr key={timestampStr}>
                 <th scope="row"> {React.string(person.name)} </th>
                 <td>
@@ -205,7 +208,8 @@ let make = (
                     : <button
                         className={`${Styles.button.sizeExtraSmall} ${tableConsumptionsClasses.deleteButton}`}
                         onClick={_ => onDeleteConsumption(timestampStr)}
-                        type_="button">
+                        type_="button"
+                      >
                         {React.string("🗑️ Smáznout")}
                       </button>}
                 </td>
@@ -227,7 +231,8 @@ let make = (
           onDeleteKeg()
         }}
         onDismiss={() => hideDialog()}
-        visible=true>
+        visible=true
+      >
         <p>
           {React.string(`Chystáte se odstranit sud `)}
           <b> {React.string(kegName)} </b>
@@ -243,7 +248,8 @@ let make = (
           onFinalizeKeg()
         }}
         onDismiss={() => hideDialog()}
-        visible=true>
+        visible=true
+      >
         <dl className={Styles.descriptionList.hyphen}>
           <dt> {React.string("Název sudu")} </dt>
           <dd> {React.string(kegName)} </dd>

@@ -11,7 +11,7 @@ module FormFields = {
     type value. (state, field<value>, value) => state =
     (_state, field, value) =>
       switch field {
-      | Name => { name: value}
+      | Name => {name: value}
       }
 }
 
@@ -26,8 +26,8 @@ let make = (~initialName, ~onSubmit) => {
       onSubmit(state.values)
       ->Promise.catch(error => {
         let errorMessage = switch error {
-        | Js.Exn.Error(e) =>
-          switch Js.Exn.message(e) {
+        | JsExn(e) =>
+          switch JsExn.message(e) {
           | Some(msg) => `Chyba: ${msg}`
           | None => "Neznámá chyba"
           }

@@ -93,7 +93,8 @@ let make = (~initialValues, ~onDismiss, ~onPlaceDelete, ~onSubmit) => {
           <button
             className={Styles.button.variantDanger}
             onClick={_ => setDialog(_ => PlaceDelete)}
-            type_="button">
+            type_="button"
+          >
             {React.string("Smazat místo")}
           </button>
         </div>

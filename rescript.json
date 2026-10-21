@@ -1,6 +1,5 @@
 {
-  "bs-dependencies": [
-    "@rescript/core",
+  "dependencies": [
     "@rescript/react",
     "@tilia/react",
     "rescript-react-intl",
@@ -8,13 +7,9 @@
     "rescript-webapi",
     "tilia"
   ],
-  "bsc-flags": ["-open RescriptCore -open Webapi.Dom"],
+  "compiler-flags": ["-open Webapi.Dom"],
   "gentypeconfig": {
     "language": "typescript",
-    "shims": {
-      "Js": "Js",
-      "Map": "Map"
-    },
     "generatedFileExtension": ".gen.tsx",
     "module": "esmodule",
     "moduleResolution": "node",
@@ -25,7 +20,7 @@
   },
   "jsx": {
     "version": 4,
-    "mode": "automatic"
+    "preserve": true
   },
   "name": "check.beer",
   "package-specs": [
@@ -40,5 +35,5 @@
       "subdirs": true
     }
   ],
-  "suffix": ".bs.js"
+  "suffix": ".bs.jsx"
 }
