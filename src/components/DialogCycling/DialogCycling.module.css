@@ -5,6 +5,10 @@
   border-bottom: 1px solid var(--surface-1);
 }
 
+.closeButton {
+  order: 1;
+}
+
 .heading {
   display: flex;
   align-items: center;
