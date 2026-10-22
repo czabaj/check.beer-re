@@ -8,3 +8,7 @@ created: 2026-10-21T08:27:24Z
 
 Pinned `@jihchi/vite-plugin-rescript@8.0.0-beta.2` (first version that runs `rescript watch`). Watch upstream issue #242.
 Fallback if it breaks: `concurrently "rescript watch" "vite"` + `rescript && vite build`.
+
+## Note 2026-10-22T06:27:42Z
+
+2026-10-22: npm still only 8.0.0-beta.2 (no stable 8.x). Keep pinned, recheck later.
