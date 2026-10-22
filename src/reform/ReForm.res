@@ -1,4 +1,4 @@
-open ReSchema
+open! ReSchema
 
 module Helpers = ReForm__Helpers
 

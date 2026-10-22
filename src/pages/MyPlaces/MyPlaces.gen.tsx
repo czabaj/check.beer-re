@@ -5,7 +5,7 @@
 
 import * as MyPlacesJS from './MyPlaces.bs.jsx';
 
-import type {Mouse_t as JsxEvent_Mouse_t} from './JsxEvent.gen';
+import type {Mouse_t as JsxEvent_Mouse_t} from '../../../src/JsxEventShim.shim';
 
 import type {User_t as Firebase_User_t} from '../../../src/backend/Firebase.gen';
 

@@ -13,6 +13,9 @@
     "generatedFileExtension": ".gen.tsx",
     "module": "esmodule",
     "moduleResolution": "node",
+    "shims": {
+      "JsxEvent": "JsxEventShim"
+    },
     "debug": {
       "all": false,
       "basic": false

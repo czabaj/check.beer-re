@@ -1,5 +1,5 @@
 @react.component
-let make = (~children: (~formattedNumber: string) => React.element=?, ~milliliters) => {
+let make = (~children: option<(~formattedNumber: string) => React.element>=?, ~milliliters) => {
   let liters = milliliters->Int.toFloat /. 1000.0
   React.cloneElement(
     <ReactIntl.FormattedNumber
