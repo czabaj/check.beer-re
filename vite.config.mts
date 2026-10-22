@@ -65,10 +65,7 @@ export default defineConfig(({ mode }) => ({
     host: `0.0.0.0`,
   },
   test: {
-    include: [
-      //"tests/**/*_test.bs.jsx",
-      "src/**/*.test.ts",
-    ],
+    include: ["src/**/*.test.{js,jsx,ts}"],
     globals: true,
     environment: "jsdom",
     setupFiles: "./tests/setup.ts",
