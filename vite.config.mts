@@ -4,9 +4,26 @@
 import createReScriptPlugin from "@jihchi/vite-plugin-rescript";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
 import createReactPlugin from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { ViteEjsPlugin } from "vite-plugin-ejs";
 import { VitePWA } from "vite-plugin-pwa";
+
+// Storybook resolves the config twice with the same plugin instances, the second
+// `configResolved` would spawn another `rescript watch` which fails on the lock
+const createReScriptPluginOnce = (): Plugin => {
+  const plugin = createReScriptPlugin();
+  const configResolved = plugin.configResolved;
+  if (typeof configResolved !== "function") return plugin;
+  let launched = false;
+  return {
+    ...plugin,
+    configResolved(...args) {
+      if (launched) return;
+      launched = true;
+      return configResolved.apply(this, args);
+    },
+  };
+};
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -15,7 +32,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     createReactPlugin(),
-    mode !== `test` && createReScriptPlugin(),
+    mode !== `test` && createReScriptPluginOnce(),
     mode === `production` &&
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
