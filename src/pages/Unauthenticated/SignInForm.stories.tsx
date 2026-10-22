@@ -1,5 +1,5 @@
-import { type Meta, type StoryObj } from "@storybook/react";
-import { userEvent, within } from "@storybook/test";
+import { type Meta, type StoryObj } from "@storybook/react-vite";
+import { userEvent, within } from "storybook/test";
 import { FirebaseError } from "firebase/app";
 
 import { make } from "./SignInForm.gen";

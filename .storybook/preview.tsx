@@ -1,6 +1,5 @@
 import '@oddbird/popover-polyfill';
-import type { Preview } from "@storybook/react";
-import React from "react";
+import type { Preview } from "@storybook/react-vite";
 import { IntlProvider } from "react-intl";
 
 import "../src/styles/index.css";

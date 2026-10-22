@@ -1,6 +1,6 @@
 ---
 id: okoke1
-status: open
+status: closed
 type: chore
 created: 2026-10-21T11:25:17Z
 ---

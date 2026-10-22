@@ -1,6 +1,6 @@
 ---
 id: nuhap8
-status: open
+status: closed
 type: task
 created: 2026-10-20T16:32:49Z
 ---
