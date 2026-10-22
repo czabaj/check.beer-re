@@ -49,7 +49,7 @@ module Subscriber = {
   type t<'a>
   @send external next: (t<'a>, 'a) => unit = "next"
   @send external complete: t<'a> => unit = "complete"
-  @send external error: (t<'a>, 'err) => unit = "complete"
+  @send external error: (t<'a>, 'err) => unit = "error"
 }
 
 @module("rxjs")
