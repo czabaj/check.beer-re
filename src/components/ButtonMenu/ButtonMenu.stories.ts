@@ -1,6 +1,6 @@
 import { action } from "@storybook/addon-actions";
 import { type Meta, type StoryObj } from "@storybook/react";
-import { within, userEvent } from "@storybook/testing-library";
+import { within, userEvent } from "@storybook/test";
 
 //@ts-ignore
 import * as Styles from "../../styles/components/Styles.bs";
