@@ -47,6 +47,8 @@ ReactDOM.querySelector("#root")
       <ReactIntl.IntlProvider
         locale="cs"
         onError={err => {
+          // `err` is read by the raw JS below
+          ignore(err)
           %raw(`process.env.NODE_ENV === 'development' && err.code !== "MISSING_TRANSLATION" && console.error(err)`)
         }}
       >

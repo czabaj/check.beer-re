@@ -5,7 +5,7 @@
 
 import * as InputToggleJS from './InputToggle.bs.jsx';
 
-import type {Form_t as JsxEvent_Form_t} from './JsxEvent.gen';
+import type {Form_t as JsxEvent_Form_t} from '../../../src/JsxEventShim.shim';
 
 export type props<ariaDescribedby,ariaInvalid,checked,id,name,onChange> = {
   readonly ariaDescribedby?: ariaDescribedby; 

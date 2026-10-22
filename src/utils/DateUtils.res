@@ -12,7 +12,7 @@ let dayInMilliseconds =
 let weekInMilliseconds = weekInSeconds * 1000
 @genType
 let monthInMilliseconds =
-  monthInSeconds * 1000
+  monthInSeconds->Int.toFloat *. 1000.0
 
 let toIsoDateString = date => date->Date.toISOString->String.substring(~start=0, ~end=10)
 
