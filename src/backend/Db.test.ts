@@ -1,4 +1,4 @@
-import { Timestamp, arrayUnion } from "@firebase/firestore";
+import { Timestamp, arrayUnion } from "firebase/firestore";
 import { describe, expect, it } from "vitest";
 
 import {
