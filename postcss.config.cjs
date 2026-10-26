@@ -1,6 +1,6 @@
 const postcssRelativeColorSyntax = require("@csstools/postcss-relative-color-syntax");
 const cssnano = require("cssnano");
-const combineSelectors = require("postcss-combine-duplicated-selectors");
+const combineSelectors = require("postcss-combine-duplicated-selectors").default;
 const postcssPresetEnv = require("postcss-preset-env");
 
 module.exports = {
