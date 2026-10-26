@@ -5,6 +5,21 @@ let initSentry: unit => unit = %raw(`() => {
     Sentry.init({
       environment: import.meta.env.MODE,
       dsn: "https://85aeb6b971b04c4cb49af3a52f2ad81e@o4505561027903488.ingest.sentry.io/4505561029607424",
+      // Sentry v11 collects more by default, keep the restrictive v10 baseline
+      dataCollection: {
+        userInfo: false,
+        cookies: false,
+        httpHeaders: {
+          request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        },
+        httpBodies: [],
+        urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        genAI: { inputs: false, outputs: false },
+        databaseQueryData: false,
+        queues: false,
+        graphQL: { document: false, variables: false },
+      },
     });
   }
 }`)
